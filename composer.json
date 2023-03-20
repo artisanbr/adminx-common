@@ -68,5 +68,6 @@
                 "ArtisanBR\\Adminx\\Common\\AdminxCommonServiceProvider"
             ]
         }
-    }
+    },
+    "minimum-stability": "dev"
 }
