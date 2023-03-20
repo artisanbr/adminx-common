@@ -1,0 +1,13 @@
+<?php
+
+return [
+    'modules' => [
+        'forms'   => 'Formulários',
+        'posts'   => 'Postagens',
+        'widgets' => 'Elementos Personalizados (Widgets)',
+        'data_source'    => 'Fonte de Dados',
+        'advanced_html'    => 'HTML Avançado',
+        'internal_pages'    => 'Páginas Internas',
+        //todo: 'products' => 'Produtos',
+    ],
+];

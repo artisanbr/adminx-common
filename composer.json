@@ -1,0 +1,72 @@
+{
+    "name": "artisanbr/adminx-common",
+    "version": "dev-stable",
+    "description": "Adminx Common Assets",
+    "keywords": [
+        "laravel",
+        "site builder",
+        "site admin",
+        "dashboard"
+    ],
+    "homepage": "https://artisan.dev.br",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Renalcio Carlos Jr.",
+            "homepage": "https://github.com/renalcio",
+            "role": "CEO"
+        }
+    ],
+    "config": {
+        "sort-packages": true
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "canonical": true,
+            "url": "../../*/*",
+            "options": {
+                "symlink": true
+            }
+        }
+    ],
+    "require": {
+        "laravel/framework": ">=8",
+        "artisan-labs/laravel-breadcrumbs": "*",
+        "artisan-labs/laravel-geo-database": "*",
+        "artisan-labs/laravel-gmodel": "*",
+        "artisan-labs/laravel-router": "*",
+        "artisan-labs/laravel-visit-tracker": "*",
+        "artisan-labs/laravel-ide-helper-plus": "*",
+        "delight-im/random": "^1.0",
+        "league/flysystem-ftp": "^3.0",
+        "butschster/meta-tags": "^2.2",
+        "spatie/laravel-menu": "^4.1",
+        "google/recaptcha": "^1.2",
+        "twig/twig": "^3.5",
+        "scssphp/scssphp": "^1.11",
+        "prologue/alerts": "^1.0",
+        "genealabs/laravel-model-caching": "^0.13.2"
+    },
+    "require-dev": {
+        "spatie/laravel-ignition": "^2.0",
+        "barryvdh/laravel-debugbar": "^3.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "ArtisanBR\\Adminx\\Common\\": "src/",
+            "ArtisanBR\\Adminx\\Common\\App\\": "src/app/"
+        }
+    },
+    "autoload-dev": {
+        "classmap": [
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "ArtisanBR\\Adminx\\Common\\AdminxCommonServiceProvider"
+            ]
+        }
+    }
+}

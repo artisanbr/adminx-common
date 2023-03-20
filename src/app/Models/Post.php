@@ -1,0 +1,222 @@
+<?php
+
+namespace ArtisanBR\Adminx\Common\App\Models;
+
+use ArtisanBR\Adminx\Common\App\Models\Bases\EloquentModelBase;
+use ArtisanBR\Adminx\Common\App\Models\Generics\Seo;
+use ArtisanBR\Adminx\Common\App\Models\Interfaces\OwneredModel;
+use ArtisanBR\Adminx\Common\App\Models\Interfaces\PublicIdModel;
+use ArtisanBR\Adminx\Common\App\Models\Scopes\WhereSiteScope;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasOwners;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasPublicIdAttribute;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasPublicIdUriAttributes;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasSelect2;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasSEO;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasUriAttributes;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasValidation;
+use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\BelongsToPage;
+use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\BelongsToSite;
+use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\BelongsToUser;
+use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\HasCategoriesMorph;
+use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\HasComments;
+use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\HasFiles;
+use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\HasTagsMorph;
+use ArtisanBR\Adminx\Common\App\Rules\HtmlEmptyRule;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Str;
+
+class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
+{
+    use HasUriAttributes, HasSelect2, SoftDeletes, HasValidation, HasSEO, HasFiles, BelongsToPage, BelongsToUser, BelongsToSite, HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes, HasPublicIdAttribute;
+
+    protected $fillable = [
+        'site_id',
+        'user_id',
+        'page_id',
+        'account_id',
+        'title',
+        'description',
+        'content',
+        'slug',
+        'cover_id',
+        'seo',
+        'published_at',
+        'unpublished_at',
+    ];
+
+    protected $attributes = [
+        //'cover_type' => 'image',
+    ];
+
+    protected $casts = [
+        'seo'            => Seo::class,
+        'published_at'   => 'datetime:d/m/Y H:i',
+        'unpublished_at' => 'datetime:d/m/Y H:i',
+        'created_at'     => 'datetime:d/m/Y H:i:s',
+        'updated_at'     => 'datetime:d/m/Y H:i:s',
+        'content'     => 'string',
+        'html'     => 'string',
+        'description'     => 'string',
+    ];
+
+    protected $appends = [
+        'text',
+    ];
+
+    protected $dates = ['published_at','unpublished_at'];
+
+    //region VALIDATION
+    public static function createRules(FormRequest $request = null): array
+    {
+        return [
+            'title'   => ['required'],
+            'content' => [new HtmlEmptyRule],
+            'cover_file' => ['nullable', 'file']
+        ];
+    }
+
+    public static function createMessages(): array
+    {
+        return [
+            'title.required' => __('O título é obrigatório'),
+        ];
+    }
+    //endregion
+
+    //region HELPERS
+
+    public function limitContent($limit = 300)
+    {
+        return Str::limit(strip_tags($this->content), $limit);
+    }
+
+    public function seoDescription(): string
+    {
+        return $this->seo->description ?? $this->description;
+    }
+
+    //endregion
+
+    //region ATTRIBUTES
+    protected function slug(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value ?? Str::slug(Str::lower($this->title)),
+            set: static fn($value) => Str::slug(Str::lower($value)),
+        );
+    }
+
+    protected function next(): Attribute
+    {
+        // get next user
+        return Attribute::make(
+            get: fn($value) => self::where('id', '>', $this->id)->orderBy('id','asc')->first()
+        );
+
+    }
+
+    protected function previous(): Attribute
+    {
+        // get next user
+        return Attribute::make(
+            get: fn($value) => self::where('id', '<', $this->id)->orderBy('id','desc')->first()
+        );
+
+    }
+
+    //region GETS
+
+    /*protected function getPublishedAtAttribute($value)
+    {
+        return empty($value) ? $this->created_at : Carbon::parse($value) ;
+    }*/
+
+    protected function getPublicIdUrlAttribute(): string
+    {
+
+        return $this->page->public_id_url ? "{$this->page->public_id_url}/post/{$this->public_id}" : '';
+    }
+
+    protected function getUrlAttribute(): string
+    {
+
+        return $this->page->url ? "{$this->page->url}/post/" . ($this->slug ?? $this->public_id) : '';
+    }
+
+    protected function getDescriptionAttribute()
+    {
+        return $this->attributes['description'] ?? $this->limitContent();
+    }
+    //endregion
+    //endregion
+
+    //region SCOPES
+
+    public function scopePublished(Builder $query)
+    {
+        return $query->where(function (Builder $q) {
+            $q->where('published_at', null)->orWhere('published_at', '<=', Carbon::now());
+            $q->where('unpublished_at', null)->orWhere('unpublished_at', '>=', Carbon::now());
+        })->with(['cover','categories','tags','comments']);
+    }
+
+    public function scopeOrdered(Builder $query)
+    {
+        return $query->orderByDesc('published_at')->orderByDesc('updated_at')->orderByDesc('created_at')->orderBy('title');
+    }
+
+    public function scopeOrderedAsc(Builder $query)
+    {
+        return $query->orderBy('published_at')->orderBy('created_at')->orderBy('title');
+    }
+
+    public function scopeWithAll(Builder $query)
+    {
+        return $query->with(['page','site','user','cover','categories','tags','comments']);
+    }
+
+    //endregion
+
+    //region OVERRIDES
+    protected static function booted()
+    {
+        static::addGlobalScope(new WhereSiteScope);
+    }
+
+    public function save(array $options = []): bool
+    {
+        //Gerar slug se estiver em branco
+        if (empty($this->slug)) {
+            $this->slug = $this->title;
+        }
+
+        return parent::save($options);
+    }
+
+    public function delete()
+    {
+        //Todo: permissions
+
+        return parent::delete(); // TODO: Change the autogenerated stub
+    }
+
+    //endregion
+
+    //region RELATIONS
+
+    public function cover()
+    {
+        return $this->hasOne(File::class, 'id', 'cover_id');
+    }
+
+    public function menu_items()
+    {
+        return $this->morphMany(MenuItem::class, 'menuable',);
+    }
+
+    //endregion
+}
