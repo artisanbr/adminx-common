@@ -2,7 +2,7 @@
 
 namespace ArtisanBR\Adminx\Common\App\Models\Scopes;
 
-use ArtisanBR\Adminx\Common\App\Libs\FrontendEngine\FrontendSiteEngine;
+use ArtisanBR\Adminx\Common\App\Facades\FrontendSiteEngine;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\OwneredModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

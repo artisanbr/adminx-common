@@ -2,9 +2,8 @@
 
 namespace ArtisanBR\Adminx\Common\App\Models\VisitTracker;
 
-use PragmaRX\Tracker\Vendor\Laravel\Models\Base;
 
-class Log extends Base
+class Log extends TrackerBase
 {
     protected $table = 'tracker_log';
 

@@ -2,9 +2,7 @@
 
 namespace ArtisanBR\Adminx\Common\App\Models\VisitTracker;
 
-use PragmaRX\Tracker\Vendor\Laravel\Models\Base;
-
-class Path extends Base
+class Path extends TrackerBase
 {
     protected $table = 'tracker_paths';
 

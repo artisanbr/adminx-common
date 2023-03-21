@@ -2,9 +2,8 @@
 
 namespace ArtisanBR\Adminx\Common\App\Models\VisitTracker;
 
-use PragmaRX\Tracker\Vendor\Laravel\Models\Base;
 
-class Cookie extends Base
+class Cookie extends TrackerBase
 {
     protected $table = 'tracker_cookies';
 

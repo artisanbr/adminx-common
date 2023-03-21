@@ -4,9 +4,9 @@ namespace ArtisanBR\Adminx\Common\App\Models\VisitTracker;
 
 
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\OwneredModel;
+use ArtisanBR\Adminx\Common\App\Models\Scopes\WhereSiteScope;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasOwners;
 use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\BelongsToSite;
-use ArtisanLabs\LaravelVisitTracker\Models\Visit as VisitBase;
 
 class Visit extends VisitBase implements OwneredModel
 {
@@ -21,6 +21,11 @@ class Visit extends VisitBase implements OwneredModel
                              ]);
 
         parent::__construct($attributes);
+    }
+
+    protected static function booted()
+    {
+        static::addGlobalScope(new WhereSiteScope);
     }
 
 }

@@ -10,7 +10,7 @@ return [
     /*
      * Enable cache?
      */
-    'cache_enabled' => true,
+    'cache_enabled' => false,
 
     /*
      * Deffer booting for middleware use
@@ -128,7 +128,7 @@ return [
      *
      */
 
-    'geoip_database_path' => storage_path('geoip'), //__DIR__.'/geoip',
+    'geoip_database_path' => __DIR__.'/../storage/geoip', //storage_path('geoip'),
 
     /*
      * Also log SQL query bindings?
@@ -285,9 +285,9 @@ return [
 
     'referer_search_term_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\RefererSearchTerm',
 
-    'route_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\Route',
+    'route_model' => \ArtisanBR\Adminx\Common\App\Models\VisitTracker\Route::class,
 
-    'route_path_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\RoutePath',
+    'route_path_model' => \ArtisanBR\Adminx\Common\App\Models\VisitTracker\RoutePath::class,
 
     'route_path_parameter_model' => 'PragmaRX\Tracker\Vendor\Laravel\Models\RoutePathParameter',
 
