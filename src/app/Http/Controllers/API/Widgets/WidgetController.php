@@ -3,7 +3,7 @@
 namespace ArtisanBR\Adminx\Common\App\Http\Controllers\API\Widgets;
 
 use App\Http\Controllers\Controller;
-use ArtisanBR\Adminx\Common\App\Libs\FrontendEngine\FrontendSiteEngine;
+use ArtisanBR\Adminx\Common\App\Facades\FrontendSiteEngine;
 use ArtisanBR\Adminx\Common\App\Models\Page;
 use ArtisanBR\Adminx\Common\App\Models\Site;
 use ArtisanBR\Adminx\Common\App\Models\Widgeteable;

@@ -2,7 +2,7 @@
 
 namespace ArtisanBR\Adminx\Common\App\Models\Traits;
 
-use ArtisanBR\Adminx\Common\App\Libs\FrontendEngine\FrontendSiteEngine;
+use ArtisanBR\Adminx\Common\App\Facades\FrontendSiteEngine;
 use ArtisanBR\Adminx\Common\App\Models\Bases\EloquentModelBase;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Facades\Auth;

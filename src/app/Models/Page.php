@@ -15,7 +15,6 @@ use ArtisanBR\Adminx\Common\App\Models\Generics\Seo;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\HtmlModel;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\OwneredModel;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\PublicIdModel;
-use ArtisanBR\Adminx\Common\App\Models\Interfaces\WidgetableModel;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\WidgeteableModel;
 use ArtisanBR\Adminx\Common\App\Models\Scopes\WhereSiteScope;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasAdvancedHtml;

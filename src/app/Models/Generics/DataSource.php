@@ -3,7 +3,7 @@
 namespace ArtisanBR\Adminx\Common\App\Models\Generics;
 
 use ArtisanBR\Adminx\Common\App\Enums\CustomLists\CustomListType;
-use ArtisanBR\Adminx\Common\App\Libs\FrontendEngine\FrontendSiteEngine;
+use ArtisanBR\Adminx\Common\App\Facades\FrontendSiteEngine;
 use ArtisanBR\Adminx\Common\App\Libs\Support\Str;
 use ArtisanBR\Adminx\Common\App\Models\Bases\CustomListBase;
 use ArtisanBR\Adminx\Common\App\Models\Form;
@@ -47,7 +47,7 @@ class DataSource extends GenericModel
     public static function getSourcesByType($source_type, Site $site = null): Collection
     {
         if (!$site) {
-            $site = Auth::user()->site ?? FrontendSiteEngine::current();
+            $site = FrontendSiteEngine::current();
         }
 
         $pages = $site->pages->append(['text']);
@@ -114,7 +114,7 @@ class DataSource extends GenericModel
 
             $this->attributes['data'] = null;
 
-            $site = Auth::user()->site ?? FrontendSiteEngine::current();
+            $site = FrontendSiteEngine::current();
 
             switch ($this->type) {
                 //Todo:
