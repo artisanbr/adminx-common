@@ -211,7 +211,7 @@ blade)
     //region GETS
     protected function getDirectoryAttribute(): string|null
     {
-        return Str::replace("/{$this->name}", '', $this->path);
+        return Str::replaceNative("/{$this->name}", '', $this->path);
     }
     protected function getNameWhitoutExtensionAttribute(): string|null
     {

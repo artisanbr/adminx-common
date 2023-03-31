@@ -171,7 +171,7 @@ class Widgeteable extends MorphPivot implements PublicIdModel, OwneredModel
     protected function cssClass(): Attribute
     {
         return new Attribute(
-            get: fn() => Str::replace('.', '-', "widget-{$this->widget->type->slug}-{$this->widget->slug} widget-{$this->public_id}"),
+            get: fn() => Str::replaceNative('.', '-', "widget-{$this->widget->type->slug}-{$this->widget->slug} widget-{$this->public_id}"),
         );
     }
     //endregion

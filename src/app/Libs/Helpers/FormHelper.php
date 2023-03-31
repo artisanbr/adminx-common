@@ -26,7 +26,7 @@ class FormHelper
             //Padrão normal
 
             //Remover ']'
-            $attribute = Str::replace(']', '', $attribute);
+            $attribute = Str::replaceNative(']', '', $attribute);
 
             //Explodir em '['
             $attributeArray = collect(explode('[', $attribute))->filter();
@@ -75,8 +75,8 @@ class FormHelper
 
         if(preg_match($re, $name)){
             //attr[id]
-            $name = Str::replace('[]', '', $name);
-            return Str::replace(['[','-'], '_', Str::replace(']', '', $name));
+            $name = Str::replaceNative('[]', '', $name);
+            return Str::replaceNative(['[', '-'], '_', Str::replaceNative(']', '', $name));
         }
 
         return $name;

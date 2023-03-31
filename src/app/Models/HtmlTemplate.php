@@ -16,7 +16,7 @@ use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\BelongsToUser;
 use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\HasMorphAssigns;
 use ArtisanLabs\LaravelVisitTracker\Traits\Visitable;
 
-class HtmlBuild extends EloquentModelBase implements PublicIdModel, OwneredModel
+class HtmlTemplate extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
     use HasOwners, HasUriAttributes, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasVisitCounter, Visitable, HasRelatedCache, HasMorphAssigns;
 

@@ -38,7 +38,7 @@ class AdminxCommonServiceProvider extends ServiceProvider
         //Configs
         foreach ($this->config_files as $config_file) {
             $this->mergeConfigFrom(
-                $this->config_path . $config_file . '.php', Str::replace('/', '.', $config_file)
+                $this->config_path . $config_file . '.php', Str::replaceNative('/', '.', $config_file)
             );
         }
 

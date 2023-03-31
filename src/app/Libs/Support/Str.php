@@ -10,7 +10,7 @@ class Str extends CoreStr
         return preg_replace('/(?<!\s|^)[a-zA-Z\ ]/mi', '', (string) $string);
     }
 
-    public static function replace($search, $replace, $string): string{
+    public static function replaceNative($search, $replace, $string): string{
         return str_replace($search, $replace, $string);
     }
 

@@ -36,7 +36,7 @@
         "artisan-labs/laravel-geo-database": "*",
         "artisan-labs/laravel-gmodel": "*",
         "artisan-labs/laravel-router": "*",
-        "artisan-labs/laravel-visit-tracker": "*",
+        "artisan-labs/laravel-vicomposer sit-tracker": "*",
         "artisan-labs/laravel-ide-helper-plus": "*",
         "delight-im/random": "^1.0",
         "league/flysystem-ftp": "^3.0",
@@ -46,7 +46,8 @@
         "twig/twig": "^3.5",
         "scssphp/scssphp": "^1.11",
         "prologue/alerts": "^1.0",
-        "genealabs/laravel-model-caching": "^0.13.2"
+        "genealabs/laravel-model-caching": "^0.13.2",
+        "voku/html-min": "^4.5"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^2.0",

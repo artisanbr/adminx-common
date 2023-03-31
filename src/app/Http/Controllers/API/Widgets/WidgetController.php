@@ -93,6 +93,11 @@ class WidgetController extends Controller
 
         $viewData = $this->getViewData($widgeteable);
 
+
+
+        $viewRender = View::make($widgetView, $viewData)->render();
+
+
         /*Debugbar::startMeasure('render', 'Renderização');
         dump($viewData);
         Debugbar::stopMeasure('render');*/

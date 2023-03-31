@@ -91,11 +91,11 @@ class Menu extends EloquentModelBase
 
     protected function slug(): Attribute
     {
-        return Attribute::make(set: static fn($value) => Str::slug(Str::replace([
+        return Attribute::make(set: static fn($value) => Str::slug(Str::replaceNative([
                                                                                     'menu-',
                                                                                     'menu ',
                                                                                     'menu',
-                                                                                ], '', Str::lower($value))));
+                                                                                ],    '', Str::lower($value))));
     }
     //endregion
 

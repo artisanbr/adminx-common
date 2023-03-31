@@ -144,7 +144,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     //region SETS
     protected function setUrlAttribute($value){
-        $this->attributes['url'] = Str::replace(['http://', 'https://', ' '], '', $value);
+        $this->attributes['url'] = Str::replaceNative(['http://', 'https://', ' '], '', $value);
     }
     //endregion
 
