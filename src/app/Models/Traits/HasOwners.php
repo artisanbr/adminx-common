@@ -2,7 +2,7 @@
 
 namespace ArtisanBR\Adminx\Common\App\Models\Traits;
 
-use ArtisanBR\Adminx\Common\App\Facades\FrontendSiteEngine;
+use ArtisanBR\Adminx\Common\App\Facades\FrontendSite;
 use ArtisanBR\Adminx\Common\App\Models\Bases\EloquentModelBase;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +31,7 @@ trait HasOwners
                         $this->user_id = Auth::user()->id ?? null;
                         break;
                     case 'site':
-                        $this->site_id = Auth::user()->site_id ?? FrontendSiteEngine::current()->id ?? null;
+                        $this->site_id = Auth::user()->site_id ?? FrontendSite::current()->id ?? null;
                         break;
                     default:
                         $this->{$oType_key} = Auth::user()->{$oType_key} ?? null;

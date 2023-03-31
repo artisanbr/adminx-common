@@ -13,6 +13,7 @@ use ArtisanBR\Adminx\Common\App\Models\Interfaces\OwneredModel;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\PublicIdModel;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasOwners;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasPublicIdAttribute;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasRelatedCache;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasSEO;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasUriAttributes;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasValidation;
@@ -27,7 +28,7 @@ use LaravelIdea\Helper\ArtisanBR\Adminx\Common\App\Models\_IH_Site_QB;
 
 class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
-    use HasUriAttributes, HasValidation, HasSEO, HasFiles, HasPosts, BelongsToUser, HasOwners, HasPublicIdAttribute;
+    use HasUriAttributes, HasValidation, HasSEO, HasFiles, HasPosts, BelongsToUser, HasOwners, HasPublicIdAttribute, HasRelatedCache;
 
     protected $connection = 'mysql';
 

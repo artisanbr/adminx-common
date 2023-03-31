@@ -1,6 +1,6 @@
 <?php
 
-namespace ArtisanBR\Adminx\Common\App\View\Components;
+namespace ArtisanBR\Adminx\Common\App\View\Common\Components;
 
 use Illuminate\View\Component;
 

@@ -7,8 +7,7 @@ class SiteConfig extends GenericModel
 {
 
     protected $fillable = [
-        'enable_cache',
-        'clear_cache',
+        'cache',
         'is_https',
         'debug',
         'recaptcha_site_key',
@@ -19,13 +18,11 @@ class SiteConfig extends GenericModel
     protected $attributes = [
         'debug' => false,
         'is_https' => false,
-        'clear_cache' => false,
-        'enable_cache' => false,
+        'cache' => [],
     ];
 
     protected $casts = [
-        'enable_cache' => 'bool',
-        'clear_cache' => 'bool',
+        'cache' => SiteCacheConfig::class,
         'is_https' => 'bool',
         'debug' => 'bool',
         'mail' => MailServerConfig::class,

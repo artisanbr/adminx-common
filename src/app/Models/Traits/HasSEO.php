@@ -42,12 +42,17 @@ trait HasSEO
     //region HELPERS
     public function seoTitle($append = null, $prepend = null): string
     {
-        return ($prepend ?? false ? "{$prepend} - " : '') . ($this->seo->title ?: $this->title) . ($append ?? false ? " - {$append}" : '');
+        return ($prepend ?? false ? "{$prepend} - " : '') . ($this->seo->title ?? $this->title) . ($append ?? false ? " - {$append}" : '');
     }
 
     public function seoDescription($default = ''): string
     {
         return $this->seo->description ?? $default;
+    }
+
+    public function seoKeywords($default = ''): string
+    {
+        return $this->seo->keywords ?? $default;
     }
 
     public function seoImage(): string
@@ -65,6 +70,30 @@ trait HasSEO
 
         return '';
     }
+    //endregion
+
+    //region SEO Helpers
+
+    public function getTitle(): string
+    {
+        return $this->seoTitle();
+    }
+
+    public function getDescription(): string
+    {
+        return $this->seoDescription($this->site->seo->description ?? '');
+    }
+
+    public function getKeywords(): string
+    {
+        return $this->seoKeywords($this->site->seo->keywords ?? '');
+    }
+
+    public function getRobots(): string
+    {
+        return $this->seo->robots ?? $this->site->seo->robots ?? 'noindex, nofollow';
+    }
+
     //endregion
 
     ////region RELATIONS

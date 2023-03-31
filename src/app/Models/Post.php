@@ -67,6 +67,8 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
         'text',
     ];
 
+    protected $touches = ['page'];
+
     protected $dates = ['published_at','unpublished_at'];
 
     //region VALIDATION
@@ -97,6 +99,21 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
     public function seoDescription(): string
     {
         return $this->seo->description ?? $this->description;
+    }
+
+    public function getDescription(): string
+    {
+        return $this->seoDescription();
+    }
+
+    public function getKeywords(): string
+    {
+        return $this->seoKeywords($this->page->getKeywords());
+    }
+
+    public function getRobots(): string
+    {
+        return $this->seo->robots ?? $this->page->getRobots();
     }
 
     //endregion

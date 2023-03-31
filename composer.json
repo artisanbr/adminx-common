@@ -31,7 +31,7 @@
         }
     ],
     "require": {
-        "laravel/framework": ">=8",
+        "laravel/framework": ">=10",
         "artisan-labs/laravel-breadcrumbs": "*",
         "artisan-labs/laravel-geo-database": "*",
         "artisan-labs/laravel-gmodel": "*",

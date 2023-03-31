@@ -100,7 +100,7 @@ return [
      * point it to the same database (or not) and forbid logging of this connection in
      * do_not_log_sql_queries_connections.
      */
-    'connection' => 'visit_tracker',
+    'connection' => env('DB_CONNECTION', 'mysql') . '_logs',
 
     /*
      * Forbid logging of SQL queries for some connections.

@@ -52,12 +52,17 @@ class AdminxCommonServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        $commonViewPath = $this->views_path.'common';
+        $frontendViewPath = $this->views_path.'frontend';
         //Common Views
-        $this->loadViewsFrom($this->views_path, 'adminx-common');
+        $this->loadViewsFrom($commonViewPath, 'adminx-common');
+        $this->loadViewsFrom($frontendViewPath, 'adminx-frontend');
 
-        Blade::anonymousComponentPath($this->views_path.'components', 'common');
+        Blade::anonymousComponentPath($commonViewPath.'components', 'common');
+        Blade::anonymousComponentPath($frontendViewPath.'components', 'frontend');
 
-        Blade::componentNamespace('ArtisanBR\Adminx\Common\App\View\Components', 'common');
+        Blade::componentNamespace('ArtisanBR\Adminx\Common\App\View\Common\Components', 'common');
+        Blade::componentNamespace('ArtisanBR\Adminx\Common\App\View\Frontend\Components', 'frontend');
 
         //Common Routes
         Route::as('common.')

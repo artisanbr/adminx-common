@@ -12,6 +12,7 @@ use ArtisanBR\Adminx\Common\App\Models\Generics\Configs\PageConfig;
 use ArtisanBR\Adminx\Common\App\Models\Generics\Elements\HtmlElement;
 use ArtisanBR\Adminx\Common\App\Models\Generics\Elements\PageElements;
 use ArtisanBR\Adminx\Common\App\Models\Generics\Seo;
+use ArtisanBR\Adminx\Common\App\Models\Interfaces\BuildableModel;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\HtmlModel;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\OwneredModel;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\PublicIdModel;
@@ -19,9 +20,11 @@ use ArtisanBR\Adminx\Common\App\Models\Interfaces\WidgeteableModel;
 use ArtisanBR\Adminx\Common\App\Models\Scopes\WhereSiteScope;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasAdvancedHtml;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasGenericConfig;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasHtmlBuilds;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasOwners;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasPublicIdAttribute;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasPublicIdUriAttributes;
+use ArtisanBR\Adminx\Common\App\Models\Traits\HasRelatedCache;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasSelect2;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasSEO;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasSlugAttribute;
@@ -36,15 +39,20 @@ use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\HasPosts;
 use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\HasTagsMorph;
 use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\HasWidgets;
 use ArtisanLabs\LaravelVisitTracker\Traits\Visitable;
+use Barryvdh\Debugbar\Facades\Debugbar;
+use Butschster\Head\Contracts\MetaTags\RobotsTagsInterface;
+use Butschster\Head\Contracts\MetaTags\SeoMetaTagsInterface;
+use Butschster\Head\Facades\Meta;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\View;
 
-class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel, OwneredModel, HtmlModel
+class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel, OwneredModel, HtmlModel, BuildableModel, SeoMetaTagsInterface, RobotsTagsInterface
 {
-    use HasUriAttributes, HasSelect2, SoftDeletes, HasSlugAttribute, HasSEO, HasFiles, HasCategoriesMorph, HasTagsMorph, HasPosts, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasWidgets, HasParent, HasOwners, HasGenericConfig, HasVisitCounter, Visitable, HasAdvancedHtml;
+    use HasUriAttributes, HasSelect2, SoftDeletes, HasSlugAttribute, HasSEO, HasFiles, HasCategoriesMorph, HasTagsMorph, HasPosts, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasWidgets, HasParent, HasOwners, HasGenericConfig, HasVisitCounter, Visitable, HasAdvancedHtml, HasRelatedCache, HasHtmlBuilds;
 
     protected $connection = 'mysql';
 
@@ -101,6 +109,15 @@ class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel,
         'is_home' => 0,
     ];
 
+    public $buildSchema = [
+        'posts' => [
+            'categories',
+            'user',
+        ],
+        'categories',
+        'tags',
+    ];
+
 
     protected ViewContract|null $viewCache = null;
 
@@ -127,8 +144,6 @@ class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel,
 
     //region HELPERS
 
-
-
     public function buildedInternalHtml($dataItem): string
     {
         return $this->id && $this->site ? AdvancedHtmlEngine::start($this->site, $this, 'internal-html')->buildHtml([
@@ -144,6 +159,107 @@ class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel,
     public function internalUri($dataItem): string
     {
         return "{$this->uri}/i/" . ($dataItem->slug ?? $dataItem->public_id);
+    }
+
+    public function getBuildViewPath($append = null): string
+    {
+        $pageViewPathType = "adminx-frontend::pages.{$this->type->slug}" . ($append ? ".{$append}" : '');
+        $pageViewPathModel = "adminx-frontend::pages.{$this->type->slug}.{$this->model->slug}" . ($append ? ".{$append}" : '');
+
+        $pageViewFinalPath = 'adminx-frontend::pages.@default';
+
+
+        if (View::exists($pageViewPathModel)) {
+            $pageViewFinalPath = $pageViewPathModel;
+        }
+        else if (View::exists($pageViewPathType)) {
+            $pageViewFinalPath = $pageViewPathType;
+        }
+
+        return $pageViewFinalPath;
+    }
+
+    public function getBuildViewData(array $requestData = [], array $merge_data = []): array
+    {
+        //$request = request();
+        $viewData = [
+            'site'        => $this->site,
+            'page'        => $this,
+            'searchTerm'  => $requestData['q'] ?? null,
+            'breadcrumbs' => $requestData['q'] ?? null,
+        ];
+
+        if ($requestData['q'] ?? false) {
+            $viewData['searchTerm'] = $requestData['q'];
+            $viewData['breadcrumbs'] = ["Resultados da pesquisa: ".$requestData['q']];
+        }
+
+
+        //Meta::registerSeoMetaTagsForPage($this);
+
+        if ($this->using_posts) {
+
+            //Posts
+            $posts = $this->posts()->published();
+
+            //Categorias
+            if ($requestData['categorySlug'] ?? false) {
+                $category = $this->categories()->where('slug', $requestData['categorySlug'])->first();
+                if($category){
+                    $posts = $posts->whereHas('categories', function (Builder $query) use ($category) {
+                        $query->where('id', $category->id);
+                    });
+                    Meta::registerSeoMetaTagsForCategory($this, $category);
+                }
+            }
+
+            //Tags
+            if ($requestData['tagSlug'] ?? false) {
+                $tag = $this->tags()->whereSlug($requestData['tagSlug'])->first();
+                $posts = $posts->whereHas('tags', function (Builder $query) use ($tag) {
+                    $query->where('id', $tag->id);
+                });
+            }
+
+            //Busca
+            if ($requestData['q'] ?? false) {
+                $posts = $posts->whereLike(['title', 'description', 'content', 'slug'], $requestData['q']);
+
+                Meta::setTitle('Resultados da pesquisa: '.$requestData['q']);
+            }
+
+
+            $posts = $posts->paginate(9);
+
+            $viewData['posts'] = $posts;
+            //Meta::setPaginationLinks($posts);
+        }else if($this->config->sources && $this->config->sources->count()){
+
+            $sourceData = [];
+
+            foreach ($this->config->sources as $source) {
+                $sourceData[$source->name] = $source->data;
+
+                if ($this->config->isUsingModule('internal_pages')) {
+                    foreach ($sourceData[$source->name]->items as $dataItem) {
+                        $dataItem->internal_url = $this->internalUrl($dataItem, $source->internal_url);
+                    }
+                }
+            }
+
+            $viewData['data'] = $sourceData;
+        }
+
+
+
+        return [...$viewData, ...$merge_data];
+    }
+
+    public function loadSEO(){
+
+        if (!($this->site->config->debug ?? false)) {
+            Debugbar::disable();
+        }
     }
     //endregion
 
@@ -288,14 +404,7 @@ class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel,
 
     public function scopeBuild(Builder $query)
     {
-        return $query->with([
-                                'posts' => [
-                                    'categories',
-                                    'user',
-                                ],
-                                'categories',
-                                'tags',
-                            ]);
+        return $query->with($this->buildSchema);
     }
 
     //endregion

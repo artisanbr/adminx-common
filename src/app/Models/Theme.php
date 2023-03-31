@@ -163,6 +163,11 @@ class Theme extends EloquentModelBase implements WidgeteableModel, PublicIdModel
 
     //region RELATIONS
 
+    public function build()
+    {
+        return $this->hasOne(ThemeBuild::class, 'theme_id', 'id');
+    }
+
     public function menu()
     {
         return $this->hasOne(Menu::class, 'id', 'menu_id');

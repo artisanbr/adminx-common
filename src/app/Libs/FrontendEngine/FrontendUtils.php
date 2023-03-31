@@ -3,7 +3,7 @@
 namespace ArtisanBR\Adminx\Common\App\Libs\FrontendEngine;
 
 
-class FrontendHelper
+class FrontendUtils
 {
 
     public static function route($name, $parameters = [], $absolute = true): string{

@@ -19,7 +19,7 @@ return [
     'table_name' =>  'visits',
 
     //Database connection
-    'connection' => 'visit_tracker',
+    'connection' => env('DB_CONNECTION', 'mysql') . '_logs',
 
     //Visit Model
     'visit_model' => \ArtisanBR\Adminx\Common\App\Models\VisitTracker\Visit::class,

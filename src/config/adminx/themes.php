@@ -42,6 +42,19 @@ return [
             ],
         ],
 
+        'lazy-load' => [
+            'title' => 'Lazy Load',
+            'js'    => [
+                'jquery.lazy.js' => [
+                    'src' => '//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js',
+                ],
+
+                'jquery.lazy.plugins.js' => [
+                    'src' => '//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js',
+                ],
+            ],
+        ],
+
         'magnific-popup' => [
             'title'       => 'Magnific Popup',
             'description' => 'Popup/Modal em Jquery',

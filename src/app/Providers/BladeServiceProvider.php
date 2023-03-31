@@ -28,6 +28,7 @@ class BladeServiceProvider extends ServiceProvider
         //Namespaces
         //Frontend Components
         Blade::anonymousComponentNamespace('adminx-common::components', 'common');
+        Blade::anonymousComponentNamespace('adminx-frontend::components', 'frontend');
 
 
     }

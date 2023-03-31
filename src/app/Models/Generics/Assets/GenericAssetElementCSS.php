@@ -35,15 +35,17 @@ class GenericAssetElementCSS extends GenericAssetElementBase
         $this->raw_minify = $minify->add($this->raw)->minify();
 
 
+        $this->compile();
+
         $minifyScss = new CSS();
-        $this->scss = $minifyScss->add($this->scss)->minify();
+        $this->attributes['scss'] = $minifyScss->add($this->scss)->minify();
 
         return $this;
     }
 
     public function compile(): static
     {
-        $this->attributes['scss'] = HtmlHelper::compileSCSS($this->scss_raw);
+        $this->attributes['scss'] = !empty($this->scss_raw ?? null) ? HtmlHelper::compileSCSS($this->scss_raw) : '';
 
         return $this;
     }
@@ -52,7 +54,6 @@ class GenericAssetElementCSS extends GenericAssetElementBase
     protected function setScssRawAttribute($value): ?string
     {
         $this->attributes['scss_raw'] = $value;
-        $this->compile();
 
         return $value;
     }

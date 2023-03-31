@@ -3,7 +3,7 @@
 namespace ArtisanBR\Adminx\Common\App\Http\Controllers\API\Widgets;
 
 use App\Http\Controllers\Controller;
-use ArtisanBR\Adminx\Common\App\Facades\FrontendSiteEngine;
+use ArtisanBR\Adminx\Common\App\Facades\FrontendSite;
 use ArtisanBR\Adminx\Common\App\Models\Page;
 use ArtisanBR\Adminx\Common\App\Models\Site;
 use ArtisanBR\Adminx\Common\App\Models\Widgeteable;
@@ -72,7 +72,7 @@ class WidgetController extends Controller
      */
     public function render(Request $request, $public_id)
     {
-        $this->site = FrontendSiteEngine::current();
+        $this->site = FrontendSite::current();
 
 
         if (!$this->site) {

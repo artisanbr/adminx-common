@@ -2,7 +2,7 @@
 
 namespace ArtisanBR\Adminx\Common\App\Models\Scopes;
 
-use ArtisanBR\Adminx\Common\App\Facades\FrontendSiteEngine;
+use ArtisanBR\Adminx\Common\App\Facades\FrontendSite;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\OwneredModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +19,7 @@ class WhereSiteScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        $siteId = Auth::user()->site_id ?? FrontendSiteEngine::current()->id ?? null;
+        $siteId = Auth::user()->site_id ?? FrontendSite::current()->id ?? null;
         if($siteId){
             $builder->where('site_id', $siteId);
         }
