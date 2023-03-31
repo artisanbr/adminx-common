@@ -105,7 +105,7 @@ class WidgetController extends Controller
         dump($viewData);
         Debugbar::stopMeasure('render');*/
 
-        return Cache::remember("widget-view-", 60 * 24, function() use($htmlMin, $viewRender){
+        return Cache::remember("widget-view-{$this->site->public_id}-{$public_id}", 60 * 24, function() use($htmlMin, $viewRender){
             return $htmlMin->minify($viewRender);
         });
     }
