@@ -94,11 +94,14 @@ class FrontendHtmlEngine extends FrontendEngineBase
         return $this;
     }
 
-    public function setCurrentSite(Site $site): static
+    public function setCurrentSite(Site|null $site = null): static
     {
         $this->currentSite = $site;
-        $this->widgeteables = $this->currentSite->widgeteables;
-        $this->menus = $this->currentSite->menus;
+
+        if($this->currentSite){
+            $this->widgeteables = $this->currentSite->widgeteables;
+            $this->menus = $this->currentSite->menus;
+        }
 
         return $this;
     }
