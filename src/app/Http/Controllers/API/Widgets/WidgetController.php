@@ -10,6 +10,7 @@ use ArtisanBR\Adminx\Common\App\Models\Widgeteable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\View;
+use voku\helper\HtmlMin;
 
 /**
  * @prefix
@@ -94,6 +95,7 @@ class WidgetController extends Controller
         $viewData = $this->getViewData($widgeteable);
 
 
+        $htmlMin = new HtmlMin();
 
         $viewRender = View::make($widgetView, $viewData)->render();
 
@@ -102,6 +104,6 @@ class WidgetController extends Controller
         dump($viewData);
         Debugbar::stopMeasure('render');*/
 
-        return view($widgetView, $viewData);
+        return $htmlMin->minify($viewRender);
     }
 }
