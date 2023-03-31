@@ -4,5 +4,5 @@
 
 
 <div class="{{ $element->size_class }} mb-5">
-    <x-dynamic-component :component="'forms.'.$element->type->value" :element="$element"/>
+    <x-dynamic-component :component="'frontend::forms.'.$element->type->value" :element="$element"/>
 </div>
