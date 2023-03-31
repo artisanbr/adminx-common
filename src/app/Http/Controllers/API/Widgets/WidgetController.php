@@ -8,6 +8,7 @@ use ArtisanBR\Adminx\Common\App\Models\Page;
 use ArtisanBR\Adminx\Common\App\Models\Site;
 use ArtisanBR\Adminx\Common\App\Models\Widgeteable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\View;
 use voku\helper\HtmlMin;
@@ -104,6 +105,8 @@ class WidgetController extends Controller
         dump($viewData);
         Debugbar::stopMeasure('render');*/
 
-        return $htmlMin->minify($viewRender);
+        return Cache::remember("widget-view-", 60 * 24, function() use($htmlMin, $viewRender){
+            return $htmlMin->minify($viewRender);
+        });
     }
 }
