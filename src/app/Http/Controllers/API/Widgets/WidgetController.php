@@ -85,7 +85,7 @@ class WidgetController extends Controller
             return Response::json('Widget not found', 404);
         }
 
-        $widgetView = "api.Widgets.{$widgeteable->widget->type->slug}.{$widgeteable->widget->slug}";
+        $widgetView = "adminx-frontend::api.Widgets.{$widgeteable->widget->type->slug}.{$widgeteable->widget->slug}";
 
         if (!View::exists($widgetView)) {
             return Response::json('Widget View not Found', 501);
