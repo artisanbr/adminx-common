@@ -4,9 +4,11 @@ namespace ArtisanBR\Adminx\Common\App\Http\Controllers\API\Widgets;
 
 use App\Http\Controllers\Controller;
 use ArtisanBR\Adminx\Common\App\Facades\FrontendSite;
+use ArtisanBR\Adminx\Common\App\Libs\Support\Str;
 use ArtisanBR\Adminx\Common\App\Models\Page;
 use ArtisanBR\Adminx\Common\App\Models\Site;
 use ArtisanBR\Adminx\Common\App\Models\Widgeteable;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
@@ -31,8 +33,11 @@ class WidgetController extends Controller
     {
         $viewData = [
             'widgeteable' => $widgeteable,
+            'site' => $widgeteable->site,
             'variables'   => $widgeteable->variables,
         ];
+
+        Debugbar::debug($widgeteable->source->type);
 
         switch (true) {
             case $widgeteable->source->type === 'posts':
@@ -48,10 +53,22 @@ class WidgetController extends Controller
                     if ($widgeteable->config->sorting->enable || $widgeteable->widget->config->sorting->enable) {
                         $postsQuery = $postsQuery->orderBy($widgeteable->config->sort_column, $widgeteable->config->sort_direction);
                     }
-
                     $viewData['page'] = $page;
                     $viewData['posts'] = $postsQuery->take(10)->get();
                 }
+                break;
+            case Str::contains($widgeteable->source->type, 'list'):
+
+                $customList = $widgeteable->source->data;
+                $page = $customList->page;
+
+                $viewData['page'] = $page;
+                $viewData['customList'] = $customList;
+                //Todo: persinalizar quantidade de itens
+                $viewData['customListItems'] = $customList->items()->with(['list','list.page'])->take(10)->get();
+                break;
+            case $widgeteable->source->type === 'form':
+                $viewData['form'] = $widgeteable->source->data;
                 break;
             default:
                 break;
@@ -74,6 +91,8 @@ class WidgetController extends Controller
      */
     public function render(Request $request, $public_id)
     {
+        Debugbar::startMeasure('start', "Widget Init #{$public_id}");
+
         $this->site = FrontendSite::current();
 
 
@@ -81,7 +100,8 @@ class WidgetController extends Controller
             return Response::json('Unauthorized', 401);
         }
 
-        $widgeteable = Widgeteable::wherePublicId($public_id)->with(['widget'])->first();
+        $widgeteable =  $this->site->widgeteables()->wherePublicId($public_id)->whereHas('widget')->first();
+        //$widgeteable = Widgeteable::wherePublicId($public_id)->whereHas('widget')->first();
 
         if (!$widgeteable) {
             return Response::json('Widget not found', 404);
@@ -93,19 +113,23 @@ class WidgetController extends Controller
             return Response::json('Widget View not Found', 501);
         }
 
-        $viewData = $this->getViewData($widgeteable);
+        $viewData = $widgeteable->getBuildViewData();
+
+        Debugbar::stopMeasure('start');
+
+        Debugbar::debug($widgetView);
+        Debugbar::debug($viewData);
 
 
         $htmlMin = new HtmlMin();
 
+        Debugbar::startMeasure('render', "Widget Render #{$public_id}");
         $viewRender = View::make($widgetView, $viewData)->render();
+        Debugbar::stopMeasure('render');
 
+        /*return $viewRender;*/
 
-        /*Debugbar::startMeasure('render', 'Renderização');
-        dump($viewData);
-        Debugbar::stopMeasure('render');*/
-
-        return Cache::remember("widget-view-{$this->site->public_id}-{$public_id}", 60 * 24, function() use($htmlMin, $viewRender){
+        return Cache::remember("widget-view-{$this->site->public_id}-{$public_id}", 60 * 24 * 7, function() use($htmlMin, $viewRender){
             return $htmlMin->minify($viewRender);
         });
     }

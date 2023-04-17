@@ -153,12 +153,12 @@ class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel,
 
     public function internalUrl($dataItem, $prefix = null): string
     {
-        return "{$this->url}/i/". ($prefix ? "{$prefix}/" : '') . ($dataItem->slug ?? $dataItem->public_id);
+        return "{$this->url}/". ($prefix ? "{$prefix}/" : '') . ($dataItem->slug ?? $dataItem->public_id);
     }
 
     public function internalUri($dataItem): string
     {
-        return "{$this->uri}/i/" . ($dataItem->slug ?? $dataItem->public_id);
+        return "{$this->uri}/" . ($dataItem->slug ?? $dataItem->public_id);
     }
 
     public function getBuildViewPath($append = null): string
@@ -240,11 +240,11 @@ class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel,
             foreach ($this->config->sources as $source) {
                 $sourceData[$source->name] = $source->data;
 
-                if ($this->config->isUsingModule('internal_pages')) {
+                /*if ($this->config->isUsingModule('internal_pages')) {
                     foreach ($sourceData[$source->name]->items as $dataItem) {
                         $dataItem->internal_url = $this->internalUrl($dataItem, $source->internal_url);
                     }
-                }
+                }*/
             }
 
             $viewData['data'] = $sourceData;

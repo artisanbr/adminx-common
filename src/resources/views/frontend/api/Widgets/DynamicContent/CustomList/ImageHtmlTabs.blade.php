@@ -1,21 +1,19 @@
 <?php
 /***
- * @var \ArtisanBR\Adminx\Common\App\Models\Widgeteable                                    $widgeteable
- * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListHtml                     $customList
- * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemHtml $listItem
+ * @var \ArtisanBR\Adminx\Common\App\Models\Widgeteable                                                                               $widgeteable
+ * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListHtml                                                                $customList
+ * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemHtml                                            $listItem
+ * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemHtml[]|\Illuminate\Database\Eloquent\Collection $customListItems
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')
 
-@php
-    $customList = \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomList::findAndMount($widgeteable->source_ids->first());
-@endphp
-@if($customList->items()->count())
+@if($customListItems->count())
     <div
             class="tab-buttons image-html-tabs image-html-tabs-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
         {{--Tabs--}}
         <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            @foreach($customList->items()->take(10)->get() as $listItem)
+            @foreach($customListItems as $listItem)
                 <a @class([
         'active' => $loop->first
 ]) id="nav-{{ $widgeteable->public_id }}" data-toggle="tab"
@@ -26,7 +24,7 @@
         </div>
 
         <div class="tab-content" id="nav-tabContent">
-            @foreach($customList->items()->take(10)->get() as $listItem)
+            @foreach($customListItems as $listItem)
                 <div @class([
         'tab-pane fade',
         'show active' => $loop->first
@@ -48,171 +46,6 @@
         </div>
 
     </div>
-
-
-    {{--<div class="tab-buttons">
-        <div class="nav nav-tabs" id="nav-tab" role="tablist">
-            <a class="active" id="nav-mission" data-toggle="tab" href="#tab-mission" role="tab">Our Mission &
-                Vision</a>
-            <a id="nav-history" data-toggle="tab" href="#tab-history" role="tab">Company History</a>
-            <a id="nav-business" data-toggle="tab" href="#tab-business" role="tab">Business Goals</a>
-            <a id="nav-team" data-toggle="tab" href="#tab-team" role="tab">Team Member</a>
-        </div>
-        <div class="tab-content" id="nav-tabContent">
-            <div class="tab-pane fade show active" id="tab-mission" role="tabpanel">
-                <div class="tab-text-block left-image with-left-circle">
-                    <div class="row align-items-center justify-content-center">
-                        <div class="col-lg-6 col-md-10">
-                            <div class="block-image">
-                                <img src="assets/img/tab-block.jpg" alt="Image">
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-10">
-                            <div class="block-text">
-                                <h2 class="title">Professional Business Guidance Agency</h2>
-                                <p>
-                                    Sedut perspiciatis unde omnis iste natus error sit voluptat em accusantium
-                                    doloremque laudantium, totam raperiaeaque ipsa quae ab illo inventore
-                                    veritatis et quasi
-                                </p>
-                                <ul>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        There are many variations of passages of LoreIpsum available, but the
-                                        majority have suffered
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        It uses a dictionary of over 200 Latin wor combined with a handful of
-                                        model sentence structure
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        Richard McClintock, a Latin profe hampden-sydney College in Virginia,
-                                        looked up one more
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="tab-history" role="tabpanel">
-                <div class="tab-text-block right-image with-right-circle">
-                    <div class="row align-items-center justify-content-center">
-                        <div class="col-lg-6 col-md-10 order-2 order-lg-1">
-                            <div class="block-text">
-                                <h2 class="title">Professional Business Guidance Agency</h2>
-                                <p>
-                                    Sedut perspiciatis unde omnis iste natus error sit voluptat em accusantium
-                                    doloremque laudantium, totam raperiaeaque ipsa quae ab illo inventore
-                                    veritatis et quasi
-                                </p>
-                                <ul>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        There are many variations of passages of LoreIpsum available, but the
-                                        majority have suffered
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        It uses a dictionary of over 200 Latin wor combined with a handful of
-                                        model sentence structure
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        Richard McClintock, a Latin profe hampden-sydney College in Virginia,
-                                        looked up one more
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-10 order-1 order-lg-2">
-                            <div class="block-image">
-                                <img src="assets/img/tab-block.jpg" alt="Image">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="tab-business" role="tabpanel">
-                <div class="tab-text-block left-image with-left-circle">
-                    <div class="row align-items-center justify-content-center">
-                        <div class="col-lg-6 col-md-10">
-                            <div class="block-image">
-                                <img src="assets/img/tab-block.jpg" alt="Image">
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-10">
-                            <div class="block-text">
-                                <h2 class="title">Professional Business Guidance Agency</h2>
-                                <p>
-                                    Sedut perspiciatis unde omnis iste natus error sit voluptat em accusantium
-                                    doloremque laudantium, totam raperiaeaque ipsa quae ab illo inventore
-                                    veritatis et quasi
-                                </p>
-                                <ul>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        There are many variations of passages of LoreIpsum available, but the
-                                        majority have suffered
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        It uses a dictionary of over 200 Latin wor combined with a handful of
-                                        model sentence structure
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        Richard McClintock, a Latin profe hampden-sydney College in Virginia,
-                                        looked up one more
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tab-pane fade" id="tab-team" role="tabpanel">
-                <div class="tab-text-block right-image with-right-circle">
-                    <div class="row align-items-center justify-content-center">
-                        <div class="col-lg-6 col-md-10 order-2 order-lg-1">
-                            <div class="block-text">
-                                <h2 class="title">Professional Business Guidance Agency</h2>
-                                <p>
-                                    Sedut perspiciatis unde omnis iste natus error sit voluptat em accusantium
-                                    doloremque laudantium, totam raperiaeaque ipsa quae ab illo inventore
-                                    veritatis et quasi
-                                </p>
-                                <ul>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        There are many variations of passages of LoreIpsum available, but the
-                                        majority have suffered
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        It uses a dictionary of over 200 Latin wor combined with a handful of
-                                        model sentence structure
-                                    </li>
-                                    <li>
-                                        <i class="fas fa-check"></i>
-                                        Richard McClintock, a Latin profe hampden-sydney College in Virginia,
-                                        looked up one more
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-lg-6 col-md-10 order-1 order-lg-2">
-                            <div class="block-image">
-                                <img src="assets/img/tab-block.jpg" alt="Image">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>--}}
 
 @endif
 @push('css')
@@ -370,46 +203,3 @@
         }
     </style>
 @endpush
-{{--@push('js')
-    <script>
-        $(function () {
-            //Todo: slick
-            /*$('#widget-{{ $widgeteable->public_id }} .testimonials-carousel').slick({
-                dots: false,
-                arrows: false,
-                infinite: false,
-                speed: 300,
-                slidesToShow: 2,
-                slidesToScroll: 1,
-                responsive: [
-                    {
-                        breakpoint: 1024,
-                        settings: {
-                            slidesToShow: 1,
-                            slidesToScroll: 1,
-                            infinite: true,
-                            dots: false
-                        }
-                    },
-                    {
-                        breakpoint: 600,
-                        settings: {
-                            slidesToShow: 1,
-                            slidesToScroll: 2
-                        }
-                    },
-
-                    {
-                        breakpoint: 480,
-                        settings: {
-                            slidesToShow: 1,
-                            slidesToScroll: 1
-                        }
-                    }
-
-                ]
-
-            });*/
-        });
-    </script>
-@endpush--}}

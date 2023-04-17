@@ -58,8 +58,8 @@ class AdminxCommonServiceProvider extends ServiceProvider
         $this->loadViewsFrom($commonViewPath, 'adminx-common');
         $this->loadViewsFrom($frontendViewPath, 'adminx-frontend');
 
-        Blade::anonymousComponentPath($commonViewPath.'components', 'common');
-        Blade::anonymousComponentPath($frontendViewPath.'components', 'frontend');
+        Blade::anonymousComponentPath($commonViewPath.'/components', 'common');
+        Blade::anonymousComponentPath($frontendViewPath.'/components', 'frontend');
 
         Blade::componentNamespace('ArtisanBR\Adminx\Common\App\View\Common\Components', 'common');
         Blade::componentNamespace('ArtisanBR\Adminx\Common\App\View\Frontend\Components', 'frontend');

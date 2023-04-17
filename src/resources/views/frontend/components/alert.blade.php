@@ -1,3 +1,35 @@
+@props([
+    'title' => null,
+    'color' => 'primary',
+    'bgType' => 'light',
+    'noClose' => false,
+    'icon' => null,
+    'iconSize' => '2hx',
+    'iconColor' => null,
+    'iconClass' => null,
+    'titleClass' => null,
+])
+<?php
+$computedClass = function () use ($bgType, $color, $noClose, $icon): string {
+    $finalClass = '';
+
+    $finalClass .= match ($bgType) {
+        'light' => " bg-light-{$color}",
+        'solid' => " bg-{$color}",
+        default => " alert-{$color}",
+    };
+
+    if ($noClose) {
+        $finalClass .= ' alert-dismissible';
+    }
+
+    if ($icon) {
+        $finalClass .= ' d-flex align-items-center';
+    }
+
+    return $finalClass;
+}
+?>
 <div {{ $attributes->merge([
     'class' => 'alert '.$computedClass()
     ]) }}>

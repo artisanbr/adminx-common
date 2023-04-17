@@ -1,19 +1,17 @@
 <?php
 /***
- * @var \ArtisanBR\Adminx\Common\App\Models\Widgeteable                                            $widgeteable
- * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListTestimonials                     $customList
- * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemTestimonials $listItem
+ * @var \ArtisanBR\Adminx\Common\App\Models\Widgeteable                                                                                       $widgeteable
+ * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListTestimonials                                                                $customList
+ * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemTestimonials                                            $listItem
+ * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemTestimonials[]|\Illuminate\Database\Eloquent\Collection $customListItems
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')
 
-@php
-    $customList = \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomList::findAndMount($widgeteable->source_ids->first());
-@endphp
-@if($customList->items()->count())
+@if($customListItems->count())
     <div class="testimonials-carousel testimonials-carousel-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
         {{--Left--}}
-        @foreach($customList->items()->take(10)->get() as $listItem)
+        @foreach($customListItems as $listItem)
             <div class="col-xl-12 testimonials-item">
                 <div class="testimonials-box-2">
                     {!! $listItem->data->content !!}

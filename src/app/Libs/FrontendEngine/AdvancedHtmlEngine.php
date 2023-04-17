@@ -156,11 +156,11 @@ class AdvancedHtmlEngine
             foreach ($this->model->config->sources as $source){
                 $sourceData[$source->name] = $source->data;
 
-                if($this->model->config->isUsingModule('internal_pages')){
+                /*if($this->model->config->isUsingModule('internal_pages')){
                     foreach($sourceData[$source->name]->items as $dataItem){
                         $dataItem->internal_url = $this->model->internalUrl($dataItem, $source->internal_url);
                     }
-                }
+                }*/
             }
 
             $this->viewData['data'] = $sourceData;

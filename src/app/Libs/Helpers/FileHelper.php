@@ -25,16 +25,17 @@ class FileHelper
 
         $fileModel->site_id = $site->id;
 
-        return self::saveRequest($requestFile, $uploadPath, $fileName, $fileModel);
+        return self::saveRequest($requestFile, $uploadPath, $fileName, $fileModel, $site->config->enable_image_optimize);
     }
 
-    public static function saveRequest(UploadedFile $requestFile, $path = '', $fileName = '', File|null $fileModel = null): ?File
+    public static function saveRequest(UploadedFile $requestFile, $path = '', $fileName = '', File|null $fileModel = null, bool $imagesToWebp = true): ?File
     {
         if (!$fileModel) {
             $fileModel = new File();
         }
 
-        $storage = Storage::disk('public');
+        //$storage = Storage::disk('public');
+        $storage = Storage::disk('ftp');
 
         $uploadPath = $path;
         if (empty($fileName)) {
@@ -47,7 +48,10 @@ class FileHelper
             //Remove file
             $storage->delete($fileModel->path);
         }
-        $storage->delete("$uploadPath/{$name}");
+
+        if (Storage::exists("{$uploadPath}/{$name}")) {
+            $storage->delete("{$uploadPath}/{$name}");
+        }
 
 
         //Salvar
@@ -60,20 +64,29 @@ class FileHelper
 
         //$image->storePubliclyAs($uploadPath, $name); //$image->move(storage_path($uploadPath), $name);
 
-        if ($fileModel->is_image) {
+        //Converter imagem para WebP caso o recurso esteja habilitado no site.
+        if ($fileModel->is_image && !Str::contains($fileModel->mime_type, 'webp') && $imagesToWebp) {
             //Converter para Webp
             $imageRelativePath = "{$uploadPath}/{$fileName}.webp";
-            $imagePath = $storage->path($imageRelativePath);
+            $webpTempFileName = time().random_int(1, 999999)."{$fileModel->site->public_id}-{$fileName}.webp";
+            $webpTempPath = Storage::disk('temp')->path($webpTempFileName);
             $webp = Webp::make($requestFile);
-            $imageQuality = 90;
-            if ($webp->save($imagePath, $imageQuality)) {
+
+            if ($webp->save($webpTempPath, 90)) {
+
+                //Save on CDN
+                $storage->put($imageRelativePath, file_get_contents($webpTempPath));
+
                 // File is saved successfully
                 $fileModel->fill([
                                      'name'      => "{$fileName}.webp",
-                                     'mime_type' => $storage->mimeType($imageRelativePath),
+                                     'mime_type' => $storage->mimeType($webpTempPath),
                                      'extension' => 'webp',
                                      'path'      => $imageRelativePath,
                                  ]);
+
+                //Clear Temp
+                Storage::disk('temp')->delete($webpTempFileName);
 
                 return $fileModel;
             }

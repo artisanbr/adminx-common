@@ -3,6 +3,7 @@
  * @var \ArtisanBR\Adminx\Common\App\Models\Page    $page
  * @var \ArtisanBR\Adminx\Common\App\Models\Post    $post
  * @var \Illuminate\Pagination\LengthAwarePaginator $comments
+ * @var string[] $breadcrumbs
  */
 ?>
 @extends('adminx-frontend::layout.partials.content')
@@ -10,7 +11,7 @@
 @section('content')
 
     @if(!$page->is_home && ($page->config->breadcrumb ? $page->config->breadcrumb->enable : $page->site->theme->config->breadcrumb->enable))
-        <x-frontend::breadcrumb :page="$page"/>
+        <x-frontend::breadcrumb :page="$page" :append="$breadcrumbs"/>
     @endif
 
     {!! $page->html !!}
@@ -199,17 +200,17 @@
                                     <x-common::recaptcha :site="$page->site" no-ajax/>
                                     <div class="row">
                                         <div class="col-12">
-                                            <x-common::alert color="info" class="mb-5 fade collapse" no-close>
+                                            <x-frontend::alert color="info" class="mb-5 fade collapse" no-close>
                                                 Aguarde....
-                                            </x-common::alert>
+                                            </x-frontend::alert>
                                         </div>
 
                                         @if ($errors->any())
                                             @foreach ($errors->all() as $error)
                                                 <div class="col-12">
-                                                    <x-common::alert color="danger" no-close>
+                                                    <x-frontend::alert color="danger" no-close>
                                                         {!! $error !!}
-                                                    </x-common::alert>
+                                                    </x-frontend::alert>
                                                 </div>
                                             @endforeach
                                         @endif

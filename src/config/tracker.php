@@ -34,7 +34,8 @@ return [
      */
     'do_not_track_routes' => [
         'tracker.stats.*',
-        'adminx.*'
+        'adminx.*',
+        'common.api.widgets.render', //Não é necessario registrar a api de renderização de widgets
     ],
 
     /*

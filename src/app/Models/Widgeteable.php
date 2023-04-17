@@ -12,6 +12,8 @@ use ArtisanBR\Adminx\Common\App\Models\Scopes\WhereSiteScope;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasOwners;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasPublicIdAttribute;
 use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\BelongsToSite;
+use Barryvdh\Debugbar\Facades\Debugbar;
+use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Support\Collection;
@@ -19,7 +21,7 @@ use Illuminate\Support\Facades\Auth;
 
 class Widgeteable extends MorphPivot implements PublicIdModel, OwneredModel
 {
-    use HasPublicIdAttribute, HasOwners, BelongsToSite;
+    use HasPublicIdAttribute, HasOwners, BelongsToSite, Cachable;
 
     protected array $ownerTypes = ['site'];
 
@@ -56,6 +58,60 @@ class Widgeteable extends MorphPivot implements PublicIdModel, OwneredModel
     ];
 
     ////region HELPERS
+    public function getBuildViewData(array $merge_data = []): array
+    {
+        $viewData = [
+            'widgeteable' => $this,
+            'site' => $this->site,
+            'variables'   => $this->variables,
+        ];
+
+        Debugbar::debug($this->source->type);
+
+        switch (true) {
+            case $this->source->type === 'posts':
+                /**
+                 * @var Page|null $page ;
+                 */
+
+                $page = $this->source->data;
+
+                if ($page) {
+
+                    $postsQuery = $page->posts()->published();
+                    if ($this->config->sorting->enable || $this->widget->config->sorting->enable) {
+                        $postsQuery = $postsQuery->orderBy($this->config->sort_column, $this->config->sort_direction);
+                    }
+                    $viewData['page'] = $page;
+                    $viewData['posts'] = $postsQuery->take(10)->get();
+                }
+                break;
+            case Str::contains($this->source->type, 'list'):
+
+                $customList = $this->source->data;
+                $page = $customList->page;
+
+                $viewData['page'] = $page;
+                $viewData['customList'] = $customList;
+                //Todo: personalizar quantidade de itens
+                $viewData['customListItems'] = $customList->items()->with(['list','list.page'])->take(10)->get();
+                break;
+            case $this->source->type === 'form':
+                $viewData['form'] = $this->source->data;
+                break;
+            default:
+                break;
+            //Todo:
+            /*case 'page':
+            case 'products':
+            case 'form':
+            case 'post':
+            case 'address':*/
+
+        }
+
+        return !empty($merge_data) ? [...$viewData, ...$merge_data] : $viewData;
+    }
 
     public static function getSourcesByType($source_type, Site $site = null): Collection
     {
@@ -119,7 +175,6 @@ class Widgeteable extends MorphPivot implements PublicIdModel, OwneredModel
         //return DataSource::getSourceTypeConfig($this->source->type ?? $this->widget->config->source_types->first(), 'sorting_columns', []);
     }
     //endregion
-
 
     //region  Attributes
 

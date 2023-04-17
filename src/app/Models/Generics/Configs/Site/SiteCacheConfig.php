@@ -1,5 +1,5 @@
 <?php
-namespace ArtisanBR\Adminx\Common\App\Models\Generics\Configs;
+namespace ArtisanBR\Adminx\Common\App\Models\Generics\Configs\Site;
 
 use ArtisanLabs\GModel\GenericModel;
 

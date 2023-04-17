@@ -8,6 +8,7 @@ use ArtisanBR\Adminx\Common\App\Models\Interfaces\WidgeteableModel;
 use ArtisanBR\Adminx\Common\App\Models\Page;
 use ArtisanBR\Adminx\Common\App\Models\Site;
 use ArtisanBR\Adminx\Common\App\Models\Widgeteable;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\View;
 use PragmaRX\Support\Exceptions\Exception;
 use Twig\Environment;
@@ -156,16 +157,19 @@ class FrontendHtmlEngine extends FrontendEngineBase
     {
 
 
-        $widget = $this->widgeteables->firstWhere('public_id', $widgeteable_public_id);
+        $widgeteable = $this->widgeteables->firstWhere('public_id', $widgeteable_public_id);
 
-        if (!$widget) {
+        if (!$widgeteable) {
             return "Widget {$widgeteable_public_id} não encontrado";
         }
 
         //Widget View
-        $widgeteableView = View::make(($widget->config->ajax_render ?? true) ? 'adminx-common::Elements.Widgets.renders.ajax-render' : 'adminx-common::Elements.Widgets.renders.static-render', [
-            'widgeteable' => $widget,
-        ]);
+        //Debugbar::debug($widgeteable->public_id, $widgeteable->config->ajax_render);
+
+        $renderView = $widgeteable->config->ajax_render ? 'adminx-common::Elements.Widgets.renders.ajax-render' : 'adminx-common::Elements.Widgets.renders.static-render';
+        $renderData = $widgeteable->config->ajax_render ? compact('widgeteable') : $widgeteable->getBuildViewData();
+
+        $widgeteableView = View::make($renderView, $renderData);
 
         return $widgeteableView->render();
 

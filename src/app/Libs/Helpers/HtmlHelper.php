@@ -12,6 +12,7 @@ namespace ArtisanBR\Adminx\Common\App\Libs\Helpers;
 use Illuminate\Support\Str;
 use ScssPhp\ScssPhp\Compiler;
 use ScssPhp\ScssPhp\Exception\SassException;
+use ScssPhp\ScssPhp\OutputStyle;
 
 class HtmlHelper
 {
@@ -194,11 +195,14 @@ class HtmlHelper
      *
      * @throws SassException
      */
-    public static function compileSCSS($sass): string
+    public static function compileSCSS($sass, $compress = false): string
     {
         $compiler = new Compiler();
 
+        $compiler->setOutputStyle($compress ? OutputStyle::COMPRESSED : OutputStyle::EXPANDED);
+
         return $compiler->compileString($sass)->getCss();
     }
+
 
 }

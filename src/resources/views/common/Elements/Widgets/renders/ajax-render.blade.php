@@ -10,7 +10,7 @@
         <div class="w-100 d-flex justify-content-center my-5 py-5 fa-3x"><i
                 class="fa-solid fa-circle-notch fa-spin fa-spin-pulse"></i></div>
     </div>
-    <script>
+    <script async>
         const WidgetModule_{{ $widgeteable->public_id }} = function () {
             const widgetAreaID = "#widget-{{ $widgeteable->public_id }}";
             const renderRemote = function () {

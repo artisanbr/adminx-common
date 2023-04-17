@@ -4,4 +4,4 @@
  */
 ?>
 {{--Incluir view do widget--}}
-@includeIf("frontend.api.Widgets.{$widgeteable->widget->type->slug}.{$widgeteable->widget->slug}", compact('widgeteable'))
+@includeIf("adminx-frontend::api.Widgets.{$widgeteable->widget->type->slug}.{$widgeteable->widget->slug}", compact('widgeteable'))

@@ -124,6 +124,16 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
         return self::findAndMount($this->id, $this->type->value);
     }
 
+    public function itemUrl(CustomListItemBase $listItem): string
+    {
+        return $this->url . '/i/' . ($listItem->slug ?? $listItem->public_id);
+    }
+
+    public function itemUri(CustomListItemBase $listItem): string
+    {
+        return $this->uri . '/i/' . ($listItem->slug ?? $listItem->public_id);
+    }
+
     //endregion
 
     //region ATTRIBUTES

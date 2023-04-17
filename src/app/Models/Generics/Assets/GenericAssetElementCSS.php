@@ -5,6 +5,7 @@ namespace ArtisanBR\Adminx\Common\App\Models\Generics\Assets;
 use ArtisanBR\Adminx\Common\App\Libs\Helpers\HtmlHelper;
 use Html;
 use MatthiasMullie\Minify\CSS;
+use ScssPhp\ScssPhp\Exception\SassException;
 
 class GenericAssetElementCSS extends GenericAssetElementBase
 {
@@ -35,17 +36,20 @@ class GenericAssetElementCSS extends GenericAssetElementBase
         $this->raw_minify = $minify->add($this->raw)->minify();
 
 
-        $this->compile();
+        $this->compile(true);
 
-        $minifyScss = new CSS();
-        $this->attributes['scss'] = $minifyScss->add($this->scss)->minify();
+        /*$minifyScss = new CSS();
+        $this->attributes['scss'] = $minifyScss->add($this->scss)->minify();*/
 
         return $this;
     }
 
-    public function compile(): static
+    /**
+     * @throws SassException
+     */
+    public function compile($compress = false): static
     {
-        $this->attributes['scss'] = !empty($this->scss_raw ?? null) ? HtmlHelper::compileSCSS($this->scss_raw) : '';
+        $this->attributes['scss'] = !empty($this->scss_raw ?? null) ? HtmlHelper::compileSCSS($this->scss_raw, $compress) : '';
 
         return $this;
     }

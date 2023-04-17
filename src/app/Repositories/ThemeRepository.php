@@ -65,6 +65,8 @@ class ThemeRepository extends Repository
             $this->processUploads();
             $this->theme->save();
 
+            $this->theme->compile();
+
             return $this->theme;
         });
     }

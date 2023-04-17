@@ -138,10 +138,13 @@ class DataSource extends GenericModel
 
             if(empty($this->attributes['data']) && ($this->type === 'list' || Str::contains($this->type, 'list.'))){
                 //Listas Customizadas
-                $this->attributes['data'] = $site->lists()->where('id', $this->id)->first();
+                /**
+                 * @var CustomListBase $customList
+                 */
+                $customList = $site->lists()->where('id', $this->id)->first();
 
-                if ($this->attributes['data']) {
-                    $this->attributes['data'] = $this->attributes['data']->mountModel();
+                if ($customList) {
+                    $this->attributes['data'] = $customList->mountModel();
                 }
             }
 

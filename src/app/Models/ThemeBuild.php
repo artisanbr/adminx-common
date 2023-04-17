@@ -2,6 +2,7 @@
 
 namespace ArtisanBR\Adminx\Common\App\Models;
 
+use ArtisanBR\Adminx\Common\App\Models\Bases\EloquentModelBase;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasOwners;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasPublicIdAttribute;
 use ArtisanBR\Adminx\Common\App\Models\Traits\HasPublicIdUriAttributes;
@@ -12,12 +13,9 @@ use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\BelongsToSite;
 use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\BelongsToUser;
 use ArtisanBR\Adminx\Common\App\Models\Traits\Relations\HasMorphAssigns;
 use ArtisanLabs\LaravelVisitTracker\Traits\Visitable;
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Blade;
 
-class ThemeBuild extends Model
+class ThemeBuild extends EloquentModelBase
 {
     use HasOwners, HasUriAttributes, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasVisitCounter, Visitable, HasRelatedCache, HasMorphAssigns;
 

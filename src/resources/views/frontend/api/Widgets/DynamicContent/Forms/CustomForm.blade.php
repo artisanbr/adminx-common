@@ -2,20 +2,13 @@
 /***
  * @var \ArtisanBR\Adminx\Common\App\Models\Widgeteable $widgeteable
  * @var \ArtisanBR\Adminx\Common\App\Models\Form        $form
- * @var \ArtisanBR\Adminx\Common\App\Models\Post        $post
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')
 
-@php
+{{--@php
     $form = $widgeteable->sources->first();
-@endphp
-
-<?php
-/**=
- * @var \ArtisanBR\Adminx\Common\App\Models\Form $form
- */
-?>
+@endphp--}}
 
 @if($form->id ?? false)
     <form id="form-{{$form->id}}" class="form w-100" action="{{ route('frontend.send-form', $form->id, false) }}"
@@ -225,5 +218,5 @@
     @endpush
 
 @else
-    <x-common::alert color="warning" no-close>Não há um formulário vinculado a página</x-common::alert>
+    <x-frontend::alert color="warning" no-close>Não há um formulário vinculado a página</x-frontend::alert>
 @endif

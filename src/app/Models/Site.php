@@ -6,7 +6,7 @@ use ArtisanBR\Adminx\Common\App\Libs\Support\Str;
 use ArtisanBR\Adminx\Common\App\Libs\Support\Url;
 use ArtisanBR\Adminx\Common\App\Models\Bases\EloquentModelBase;
 use ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomList;
-use ArtisanBR\Adminx\Common\App\Models\Generics\Configs\SiteConfig;
+use ArtisanBR\Adminx\Common\App\Models\Generics\Configs\Site\SiteConfig;
 use ArtisanBR\Adminx\Common\App\Models\Generics\Contact\Contact;
 use ArtisanBR\Adminx\Common\App\Models\Generics\Seo;
 use ArtisanBR\Adminx\Common\App\Models\Interfaces\OwneredModel;
@@ -24,7 +24,6 @@ use ArtisanBR\Adminx\Common\App\Rules\DomainRule;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
-use LaravelIdea\Helper\ArtisanBR\Adminx\Common\App\Models\_IH_Site_QB;
 
 class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
@@ -84,7 +83,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     //endregion
 
     //region HELPERS
-    public static function getFromPreviousDomain($public_id): EloquentModelBase|_IH_Site_QB|Builder|Site|null
+    public static function getFromPreviousDomain($public_id): EloquentModelBase|Builder|Site|null
     {
         $site = self::where('public_id',$public_id)->with(['pages'])->first();
 

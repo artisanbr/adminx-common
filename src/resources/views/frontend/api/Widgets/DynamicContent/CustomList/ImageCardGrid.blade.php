@@ -1,19 +1,22 @@
 <?php
 /***
- * @var \ArtisanBR\Adminx\Common\App\Models\Widgeteable                                    $widgeteable
- * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListHtml                     $customList
- * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemHtml $listItem
+ * @var \ArtisanBR\Adminx\Common\App\Models\Page                                                                                      $page
+ * @var \ArtisanBR\Adminx\Common\App\Models\Widgeteable                                                                               $widgeteable
+ * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListHtml                                                                $customList
+ * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemHtml                                            $listItem
+ * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemHtml[]|\Illuminate\Database\Eloquent\Collection $customListItems
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')
-@php
+{{--@php
     $customList = $widgeteable->source->data;
-@endphp
-@if($customList->items()->count())
+    $page = $customList->page;
+@endphp--}}
+@if($customListItems->count())
     <div
             class="image-card-grid image-card-grid-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }} row justify-content-center">
         {{--Left--}}
-        @foreach($customList->items()->take(10)->get() as $listItem)
+        @foreach($customListItems as $listItem)
             <div class="col-lg-4 col-sm-6">
                 <div class="image-card-grid-box">
                     <div class="image-card-grid-thumb">
@@ -21,7 +24,7 @@
                              style="background-image: url('{{ $listItem->data->image->file->url }}');"></div>
                     </div>
                     <div class="image-card-grid-desc text-center">
-                        <h4><a href="{{ $listItem->url ?? '#' }}">{{ $listItem->title }}</a></h4>
+                        <h4><a href="{{ $customList->itemUrl($listItem) ?? '#' }}">{{ $listItem->title }}</a></h4>
                         <p>{!! $listItem->description ?? '' !!}</p>
                         <a href="#" class="image-card-grid-link">
                             <i class="fa-solid fa-long-arrow-right"></i>

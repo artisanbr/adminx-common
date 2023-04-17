@@ -3,6 +3,7 @@
  * @var \ArtisanBR\Adminx\Common\App\Models\Widgeteable $widgeteable
  * @var \ArtisanBR\Adminx\Common\App\Models\Page        $page
  * @var \ArtisanBR\Adminx\Common\App\Models\Post        $post
+ * @var \ArtisanBR\Adminx\Common\App\Models\Post[]|\Illuminate\Database\Eloquent\Collection        $posts
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')

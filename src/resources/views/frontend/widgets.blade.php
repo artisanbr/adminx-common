@@ -211,5 +211,5 @@
         @endonce
     @stop
 @else
-    <x-common::alert color="warning">Não há um formulário vinculado a página</x-common::alert>
+    <x-frontend::alert color="warning">Não há um formulário vinculado a página</x-frontend::alert>
 @endif

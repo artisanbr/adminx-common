@@ -4,19 +4,20 @@
  * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListImageSlider                                 $customList
  * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemImageSlider             $listItem
  * @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\Generic\CustomListItemDatas\Sliders\SliderDataButtons $button
+ *                                                                                                                   @var \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomListItems\CustomListItemImageSlider[]|\Illuminate\Database\Eloquent\Collection $customListItems
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')
 
-@php
+{{--@php
     $customList = \ArtisanBR\Adminx\Common\App\Models\CustomLists\CustomList::findAndMount($widgeteable->source_ids->first());
-@endphp
-@if($customList->items()->count())
+@endphp--}}
+@if($customListItems->count())
     <section
             class="banner-section banner-section-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
         {{--Left--}}
         <div class="banner-slider" id="bannerSlider-{{ $widgeteable->public_id }}">
-            @foreach($customList->items()->take(10)->get() as $listItem)
+            @foreach($customListItems as $listItem)
                 @push('css')
                     <link rel="preload" as="image" href="{{ $listItem->data->image->file->url }}" />
                 @endpush
@@ -101,7 +102,7 @@
 @endphp
 @push('js')
     <script>
-        $(function () {
+        document.addEventListener('DOMContentLoaded', (event) => {
 
             const {{ $jsModuleName }} = function () {
 
