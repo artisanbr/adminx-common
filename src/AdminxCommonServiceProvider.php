@@ -1,8 +1,8 @@
 <?php
 
-namespace ArtisanBR\Adminx\Common;
+namespace Adminx\Common;
 
-use ArtisanBR\Adminx\Common\App\Libs\Support\Str;
+use Adminx\Common\Libs\Support\Str;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Route;
 class AdminxCommonServiceProvider extends ServiceProvider
 {
 
-    private $config_path = __DIR__ . '/config/';
-    private $routes_path = __DIR__ . '/routes/';
-    private $views_path  = __DIR__ . '/resources/views/';
+    private $config_path = __DIR__ . '/../config/';
+    private $routes_path = __DIR__ . '/../routes/';
+    private $views_path  = __DIR__ . '/../resources/views/';
 
     private $config_files = [
         'tracker',
@@ -61,12 +61,12 @@ class AdminxCommonServiceProvider extends ServiceProvider
         Blade::anonymousComponentPath($commonViewPath.'/components', 'common');
         Blade::anonymousComponentPath($frontendViewPath.'/components', 'frontend');
 
-        Blade::componentNamespace('ArtisanBR\Adminx\Common\App\View\Common\Components', 'common');
-        Blade::componentNamespace('ArtisanBR\Adminx\Common\App\View\Frontend\Components', 'frontend');
+        Blade::componentNamespace('Adminx\Common\View\Common\Components', 'common');
+        Blade::componentNamespace('Adminx\Common\View\Frontend\Components', 'frontend');
 
         //Common Routes
         Route::as('common.')
-             ->namespace('ArtisanBR\Adminx\Common\App\Http\Controllers')
+             ->namespace('Adminx\Common\Http\Controllers')
              ->group(function () {
 
                  Route::prefix('api/v1/common')

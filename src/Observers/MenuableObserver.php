@@ -1,0 +1,21 @@
+<?php
+
+namespace Adminx\Common\Observers;
+
+use Adminx\Common\Models\Category;
+use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Post;
+use Illuminate\Database\Eloquent\Model;
+
+class MenuableObserver
+{
+    public function saved(Model|Page|Post|Category $model){
+
+        if($model->menu_items()->count()){
+            foreach ($model->menu_items as $menuItem){
+                $menuItem->loadUrlFromMenuable();
+                $menuItem->save();
+            }
+        }
+    }
+}

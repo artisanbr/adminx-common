@@ -55,8 +55,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ArtisanBR\\Adminx\\Common\\": "src/",
-            "ArtisanBR\\Adminx\\Common\\App\\": "src/app/"
+            "Adminx\\Common\\": "src/"
         }
     },
     "autoload-dev": {
@@ -66,7 +65,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "ArtisanBR\\Adminx\\Common\\AdminxCommonServiceProvider"
+                "Adminx\\Common\\AdminxCommonServiceProvider"
             ]
         }
     },
