@@ -38,7 +38,6 @@ use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\Relations\HasPosts;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
 use Adminx\Common\Models\Traits\Relations\HasWidgets;
-use ArtisanLabs\LaravelVisitTracker\Traits\Visitable;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Butschster\Head\Contracts\MetaTags\RobotsTagsInterface;
 use Butschster\Head\Contracts\MetaTags\SeoMetaTagsInterface;
@@ -52,7 +51,7 @@ use Illuminate\Support\Facades\View;
 
 class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel, OwneredModel, HtmlModel, BuildableModel, SeoMetaTagsInterface, RobotsTagsInterface
 {
-    use HasUriAttributes, HasSelect2, SoftDeletes, HasSlugAttribute, HasSEO, HasFiles, HasCategoriesMorph, HasTagsMorph, HasPosts, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasWidgets, HasParent, HasOwners, HasGenericConfig, HasVisitCounter, Visitable, HasAdvancedHtml, HasRelatedCache, HasHtmlBuilds;
+    use HasUriAttributes, HasSelect2, SoftDeletes, HasSlugAttribute, HasSEO, HasFiles, HasCategoriesMorph, HasTagsMorph, HasPosts, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasWidgets, HasParent, HasOwners, HasGenericConfig, HasVisitCounter, HasAdvancedHtml, HasRelatedCache, HasHtmlBuilds;
 
     protected $connection = 'mysql';
 
@@ -421,36 +420,6 @@ class Page extends EloquentModelBase implements WidgeteableModel, PublicIdModel,
 
     public function save(array $options = [])
     {
-        //Gerar slug se estiver em branco
-        if (empty($this->slug) && !$this->is_home) {
-            $this->slug = $this->title;
-        }
-
-
-        //Pagina Incial
-        if ($this->is_home) {
-            //Tirar demais páginas iniciais
-            $this->site->pages()->where(function (Builder $q) {
-                $q->where('is_home', 'true');
-                if ($this->id) {
-                    $q->whereNot('id', $this->id);
-                }
-            })->update([
-                           'is_home' => false,
-                       ]);
-        }
-
-        if ($this->id) {
-
-            //Minifies
-            $this->css->minify();
-            $this->js->minify();
-
-            //Build HTML
-            //Todo: CACHE: $this->attributes['html'] = $this->buildedHtml();
-
-        }
-
         return parent::save($options);
     }
 

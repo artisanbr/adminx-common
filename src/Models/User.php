@@ -2,6 +2,7 @@
 
 namespace Adminx\Common\Models;
 
+use Adminx\Common\Models\Bases\EloquentModelBase;
 use App\Http\Controllers\API\Auth\AuthController;
 use Adminx\Common\Models\Generics\Configs\UserConfig;
 use Adminx\Common\Models\Traits\HasValidation;
@@ -15,11 +16,21 @@ use Illuminate\Validation\Rule;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
-//use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
-class User extends UserVisitTrackerBase
+class User extends EloquentModelBase implements AuthenticatableContract,
+                                                   AuthorizableContract,
+                                                   CanResetPasswordContract
 {
-    use HasApiTokens, Notifiable, HasRoles, HasValidation, HasPosts;
+    use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasApiTokens, Notifiable, HasRoles, HasValidation, HasPosts;
+
+    protected $connection = 'mysql';
 
 
     /**
@@ -153,7 +164,8 @@ class User extends UserVisitTrackerBase
         return $this->hasMany(Theme::class);
     }
 
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
 

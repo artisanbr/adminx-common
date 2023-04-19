@@ -37,20 +37,7 @@ class EventServiceProvider extends ServiceProvider
     ];
 
     protected $observers = [
-
         /** Visit Tracker */
-        Session::class => [
-            OwneredModelObserver::class,
-        ],
-        Cookie::class => [
-            OwneredModelObserver::class,
-        ],
-        Path::class => [
-            OwneredModelObserver::class,
-        ],
-        Visit::class => [
-            OwneredModelObserver::class,
-        ],
     ];
 
     /**

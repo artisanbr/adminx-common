@@ -14,11 +14,10 @@ use Adminx\Common\Models\Traits\HasVisitCounter;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
-use ArtisanLabs\LaravelVisitTracker\Traits\Visitable;
 
 class HtmlBuild extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
-    use HasOwners, HasUriAttributes, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasVisitCounter, Visitable, HasRelatedCache, HasMorphAssigns;
+    use HasOwners, HasUriAttributes, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasVisitCounter, HasRelatedCache, HasMorphAssigns;
 
     protected $connection = 'mysql';
 

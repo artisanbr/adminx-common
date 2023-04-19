@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 trait HasVisitCounter
 {
 
-    public function uniqueVisits(){
+    /*public function uniqueVisits(){
         return $this->visitLogs()->distinct('ip');
     }
 
@@ -30,7 +30,7 @@ trait HasVisitCounter
 
     protected function dayUniqueVisitsCount(): Attribute {
         return Attribute::make(get: fn() => $this->uniqueVisits()->whereDate('created_at', Carbon::today())->count('ip'));
-    }
+    }*/
 
 
 
