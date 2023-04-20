@@ -3,11 +3,9 @@
 namespace Adminx\Common\Models;
 
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use App\Http\Controllers\API\Auth\AuthController;
 use Adminx\Common\Models\Generics\Configs\UserConfig;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\HasPosts;
-use ArtisanLabs\LaravelVisitTracker\Models\UserVisitTrackerBase;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
