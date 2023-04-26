@@ -4,6 +4,7 @@ namespace Adminx\Common\Models;
 
 use Adminx\Common\Enums\CustomLists\CustomListType;
 use Adminx\Common\Libs\Support\Str;
+use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\WidgetConfig;
 use Adminx\Common\Models\Generics\DataSource;
 use Adminx\Common\Models\Interfaces\OwneredModel;
@@ -12,6 +13,7 @@ use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
+use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -19,23 +21,20 @@ use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
-class Widgeteable extends MorphPivot implements PublicIdModel, OwneredModel
+class Widgeteable extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
-    use HasPublicIdAttribute, HasOwners, BelongsToSite, Cachable;
+    use HasPublicIdAttribute, HasOwners, BelongsToSite, BelongsToUser;
 
-    protected array $ownerTypes = ['site'];
+    protected array $ownerTypes = ['site','user'];
 
     protected $table        = 'widgeteables';
     public    $timestamps   = false;
-    public    $incrementing = true;
 
     protected $fillable = [
         'site_id',
+        'user_id',
         'widget_id',
-        'widgeteable_id',
-        'widgeteable_type',
-        'source_ids',
-        'source_type',
+        'vars',
         'source',
         'title',
         'config',
@@ -43,18 +42,15 @@ class Widgeteable extends MorphPivot implements PublicIdModel, OwneredModel
 
     protected $casts = [
         'config'      => WidgetConfig::class,
-        'source_ids'  => 'collection',
-        'source_type' => 'string',
+        'vars'  => 'collection',
         'source'      => DataSource::class,
         'public_id'   => 'string',
         'title'       => 'string',
         'sources'     => 'collection',
         'css_class'   => 'string',
-        'variables'     => 'collection',
     ];
 
     protected $attributes = [
-        'config' => [],
     ];
 
     ////region HELPERS
@@ -255,19 +251,9 @@ class Widgeteable extends MorphPivot implements PublicIdModel, OwneredModel
     //endregion
 
     //region Relations
-    /*public function site()
-    {
-        return $this->hasOne(Site::class, 'id', 'site_id');
-    }*/
-
     public function widget()
     {
         return $this->belongsTo(Widget::class);
-    }
-
-    public function widgeteable()
-    {
-        return $this->morphTo(__FUNCTION__);
     }
     //endregion
 }

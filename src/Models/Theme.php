@@ -2,7 +2,6 @@
 
 namespace Adminx\Common\Models;
 
-use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
@@ -12,10 +11,8 @@ use Adminx\Common\Models\Generics\Elements\Themes\ThemeFooterElement;
 use Adminx\Common\Models\Generics\Elements\Themes\ThemeHeader;
 use Adminx\Common\Models\Generics\Elements\Themes\ThemeHeaderElement;
 use Adminx\Common\Models\Generics\Elements\Themes\ThemeMediaElement;
-use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
-use Adminx\Common\Models\Interfaces\WidgeteableModel;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasSelect2;
@@ -34,9 +31,9 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\View;
 use voku\helper\HtmlMin;
 
-class Theme extends EloquentModelBase implements WidgeteableModel, PublicIdModel, OwneredModel
+class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
-    use SoftDeletes, HasUriAttributes, BelongsToSite, BelongsToUser, HasSelect2, HasParent, HasValidation, HasOwners, HasFiles, HasWidgets, HasPublicIdAttribute;
+    use SoftDeletes, HasUriAttributes, BelongsToSite, BelongsToUser, HasSelect2, HasParent, HasValidation, HasOwners, HasFiles, HasPublicIdAttribute;
 
     protected $fillable = [
         'account_id',

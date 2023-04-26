@@ -3,7 +3,6 @@
 namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Models\Interfaces\HtmlModel;
-use Adminx\Common\Models\Interfaces\WidgeteableModel;
 use Adminx\Common\Models\Page;
 use Adminx\Common\Models\Site;
 use Adminx\Common\Models\Widgeteable;
@@ -19,7 +18,7 @@ use Twig\TwigFilter;
 use Twig\TwigFunction;
 
 /**
- * @property WidgeteableModel|Page $model
+ * @property Page $model
  */
 class AdvancedHtmlEngine
 {
@@ -39,7 +38,7 @@ class AdvancedHtmlEngine
 
     public function __construct(
         public Site             $site,
-        public WidgeteableModel|HtmlModel $model,
+        public HtmlModel $model,
         public string           $viewTemporaryName
     ) {
         $this->widgeteables = $this->site->widgeteables;
@@ -48,7 +47,7 @@ class AdvancedHtmlEngine
 
     }
 
-    public static function start(Site $site, WidgeteableModel|HtmlModel $model, string $viewTemporaryName = "temp-html"): self
+    public static function start(Site $site, HtmlModel $model, string $viewTemporaryName = "temp-html"): self
     {
         $site->load(['theme','widgeteables','menus']);
         return (new self($site, $model, $viewTemporaryName));

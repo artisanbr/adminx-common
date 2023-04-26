@@ -3,12 +3,9 @@
 namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Facades\FrontendSite;
-use Adminx\Common\Models\Interfaces\HtmlModel;
-use Adminx\Common\Models\Interfaces\WidgeteableModel;
 use Adminx\Common\Models\Page;
 use Adminx\Common\Models\Site;
 use Adminx\Common\Models\Widgeteable;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\View;
 use PragmaRX\Support\Exceptions\Exception;
 use Twig\Environment;

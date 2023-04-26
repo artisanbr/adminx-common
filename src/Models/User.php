@@ -172,5 +172,9 @@ class User extends EloquentModelBase implements AuthenticatableContract,
         return $this->hasMany(Page::class);
     }
 
+    public function widgeteables(){
+        return $this->hasMany(Widgeteable::class);
+    }
+
     //endregion
 }

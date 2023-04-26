@@ -208,24 +208,14 @@ class MenusServiceProvider extends ServiceProvider
 
                 foreach ($pages as $page) {
 
-                    if ($page->using_posts || $page->using_forms) {
+                    if ($page->using_posts) {
                         //Posts
                         $this->itemSubmenu($page->title, function (Menu $submenu) use ($page) {
                             $submenu->subItem("Configurar Página", route('app.pages.cadastro', $page->id));
 
-                            if ($page->using_posts) {
-                                //Posts
-                                $submenu->subItem('Gerenciar Postagens', route('app.pages.posts.index', $page->id))
-                                        ->subItem('Nova Postagem', route('app.pages.posts.cadastro', $page->id));
-                            }
+                            $submenu->subItem('Gerenciar Postagens', route('app.pages.posts.index', $page->id))
+                                    ->subItem('Nova Postagem', route('app.pages.posts.cadastro', $page->id));
 
-                            if ($page->using_forms) {
-                                //todo: Form
-                                /*$submenu->subItem('Respostas do Formulário', route('app.elements.forms.answers', [
-                                    $page->form->id,
-                                    $page->id,
-                                ]));*/
-                            }
 
                             return $submenu;
                         },                 $page->is_home ? 'home' : 'blog');
