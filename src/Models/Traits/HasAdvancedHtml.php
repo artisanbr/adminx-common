@@ -25,18 +25,21 @@ trait HasAdvancedHtml
          * @var EloquentModelBase|Page|HtmlModel $this
          */
 
-        $this->attributes[$this->htmlCacheAttribute] = $this->builtHtml();
+        $htmlCacheAttr = $this->htmlCacheAttribute;
+
+        $this->attributes[$htmlCacheAttr] = $this->builtHtml();
 
         if($save){
             $this->save();
         }
 
-        return $this->html;
+        return $this->{$htmlCacheAttr};
     }
 
     public function builtHtml(): string
     {
         $htmlRawAttribute = $this->htmlRawAttribute;
+
         return $this->htmlBuilder()->html($this->{$htmlRawAttribute})->buildHtml();
     }
 

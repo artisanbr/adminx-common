@@ -130,6 +130,18 @@ class MetaTagsServiceProvider extends ServiceProvider
         //region CUSTOM PACKAGES
 
 
+        //vueJS
+        PackageManager::create('vue2', function (Package $package) {
+            $package
+                ->addScript('vue2.js',
+                            'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js');
+        });
+        PackageManager::create('vue3', function (Package $package) {
+            $package
+                ->addScript('vue3.js',
+                            'https://unpkg.com/vue@3/dist/vue.global.js');
+        });
+
         //autocomplete
         PackageManager::create('autocomplete', function (Package $package) {
             $package

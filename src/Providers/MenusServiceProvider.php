@@ -244,7 +244,7 @@ class MenusServiceProvider extends ServiceProvider
                                         ])
 
                 //Itens
-                        ->item('Painel de Controle', route('app.dashboard.index'), 'general/gen002.svg')
+                        ->item('Painel de Controle', appUrl(), 'general/gen002.svg')
 
                 //Sites
                 /*       ->itemSubmenu('Sites', function (Menu $submenu) {

@@ -17,6 +17,11 @@ class PageObserver
             $model->slug = $model->title;
         }
 
+        //Gerar config caso esteja em branco
+        if(!$model->has_config){
+            $model->config = $model->model->has_config ? $model->model->config : $model->type->config;
+        }
+
         if ($model->id) {
 
             //Comprimir CSS e JS personalizado da Página

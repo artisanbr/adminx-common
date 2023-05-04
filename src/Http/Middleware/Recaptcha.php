@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Http\Middleware;
 
-use App\Http\Responses\ApiResponse;
+use Adminx\Common\Http\Responses\ApiResponse;
 use Closure;
 use FrontendSite;
 use ReCaptcha\ReCaptcha as GReCaptcha;

@@ -75,6 +75,7 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         'seo',
         'published_at',
         'unpublished_at',
+        'elements'
     ];
 
     protected $casts = [
@@ -87,7 +88,6 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         'css'               => GenericAssetElementCSS::class,
         'js'                => GenericAssetElementJS::class,
         'elements'          => PageElements::class,
-        'elements_old'      => AsCollectionOf::class . ':' . HtmlElement::class,
         'html'              => 'string',
         'html_raw'          => 'string',
         'internal_html_raw' => 'string',

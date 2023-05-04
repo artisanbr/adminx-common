@@ -45,14 +45,10 @@ class PageRepository extends Repository
 
             $this->page->fill($this->data);
 
-            //dd($this->data, $this->theme->footer, $this->theme->footer->is_html_advanced, $this->theme->footer->raw);
 
             $this->page->save();
             $this->page->refresh();
-
-            if(!$this->page->has_config){
-                $this->page->config = $this->page->model->has_config ? $this->page->model->config : $this->page->type->config;
-            }
+            //dd('chegou', $this->page);
 
             //Generate breadcrumb
             $this->page->config->breadcrumb = $this->page->config->breadcrumb ?? $this->page->site->theme->config->breadcrumb ?? new BreadcrumbConfig();

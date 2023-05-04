@@ -4,13 +4,16 @@ namespace Adminx\Common\Mail\Frontend;
 
 use Adminx\Common\Models\FormAnswer;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Mail\Factory;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Mail\Mailables\Headers;
+use Illuminate\Mail\SentMessage;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Mail;
 
 class FormAnswerMail extends Mailable
 {
@@ -23,16 +26,56 @@ class FormAnswerMail extends Mailable
      */
     public function __construct(public FormAnswer $formAnswer)
     {
-        if ($this->formAnswer->site->config->mail ?? false) {
+
+    }
+
+    /**
+     * @param Factory|Mailer $mailer
+     */
+    public function send($mailer): SentMessage|null
+    {
+        if ($this->setAppMailConfig()) {
+            $mailer = Mail::mailer($this->formAnswer->site->id);
+        }
+
+        return parent::send($mailer);
+    }
+
+    public function getMailConfig(): array
+    {
+
+        return [
+            'transport'  => 'smtp',
+            'encryption' => $this->formAnswer->site->config->mail->security ?? false,
+            'host'       => $this->formAnswer->site->config->mail->host,
+            'port'       => $this->formAnswer->site->config->mail->port,
+            'username'   => $this->formAnswer->site->config->mail->user,
+            'password'   => $this->formAnswer->site->config->mail->password_decrypt(),
+        ];
+    }
+
+    public function validateSiteMailConfig()
+    {
+        if (($this->formAnswer->site->config->mail ?? false) && !$this->formAnswer->site->config->mail->checked) {
             $this->formAnswer->site->config->mail->checkConnection();
         }
 
-        if ($this->formAnswer->site->config->mail->checked ?? false) {
-            Config::set('mail.mailers.smtp.host', $this->formAnswer->site->config->mail->host);
-            Config::set('mail.mailers.smtp.username', $this->formAnswer->site->config->mail->user);
-            Config::set('mail.mailers.smtp.password', $this->formAnswer->site->config->mail->password_decrypt());
-            Config::set('mail.mailers.smtp.port', $this->formAnswer->site->config->mail->port);
+        return $this->formAnswer->site->config->mail->checked ?? false;
+    }
+
+    public function setAppMailConfig()
+    {
+        if ($this->validateSiteMailConfig()) {
+
+            config([
+                       "mail.mailers.{$this->formAnswer->site->id}" => $this->getMailConfig(),
+                   ]);
+
+            return true;
         }
+
+
+        return false;
     }
 
     /**
@@ -42,6 +85,7 @@ class FormAnswerMail extends Mailable
      */
     public function envelope(): Envelope
     {
+
         $from = [
             'address' => $this->formAnswer->form->config->mail_from_address ?? $this->formAnswer->site->config->mail->from_address ?? config('mail.from.address'),
 
@@ -57,7 +101,7 @@ class FormAnswerMail extends Mailable
         return new Envelope(
             from:    new Address($from['address'], $from['name']),
             //replyTo: $replyTo,
-            subject: "{$this->formAnswer->site->title} - Nova resposta de formulário recebida em ".$this->formAnswer->created_at->format('d/m/Y \à\s H:i'),
+            subject: "{$this->formAnswer->site->title} - Nova resposta de formulário recebida em " . $this->formAnswer->created_at->format('d/m/Y \à\s H:i'),
             tags:    ['contact', 'form']
         );
     }
@@ -71,7 +115,7 @@ class FormAnswerMail extends Mailable
     {
         return new Headers(
             text: [
-                      'List-Unsubscribe' => '<'.route('app.elements.forms.cadastro', $this->formAnswer->form_id).'>',
+                      'List-Unsubscribe' => "<{$this->formAnswer->site->url}>",
                   ],
         );
     }
@@ -84,7 +128,7 @@ class FormAnswerMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'layouts.mail.frontend.form-answer',
+            view: 'adminx-common::layouts.mail.frontend.form-answer',
             with: [
                       'formAnswer' => $this->formAnswer,
                   ]
