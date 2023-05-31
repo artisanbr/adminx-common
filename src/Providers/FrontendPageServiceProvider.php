@@ -157,7 +157,7 @@ class FrontendPageServiceProvider extends ServiceProvider
                                 'media'  => 'print',
                                 'onload' => "this.media='all'",
                             ]*/
-                            dump($file->path);
+                            //dump($file->path);
                             $package->addStyle($file->name, $file->url);
                         }
                         if ($file->extension === 'js') {
@@ -172,10 +172,13 @@ class FrontendPageServiceProvider extends ServiceProvider
         });
 
         Meta::macro('registerSeoMetaTagsForPage', function (Page $page) {
+
+            if($page->site->seo->config->show_parent_title){
+                $this->prependTitle($page->site->getTitle());
+            }
+
             //Page
-            $this
-                ->prependTitle($page->site->getTitle())
-                ->setMetaFrom($page);
+            $this->setMetaFrom($page);
 
         });
 

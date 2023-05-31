@@ -6,7 +6,7 @@ use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas\Sliders\SliderDataButtons;
 use Adminx\Common\Models\Generics\Elements\HtmlElement;
 use Adminx\Common\Models\Generics\Files\GenericImageFile;
-use Adminx\Common\Models\Generics\Seo;
+use Adminx\Common\Models\Generics\Seo\Seo;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 

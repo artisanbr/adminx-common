@@ -20,7 +20,14 @@
     @@stack('css')
     @@yield('css')--}}
 
-    <link rel="preload" as="image" href="{{ appAsset(config('adminx.app.provider.logo')) }}" />
+    <link rel="preload" as="image" href="{{ FrontendUtils::asset(config('adminx.app.provider.logo')) }}" />
+
+    @foreach(['logo','logo_secondary'] as $media)
+        @if(($site->theme->media->{$media} ?? false) && ($site->theme->media->{$media}->url ?? false))
+            <link rel="preload" as="image" href="{{ $site->theme->media->{$media}->url ?? '' }}" />
+        @endif
+    @endforeach
+
 
     {!! $site->theme->js->head_js_html ?? '' !!}
     @{!! $page->js->head_js_html ?? '' !!}

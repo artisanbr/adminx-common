@@ -28,9 +28,9 @@ class FrontendSiteEngine extends FrontendEngineBase
     public function loadCurrent($modelCache = true): Site|null
     {
 
-        if (Auth::check() && Auth::user()->site_id) {
+        /*if (Auth::check() && Auth::user()->site_id) {
             return Auth::user()->site;
-        }
+        }*/
 
         //Pegar dominio atual e remover o WWW
         //header("Host: {$this->currentDomain}");
@@ -87,7 +87,7 @@ class FrontendSiteEngine extends FrontendEngineBase
 
                 //Limpar cache se necessário:
                 $cacheBus = [];
-                if ($this->currentSite->config->cache->clear_model) {
+                /*if ($this->currentSite->config->cache->clear_model) {
 
                     $cacheBus[] = function () {
                         Artisan::call('modelCache:clear');
@@ -106,7 +106,7 @@ class FrontendSiteEngine extends FrontendEngineBase
 
                     $this->currentSite->config->cache->clear_view = false;
 
-                }
+                }*/
 
                 if (count($cacheBus)) {
                     Bus::chain($cacheBus)->dispatch();

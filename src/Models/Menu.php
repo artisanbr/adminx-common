@@ -66,8 +66,8 @@ class Menu extends EloquentModelBase
 
         $menuParentItems = $this->parent_items;
 
-        foreach ($this->parent_items as $menuItem){
-            $menuBuilder = $menuItem->mount($menuBuilder);
+        foreach ($menuParentItems as $menuItem){
+            $menuBuilder = $menuItem->mount($menuBuilder, $this);
         }
 
         return $menuBuilder->each(function (SpatieMenu $submenu) {

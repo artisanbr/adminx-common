@@ -3,7 +3,7 @@
 namespace Adminx\Common\Models;
 
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Generics\Seo;
+use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Scopes\WhereSiteScope;

@@ -11,7 +11,7 @@ use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
 use Adminx\Common\Models\Generics\Configs\PageConfig;
 use Adminx\Common\Models\Generics\Elements\HtmlElement;
 use Adminx\Common\Models\Generics\Elements\PageElements;
-use Adminx\Common\Models\Generics\Seo;
+use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Interfaces\BuildableModel;
 use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Interfaces\OwneredModel;

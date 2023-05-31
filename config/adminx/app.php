@@ -14,7 +14,7 @@ return [
     'provider' => [
         'name' => env('ADMINX_PROVIDER_NAME','Artisan Digital'),
         'url' => env('ADMINX_PROVIDER_URL', 'https://artisan.dev.br'),
-        'logo' => env('ADMINX_PROVIDER_LOGO', 'media/images/providers/artisan/logo-small.webp'),
+        'logo' => env('ADMINX_PROVIDER_LOGO', 'media/images/providers/artisan/logo-micro.webp'),
         'since' => env('ADMINX_PROVIDER_SINCE', 2022),
         'copyright' => env('ADMINX_PROVIDER_COPYRIGHT', "Desenvolvido com ❤️ com o apoio de"),
     ],

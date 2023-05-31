@@ -106,8 +106,12 @@ class MenuItem extends EloquentModelBase
         return $this;
     }
 
-    public function mount(SpatieMenu $menuBuilder): SpatieMenu
+    public function mount(SpatieMenu $menuBuilder, Menu|null $menu = null): SpatieMenu
     {
+        if(!$menu){
+            $menu = $this->menu;
+        }
+
         if ($this->menuable_type === 'menu' || $this->children->count()) {
 
             /*$subMenu = SpatieMenu::new()
@@ -119,25 +123,23 @@ class MenuItem extends EloquentModelBase
                                         'data-toggle' => 'dropdown',
                                         'role'        => 'button',
                                     ]),
-                function (SpatieMenu $subMenu) {
+                function (SpatieMenu $subMenu) use ($menu) {
 
-                    $subMenu->addClass($this->menu->config->submenu_class ?? '');
+                    $subMenu->addClass($menu->config->submenu_class ?? '');
 
                     if($this->config->is_source_submenu && $this->config->submenu_source->data->id ?? false){
                         //Subitens de uma fonte de dados
                         $sourceData = $this->config->submenu_source->data->mountModel();
 
 
-                        if($sourceData->items->count() ?? false){
-                            foreach($sourceData->items as $dataItem){
-                                $subMenu->add(Link::to($dataItem->url, $dataItem->title)->addParentClass($this->menu->config->menu_item_class ?? ''));
-                            }
+                        foreach($sourceData->items as $dataItem){
+                            $subMenu->add(Link::to($sourceData->itemUrl($dataItem), $dataItem->title)->addParentClass($menu->config->menu_item_class ?? ''));
                         }
 
                     }else if($this->children->count()){
                         //Subitens cadastrados
                         foreach ($this->children as $childMenuItem) {
-                            $subMenu = $childMenuItem->mount($subMenu);
+                            $subMenu = $childMenuItem->mount($subMenu, $menu);
                         }
                     }
                 }
@@ -162,7 +164,7 @@ class MenuItem extends EloquentModelBase
 
         }
         else {
-            $menuBuilder->add(Link::to($this->url, $this->title)->addParentClass($this->menu->config->menu_item_class ?? ''));
+            $menuBuilder->add(Link::to($this->url, $this->title)->addParentClass($menu->config->menu_item_class ?? ''));
         }
 
         return $menuBuilder;

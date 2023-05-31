@@ -8,7 +8,8 @@ use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Generics\Configs\Site\SiteConfig;
 use Adminx\Common\Models\Generics\Contact\Contact;
-use Adminx\Common\Models\Generics\Seo;
+use Adminx\Common\Models\Generics\Seo\Seo;
+use Adminx\Common\Models\Generics\Seo\SiteSeo;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Traits\HasOwners;
@@ -46,7 +47,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     protected $casts = [
         'config' => SiteConfig::class,
-        'seo' => Seo::class,
+        'seo' => SiteSeo::class,
         'contact' => Contact::class,
         'uri' => 'string',
         'dynamic_uri' => 'string',

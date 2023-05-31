@@ -20,6 +20,7 @@ use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
 use Adminx\Common\Models\Traits\Relations\BelongsToPage;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 
@@ -32,6 +33,7 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
     protected string $listItemClass = CustomListItem::class;
 
     protected $fillable = [
+        'id',
         'site_id',
         'user_id',
         'account_id',
@@ -108,7 +110,8 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
     public static function findAndMount($id = null, $type = null): CustomListBase
     {
         if (!$type && $id) {
-            $listType = CustomList::find($id)->type->value ?? null;
+            //dd(CustomList::where('id',$id)->select(['type'])->get());
+            $listType = CustomList::where('id',$id)->select(['type'])->get()->type->value ?? null;
         }
         else {
             $listType = $type;
@@ -121,7 +124,15 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
     }
 
     public function mountModel(){
-        return self::findAndMount($this->id, $this->type->value);
+
+        $mountClass = $this->type->value ? CustomListType::from($this->type->value)->mountClass() : CustomList::class;
+
+        $mountModel = $mountClass::make($this->toArray());
+        $mountModel->refresh();
+
+        return $mountModel;
+
+        //return self::findAndMount($this->id, $this->type->value);
     }
 
     public function itemUrl(CustomListItemBase $listItem): string

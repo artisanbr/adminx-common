@@ -1,8 +1,10 @@
 <?php
 
-namespace Adminx\Common\Models\Generics;
+namespace Adminx\Common\Models\Generics\Seo;
 
+use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\File;
+use Adminx\Common\Models\Generics\Seo\Config\SeoConfig;
 use Illuminate\Support\Collection;
 use ArtisanLabs\GModel\GenericModel;
 
@@ -19,6 +21,7 @@ class Seo extends GenericModel
         'description',
         'keywords',
         'robots',
+        'config'
     ];
 
     protected $attributes = [
@@ -26,6 +29,7 @@ class Seo extends GenericModel
         'description' => '',
         'keywords'    => '',
         'robots'      => 'index, follow',
+        'config'      => [],
     ];
 
     protected $casts = [
@@ -35,6 +39,7 @@ class Seo extends GenericModel
         'keywords'       => 'string',
         'keywords_array' => 'collection',
         'robots'         => 'string',
+        'config'         => SeoConfig::class,
     ];
 
     protected $appends = [
@@ -56,6 +61,8 @@ class Seo extends GenericModel
         else {
             $this->attributes['keywords'] = (string)$value;
         }
+
+        $this->attributes['keywords'] = Str::lower($this->attributes['keywords']);
     }
     //endregion
 

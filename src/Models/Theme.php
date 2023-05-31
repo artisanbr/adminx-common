@@ -23,6 +23,7 @@ use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\Relations\HasWidgets;
+use App\Providers\AppMetaTagsServiceProvider;
 use Butschster\Head\Facades\Meta;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -105,6 +106,8 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
     public function compile()
     {
         $this->load(['site']);
+
+        AppMetaTagsServiceProvider::registerFrontendPackages();
 
         Meta::registerSeoMetaTagsForSite($this->site);
         Meta::removeTag('description');
@@ -241,11 +244,11 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         $this->css->minify();
         $this->js->minify();
 
-        if (!$this->id) {
+        /*if (!$this->id) {
             //Salvar antes de gerar o HTML Avançado no caso de um novo tema
             parent::save($options);
             $this->refresh();
-        }
+        }*/
 
         //Cache dos HTMLs
         //$this->header_old->flushHtmlCache($this->site, $this);

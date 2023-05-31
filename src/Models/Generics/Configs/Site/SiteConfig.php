@@ -13,16 +13,14 @@ class SiteConfig extends GenericModel
         'ssl',
         'debug',
 
-        'enable_html_minify',
-        'enable_image_optimize',
+        'maintenance',
 
         'recaptcha_site_key',
         'recaptcha_private_key',
     ];
 
     protected $attributes = [
-        'enable_html_minify' => false,
-        'enable_image_optimize' => true,
+        'maintenance' => false,
         'debug' => false,
         'ssl' => false,
         'performance' => [],
@@ -34,8 +32,7 @@ class SiteConfig extends GenericModel
         'is_https' => 'bool',
         'ssl' => 'bool',
         'debug' => 'bool',
-        'enable_html_minify' => 'bool',
-        'enable_image_optimize' => 'bool',
+        'maintenance' => 'bool',
     ];
 
 

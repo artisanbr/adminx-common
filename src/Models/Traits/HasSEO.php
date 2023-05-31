@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Models\Traits;
 
-use Adminx\Common\Models\Generics\Seo;
+use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Page;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Site;
@@ -76,22 +76,38 @@ trait HasSEO
 
     public function getTitle(): string
     {
-        return $this->seoTitle();
+        return $this->seo->title ?? $this->title;
     }
 
     public function getDescription(): string
     {
-        return $this->seoDescription($this->site->seo->description ?? '');
+
+        if(get_class($this) !== Site::class && $this->site ?? false && $this->site->seo->config->use_defaults){
+            return $this->seo->description ?? $this->site->getDescription();
+        }
+
+        return $this->seo->description;
     }
 
     public function getKeywords(): string
     {
-        return $this->seoKeywords($this->site->seo->keywords ?? '');
+
+        if(get_class($this) !== Site::class && ($this->site ?? false) && $this->site->seo->config->use_defaults){
+            return $this->seo->keywords ?? $this->site->getKeywords();
+        }
+
+        return $this->seo->keywords;
+
+        //return $this->seoKeywords($this->site->seo->keywords ?? '');
     }
 
     public function getRobots(): string
     {
-        return $this->seo->robots ?? $this->site->seo->robots ?? 'noindex, nofollow';
+        if(get_class($this) !== Site::class && ($this->site ?? false) && $this->site->seo->config->use_defaults){
+            return $this->seo->robots ?? $this->site->getRobots();
+        }
+
+        return $this->seo->robots ?? 'noindex, nofollow';
     }
 
     //endregion

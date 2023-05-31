@@ -114,7 +114,7 @@ class DataSource extends GenericModel
 
             $this->attributes['data'] = null;
 
-            $site = FrontendSite::current();
+            $site = (Auth::check() && Auth::user()->site) ? Auth::user()->site : FrontendSite::current();
 
             switch ($this->type) {
                 //Todo:

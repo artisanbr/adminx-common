@@ -19,9 +19,9 @@
         <div class="banner-slider" id="bannerSlider-{{ $widgeteable->public_id }}">
             @foreach($customListItems as $listItem)
                 @push('css')
-                    <link rel="preload" as="image" href="{{ $listItem->data->image->file->url }}" />
+                    <link rel="preload" as="image" href="{{ $listItem->data->image->file->url ?? '' }}" />
                 @endpush
-                <div class="single-banner" style="background-image: url({{ $listItem->data->image->file->url }});">
+                <div class="single-banner" style="background-image: url({{ $listItem->data->image->file->url ?? '' }});">
                     <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-lg-10">
@@ -33,7 +33,6 @@
                                     <ul class="btn-wrap">
                                         @foreach($listItem->data->buttons as $button)
                                             <li data-animation="fadeInLeft" data-delay="1.2s">
-                                                {{--<a href="{{ $button->url }}" {{ $button->external ? 'target="_blank"' : '' }} class="main-btn main-btn-4">{{ $button->content }}</a>--}}
                                                 {!! $button->html !!}
                                             </li>
                                         @endforeach

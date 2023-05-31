@@ -2,10 +2,13 @@
 
 namespace Adminx\Common\Libs\FrontendEngine;
 
+use Adminx\Common\Facades\FrontendHtml;
 use Adminx\Common\Facades\FrontendSite;
 use Adminx\Common\Models\Page;
 use Adminx\Common\Models\Site;
+use Adminx\Common\Models\ThemeBuild;
 use Adminx\Common\Models\Widgeteable;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use PragmaRX\Support\Exceptions\Exception;
 use Twig\Environment;
@@ -16,6 +19,7 @@ use Twig\Extension\DebugExtension;
 use Twig\Loader\ArrayLoader;
 use Twig\TwigFilter;
 use Twig\TwigFunction;
+use voku\helper\HtmlMin;
 
 class FrontendHtmlEngine extends FrontendEngineBase
 {
@@ -26,7 +30,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
 
     protected ArrayLoader $twigLoader;
 
-    protected string $rawHtml;
+    protected string|null $rawHtml = null;
 
     protected array $customViewData = [];
 
@@ -39,18 +43,13 @@ class FrontendHtmlEngine extends FrontendEngineBase
     public array $viewData = [];
 
     public function __construct(
-        public Site|null  $currentSite = null,
-        public string     $viewTemporaryName = 'temp-html'
+        public Site|null $currentSite = null,
+        public string    $viewTemporaryName = 'temp-html'
     )
     {
         if (!$this->currentSite) {
             $this->setCurrentSite(FrontendSite::current());
         }
-
-        $this->viewData = [
-            'site' => $this->currentSite,
-            'theme' => $this->currentSite->theme
-        ];
 
     }
 
@@ -86,20 +85,28 @@ class FrontendHtmlEngine extends FrontendEngineBase
             return $this->widget($public_id);
         }));
 
-        $this->twig->addFunction(new TwigFunction('widget', function (string $public_id){
+        $this->twig->addFunction(new TwigFunction('widget', function (string $public_id) {
             return $this->widget($public_id);
         }));
 
         return $this;
     }
 
-    public function setCurrentSite(Site|null $site = null): static
+    public function setCurrentSite(Site|null $site = null, $changeData = true): static
     {
         $this->currentSite = $site;
 
-        if($this->currentSite){
+        if ($this->currentSite) {
             $this->widgeteables = $this->currentSite->widgeteables;
             $this->menus = $this->currentSite->menus;
+
+            if($changeData){
+                $this->viewData = [
+                    'site'  => $this->currentSite,
+                    'theme' => $this->currentSite->theme,
+                ];
+            }
+
         }
 
         return $this;
@@ -112,20 +119,63 @@ class FrontendHtmlEngine extends FrontendEngineBase
         return $this;
     }
 
-    public function page(Page $page): self
+    public function page(Page $page): string
     {
+        $this->setCurrentSite($page->site, false);
         $this->viewData = $page->getBuildViewData();
 
-        return $this;
+
+        $themeBuild = $page->site->theme->build()->latest()->first();
+
+        if (!$themeBuild) {
+
+            $page->site->theme->compile();
+            $themeBuild = $page->site->theme->build()->latest()->first();
+        }
+
+        if($themeBuild){
+
+            //Montar Header
+            $pageBlade = $themeBuild->renderHeader($page);
+
+            //Montar Corpo
+            $pageBlade .= View::make($page->getBuildViewPath(), $this->viewData)->render();
+
+            //Montar footer
+            $pageBlade .= $themeBuild->renderFooter($page);
+
+            $this->rawHtml = $pageBlade;
+
+            $this->startTwig();
+
+
+        }else{
+            $this->rawHtml = View::make($page->getBuildViewPath(), $this->viewData)->render();
+            $this->startTwig();
+        }
+
+        $renderedBlade = Blade::render($this->renderTwig(), compact('page'));
+
+        if ($this->currentSite->config->enable_html_minify) {
+            $htmlMin = new HtmlMin();
+
+            $renderedBlade = $htmlMin->minify($renderedBlade);
+        }
+
+        return $renderedBlade;
     }
 
-    public function html($rawHtml): static
+    public function html($rawHtml = null, $viewData = null): string
     {
+        if($viewData){
+            $this->viewData = $viewData;
+        }
+
         $this->rawHtml = $rawHtml;
 
         $this->startTwig();
 
-        return $this;
+        return $this->renderTwig();
     }
 
     /**
@@ -134,14 +184,16 @@ class FrontendHtmlEngine extends FrontendEngineBase
      * @throws LoaderError
      * @throws Exception
      */
-    public function render(): string
+    public function renderTwig(): string
     {
-        if(!$this->twig){
+        if (!$this->twig) {
             throw new Exception('HTML não definido');
         }
 
         try {
+
             return $this->twig->render($this->viewTemporaryName, $this->viewData);
+
         } catch (\Exception $e) {
             dump($this->viewTemporaryName, $this->viewData, $this->rawHtml);
             throw $e;

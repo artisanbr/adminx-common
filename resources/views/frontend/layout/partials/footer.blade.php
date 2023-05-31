@@ -22,7 +22,7 @@
                     <a href="{{ config('adminx.app.provider.url') }}" target="_blank"
                        title="Powered by {{ config('adminx.app.provider.name') }}"
                        class="ms-2 ml-2">
-                        <img src="{{ appAsset(config('adminx.app.provider.logo')) }}" height="18px"
+                        <img src="{{ FrontendUtils::asset(config('adminx.app.provider.logo')) }}" height="18"
                              alt="{{ config('adminx.app.provider.name') }}"/>
                     </a>
                 </div>
