@@ -152,15 +152,44 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
     {
         $frontendBuild = $this->page->frontendBuild();
 
+        //Gtag
         $frontendBuild->head->gtag_script = $this->getGTagScript();
+
+        //Antes inicio da tag head
         $frontendBuild->head->addBefore(Meta::toHtml());
         $frontendBuild->head->css .= $this->css_html;
+
+        //Fim d atag head
         $frontendBuild->head->addAfter($this->assets->js->head_html ?? '');
         $frontendBuild->head->addAfter($this->assets->head_script->html ?? '');
 
+        //JSON-LD BlogPost
+        $jsonLD = [
+            "@context"      => "https://schema.org",
+            "@type"         => "NewsArticle",
+            "headline"      => $this->title,
+            "image"         => [
+                $this->seoImage(),
+            ],
+            "datePublished" => $this->published_at->toIso8601String(),
+            "dateModified"  => $this->updated_at->toIso8601String(),
+            "author"        => [
+                [
+                    "@type" => "Organization",
+                    "name"  => $this->site->title,
+                    "url"   => $this->uri,
+                ],
+            ],
+        ];
+
+        $frontendBuild->head->addAfter('<script type="application/ld+json">'.json_encode($jsonLD).'</script>');
+
+        //Inicio do body
         $frontendBuild->body->id = "post-{$this->public_id}";
         $frontendBuild->body->class .= " post-{$this->public_id}";
         $frontendBuild->body->addBefore($this->assets->js->before_body_html ?? '');
+
+        //Fim do body
         $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
 
         return $frontendBuild;
