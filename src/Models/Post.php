@@ -31,7 +31,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -163,26 +162,8 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
         $frontendBuild->head->addAfter($this->assets->js->head_html ?? '');
         $frontendBuild->head->addAfter($this->assets->head_script->html ?? '');
 
-        //JSON-LD BlogPost
-        $jsonLD = [
-            "@context"      => "https://schema.org",
-            "@type"         => "NewsArticle",
-            "headline"      => $this->title,
-            "image"         => [
-                $this->seoImage(),
-            ],
-            "datePublished" => $this->published_at->toIso8601String(),
-            "dateModified"  => $this->updated_at->toIso8601String(),
-            "author"        => [
-                [
-                    "@type" => "Organization",
-                    "name"  => $this->site->title,
-                    "url"   => $this->uri,
-                ],
-            ],
-        ];
-
-        $frontendBuild->head->addAfter('<script type="application/ld+json">'.json_encode($jsonLD).'</script>');
+        //JSON-LD
+        $frontendBuild->head->addAfter($this->ld_json_script);
 
         //Inicio do body
         $frontendBuild->body->id = "post-{$this->public_id}";
@@ -198,6 +179,31 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
     //endregion
 
     //region ATTRIBUTES
+    protected function ldJsonScript(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => '<script type="application/ld+json">' . json_encode(
+                    [
+                        "@context"      => "https://schema.org",
+                        "@type"         => "NewsArticle",
+                        "headline"      => $this->title,
+                        "image"         => [
+                            $this->seoImage(),
+                        ],
+                        "datePublished" => $this->published_at->toIso8601String(),
+                        "dateModified"  => $this->updated_at->toIso8601String(),
+                        "author"        => [
+                            [
+                                "@type" => "Organization",
+                                "name"  => $this->site->title,
+                                "url"   => $this->uri,
+                            ],
+                        ],
+                    ]
+                ) . '</script>',
+        );
+    }
+
     protected function slug(): Attribute
     {
         return Attribute::make(
