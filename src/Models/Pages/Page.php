@@ -170,10 +170,6 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
         return FrontendHtml::html($this->content->internal->html, [...$this->getBuildViewData(), 'currentItem' => $dataItem]);
 
-        /*return $this->id && $this->site ? AdvancedHtmlEngine::start($this->site, $this, 'internal-html')->buildHtml([
-                                                                                                                        'currentItem' => $dataItem,
-                                                                                                                    ], $this->internal_html_raw) : '';*/
-
     }
 
     public function internalUrl($dataItem, $prefix = null): string
