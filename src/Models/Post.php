@@ -49,6 +49,7 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
         'content',
         'slug',
         'cover_url',
+        'cover_id',
         'assets',
         'seo',
         'published_at',
@@ -286,6 +287,11 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
     public function menu_items()
     {
         return $this->morphMany(MenuItem::class, 'menuable',);
+    }
+
+    public function cover()
+    {
+        return $this->hasOne(File::class, 'id', 'cover_id');
     }
 
     //endregion
