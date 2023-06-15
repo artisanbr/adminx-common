@@ -12,6 +12,7 @@ use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Generics\Seo\SiteSeo;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasRelatedCache;
@@ -124,9 +125,38 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
 
         return [...$viewData, ...$merge_data];
     }
+
+    public function frontendBuild(): FrontendBuildObject
+    {
+        $frontendBuild = new FrontendBuildObject();
+
+        //JSON-LD
+        $frontendBuild->head->addAfter($this->ld_json_script);
+
+        return $frontendBuild;
+    }
+
+
     //endregion
 
     //region ATTRIBUTES
+
+
+    protected function ldJsonScript(): Attribute
+    {
+        //Todo: busca personalizada https://developers.google.com/search/docs/appearance/site-names?hl=pt-br
+        return Attribute::make(
+            get: fn() => '<script type="application/ld+json">' . json_encode(
+                    [
+                        "@context"      => "https://schema.org",
+                        "@type"         => "WebSite",
+                        "name"      => $this->title,
+                        "alternateName"      => $this->seo->title,
+                        "url"      => $this->uri,
+                    ]
+                ) . '</script>',
+        );
+    }
 
     protected function domain(): Attribute
     {

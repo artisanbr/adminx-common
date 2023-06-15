@@ -278,7 +278,7 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
     public function frontendBuild(): FrontendBuildObject
     {
-        $frontendBuild = new FrontendBuildObject();
+        $frontendBuild = $this->site->frontendBuild();
 
         $frontendBuild->head->gtag_script = $this->getGTagScript();
         $frontendBuild->head->addBefore(Meta::toHtml());
