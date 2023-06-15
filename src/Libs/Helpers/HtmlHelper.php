@@ -204,5 +204,14 @@ class HtmlHelper
         return $compiler->compileString($sass)->getCss();
     }
 
+    public static function ldJsonScript($schema): string{
+
+        if ($schema) {
+            return '<script type="application/ld+json">' . json_encode($schema) . '</script>';
+        }
+
+        return '';
+    }
+
 
 }

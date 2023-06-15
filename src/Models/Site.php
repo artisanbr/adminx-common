@@ -2,13 +2,13 @@
 
 namespace Adminx\Common\Models;
 
+use Adminx\Common\Libs\Helpers\HtmlHelper;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Libs\Support\Url;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Generics\Configs\Site\SiteConfig;
 use Adminx\Common\Models\Generics\Contact\Contact;
-use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Generics\Seo\SiteSeo;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
@@ -23,7 +23,7 @@ use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasPosts;
 use Adminx\Common\Rules\DomainRule;
-use Butschster\Head\Facades\Meta;
+use App\Libs\Utils\FrontendUtils;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
@@ -34,7 +34,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     protected $connection = 'mysql';
 
-    protected array $ownerTypes = ['user','account'];
+    protected array $ownerTypes = ['user', 'account'];
 
     protected $fillable = [
         'user_id',
@@ -48,10 +48,10 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     ];
 
     protected $casts = [
-        'config' => SiteConfig::class,
-        'seo' => SiteSeo::class,
-        'contact' => Contact::class,
-        'uri' => 'string',
+        'config'      => SiteConfig::class,
+        'seo'         => SiteSeo::class,
+        'contact'     => Contact::class,
+        'uri'         => 'string',
         'dynamic_uri' => 'string',
         'scripts_uri' => 'string',
     ];
@@ -68,14 +68,15 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
         'id',
         'user_id',
         'account_id',
-        'theme_id'
+        'theme_id',
     ];
 
     //region VALIDATIONS
-    public static function createRules(FormRequest $request = null): array{
+    public static function createRules(FormRequest $request = null): array
+    {
         return [
             'title' => ['required'],
-            'url' => ['required', new DomainRule],
+            'url'   => ['required', new DomainRule],
         ];
     }
 
@@ -83,7 +84,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     {
         return [
             'title.required' => 'O título do site é obrigatório',
-            'url.required' => 'O url do site é obrigatório',
+            'url.required'   => 'O url do site é obrigatório',
         ];
     }
     //endregion
@@ -91,9 +92,9 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     //region HELPERS
     public static function getFromPreviousDomain($public_id): EloquentModelBase|Builder|Site|null
     {
-        $site = self::where('public_id',$public_id)->with(['pages'])->first();
+        $site = self::where('public_id', $public_id)->with(['pages'])->first();
 
-        if(!$public_id || $site) {
+        if (!$public_id || $site) {
             $previousDomain = Url::previousDomain();
 
             $site = self::whereUrl($previousDomain)->with(['pages'])->first();
@@ -111,8 +112,8 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
         $viewData = [
             'site'        => $this,
             'theme'       => $this->theme,
-            'searchTerm'       => '',
-            'breadcrumbs'       => null,
+            'searchTerm'  => '',
+            'breadcrumbs' => null,
         ];
 
         if ($requestData['q'] ?? false) {
@@ -145,16 +146,25 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     protected function ldJsonScript(): Attribute
     {
         //Todo: busca personalizada https://developers.google.com/search/docs/appearance/site-names?hl=pt-br
+
+        $script = HtmlHelper::ldJsonScript([
+                                                  "@context"      => "https://schema.org",
+                                                  "@type"         => "WebSite",
+                                                  "name"          => $this->title,
+                                                  "alternateName" => $this->seo->title,
+                                                  "url"           => $this->uri,
+                                              ]);
+
+        $script .= HtmlHelper::ldJsonScript([
+                                                   "@context" => "https://schema.org",
+                                                   "@type"    => "Organization",
+                                                   "name"     => $this->title,
+                                                   "url"      => $this->uri,
+                                                   "logo"     => $this->theme->media->logo->uri,
+                                               ]);
+
         return Attribute::make(
-            get: fn() => '<script type="application/ld+json">' . json_encode(
-                    [
-                        "@context"      => "https://schema.org",
-                        "@type"         => "WebSite",
-                        "name"      => $this->title,
-                        "alternateName"      => $this->seo->title,
-                        "url"      => $this->uri,
-                    ]
-                ) . '</script>',
+            get: fn() => $script,
         );
     }
 
@@ -165,7 +175,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     protected function domainTrustHostRegex(): Attribute
     {
-        return Attribute::make(get: fn() => '^(.+\.)?'.preg_quote($this->domain).'$');
+        return Attribute::make(get: fn() => '^(.+\.)?' . preg_quote($this->domain) . '$');
     }
 
     protected function uploadPath(): Attribute
@@ -176,7 +186,8 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     //region GETS
 
-    protected function getHttpProtocolAttribute(){
+    protected function getHttpProtocolAttribute()
+    {
         return @$this->config->is_https ? 'https' : 'http';
     }
 
@@ -190,7 +201,8 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
         return $this->attributes['url'] ?? null;
     }
 
-    protected function getHomePageAttribute(){
+    protected function getHomePageAttribute()
+    {
         return $this->pages()->isHome()->first();
     }
 
@@ -201,7 +213,8 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     //endregion
 
     //region SETS
-    protected function setUrlAttribute($value){
+    protected function setUrlAttribute($value)
+    {
         $this->attributes['url'] = Str::replaceNative(['http://', 'https://', ' '], '', $value);
     }
     //endregion
@@ -218,52 +231,64 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     //endregion
 
     //region RELATIONS
-    public function widgets(){
+    public function widgets()
+    {
         return $this->hasMany(SiteWidget::class);
     }
 
-    public function users(){
+    public function users()
+    {
         return $this->belongsToMany(User::class, 'site_users', 'site_id', 'user_id')->using(SiteUser::class);
         //return $this->hasMany(User::class, 'site_id', 'id');
     }
 
-    public function themes(){
+    public function themes()
+    {
         return $this->hasMany(Theme::class);
     }
 
-    public function theme(){
+    public function theme()
+    {
         return $this->hasOne(Theme::class, 'id', 'theme_id');
     }
 
-    public function menus(){
+    public function menus()
+    {
         return $this->hasMany(Menu::class);
     }
 
-    public function lists(){
+    public function lists()
+    {
         return $this->hasMany(CustomList::class, 'site_id', 'id');
     }
 
-    public function pages(){
+    public function pages()
+    {
         return $this->hasMany(\Adminx\Common\Models\Pages\Page::class)->orderByDesc('is_home')->orderBy('created_at');
     }
 
-    public function categories(){
+    public function categories()
+    {
         return $this->hasMany(Category::class);
     }
 
-    public function tags(){
+    public function tags()
+    {
         return $this->hasMany(Tag::class);
     }
 
-    public function forms(){
+    public function forms()
+    {
         return $this->hasMany(Form::class);
     }
 
-    public function files(){
+    public function files()
+    {
         return $this->hasMany(File::class);
     }
 
-    public function comments(){
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
 
