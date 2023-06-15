@@ -158,7 +158,6 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
         $script .= HtmlHelper::ldJsonScript([
                                                    "@context" => "https://schema.org",
                                                    "@type"    => "Organization",
-                                                   "name"     => $this->title,
                                                    "url"      => $this->uri,
                                                    "logo"     => $this->theme->media->logo->uri,
                                                ]);
