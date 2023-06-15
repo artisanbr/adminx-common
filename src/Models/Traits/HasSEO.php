@@ -62,8 +62,8 @@ trait HasSEO
             return $this->seo->image->url;
         }
 
-        if ($this->cover && $this->cover->url ?? false) {
-            return $this->cover->url;
+        if ($this->cover_url ?? false) {
+            return $this->cover_url;
         }
 
         //todo: Considerar imagens vinculadas

@@ -4,8 +4,10 @@ namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Facades\FrontendHtml;
 use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
+use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
+use Adminx\Common\Models\CustomLists\CustomListHtml;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
 use Adminx\Common\Models\Generics\Configs\PageConfig;
@@ -49,8 +51,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
 
+/**
+ * @property Collection|CustomList[]|CustomListHtml[] $data_sources
+ */
 class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, HtmlModel, BuildableModel, SeoMetaTagsInterface, RobotsTagsInterface
 {
     use HasUriAttributes, HasSelect2, SoftDeletes, HasSlugAttribute, HasSEO, HasFiles, HasCategoriesMorph, HasTagsMorph, HasPosts, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasParent, HasOwners, HasGenericConfig, HasVisitCounter, HasAdvancedHtml, HasRelatedCache, HasHtmlBuilds;
@@ -97,13 +103,13 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         'assets'  => FrontendAssetsBundle::class,
 
 
-        'config'            => PageConfig::class,
-        'seo'               => Seo::class,
-        'css' => GenericAssetElementCSS::class,
-        'js'                => GenericAssetElementJS::class,
-        'elements'          => PageElements::class,
-        'html'              => 'string',
-        'html_raw'          => 'string',
+        'config'   => PageConfig::class,
+        'seo'      => Seo::class,
+        'css'      => GenericAssetElementCSS::class,
+        'js'       => GenericAssetElementJS::class,
+        'elements' => PageElements::class,
+        'html'     => 'string',
+        'html_raw' => 'string',
 
 
         'is_home'        => 'boolean',
@@ -164,11 +170,14 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
     public function buildedInternalHtml($dataItem): string
     {
-        if(!$this->id || !$this->site){
+        if (!$this->id || !$this->site) {
             return '';
         }
 
-        return FrontendHtml::html($this->content->internal->html, [...$this->getBuildViewData(), 'currentItem' => $dataItem]);
+        return FrontendHtml::html($this->content->internal->html, [
+            ...$this->getBuildViewData(),
+            'currentItem' => $dataItem,
+        ]);
 
     }
 
@@ -202,9 +211,10 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
     public function getBuildViewData(array $merge_data = []): array
     {
-        $viewData = [...$this->site->getBuildViewData(),
-                     'page' => $this,
-                     'showBreadcrumb' => !$this->is_home && ($this->config->breadcrumb ? $this->config->breadcrumb->enable : $this->site->theme->config->breadcrumb->enable)
+        $viewData = [
+            ...$this->site->getBuildViewData(),
+            'page'           => $this,
+            'showBreadcrumb' => !$this->is_home && ($this->config->breadcrumb ? $this->config->breadcrumb->enable : $this->site->theme->config->breadcrumb->enable),
         ];
 
         $requestData = request()->all() ?? [];
@@ -252,7 +262,6 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
             foreach ($this->config->sources as $source) {
                 $sourceData[$source->name] = $source->data;
-
                 /*if ($this->config->isUsingModule('internal_pages')) {
                     foreach ($sourceData[$source->name]->items as $dataItem) {
                         $dataItem->internal_url = $this->internalUrl($dataItem, $source->internal_url);
@@ -266,6 +275,7 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
         return [...$viewData, ...$merge_data];
     }
+
     public function frontendBuild(): FrontendBuildObject
     {
         $frontendBuild = new FrontendBuildObject();
@@ -369,8 +379,25 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
     protected function buildedHtml(): Attribute
     {
         $page = $this;
+
         return Attribute::make(
             get: fn() => FrontendHtml::page($page),
+        );
+    }
+
+    protected function dataSources(): Attribute
+    {
+
+        $sources = collect();
+
+        //CustomLists
+        if ($this->custom_lists->count()) {
+            $sources = $this->custom_lists->keyBy(fn($customList, $key) => Str::camel($customList->slug))
+                                          ->map(fn($customList) => $customList->mountModel());
+        }
+
+        return Attribute::make(
+            get: fn() => $sources,
         );
     }
 
@@ -403,6 +430,7 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
     {
         $this->content->main->html = $value;
     }
+
     protected function setInternalHtmlAttribute($value): void
     {
         $this->content->internal->html = $value;

@@ -197,7 +197,7 @@ class FrontendPageServiceProvider extends ServiceProvider
                 ->setType('article')
                 ->setTitle($seoFullTitle)
                 ->setDescription($post->getDescription())
-                ->addOgMeta('article:author', $post->user->name)
+                //->addOgMeta('article:author', $post->user->name)
                 ->addOgMeta('article:section', $post->page->title)
                 ->addOgMeta('article:tag', $post->getKeywords())
                 ->addOgMeta('article:published_time', $post->published_at->toIso8601String())

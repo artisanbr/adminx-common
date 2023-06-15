@@ -44,6 +44,8 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
         'type',
         'description',
         'config',
+        'created_at',
+        'updated_at',
     ];
 
     protected $attributes = [
@@ -126,6 +128,7 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
     public function mountModel(){
 
         $mountClass = $this->type->value ? CustomListType::from($this->type->value)->mountClass() : CustomList::class;
+
 
         $mountModel = $mountClass::make($this->toArray());
         $mountModel->refresh();
