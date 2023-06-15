@@ -5,22 +5,22 @@
 <article @class([
         'blog-post' ,
         ])>
-    @if($post->cover)
+    @if($post->cover_url)
         <div class="blog-post-img img-hover-effect mb-3">
             <a class="img-zoom-effect" href="{{ $post->dynamic_uri }}">
-                <img class="img-full img-fluid w-100" src="{{ $post->cover->uri }}"
+                <img class="img-full img-fluid w-100" src="{{ $post->cover_url }}"
                      alt="{{ $post->title }}">
             </a>
         </div>
     @endif
-    <div class="blog-post-content {{ $post->cover ? 'pt-6' : '' }}">
+    <div class="blog-post-content {{ $post->cover_url ? 'pt-6' : '' }}">
 
         <div class="blog-post-meta mb-2 d-inline-row text-muted small">
             {{--todo: link do autor--}}
-            <span class="me-3 mr-3" title="Autor">
+            {{--<span class="me-3 mr-3" title="Autor">
                                         <i class="fa-solid fa-user me-1"></i>
                                         {{ $post->user->name }}
-                                    </span>
+                                    </span>--}}
             <span class="me-3 mr-3"
                   title="Postado {{ $post->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
                                         <i class="fa-solid fa-calendar-days me-1"></i>

@@ -1,13 +1,13 @@
 <?php
 /**
- * @var \Adminx\Common\Models\Page $page
+ * @var \Adminx\Common\Models\Pages\Page $page
  */
 
 use Illuminate\Support\Collection;
 
 ?>
 @props([
-    'page' => new \Adminx\Common\Models\Page(),
+    'page' => new \Adminx\Common\Models\Pages\Page(),
     'append' => [],
     'prepend' => [],
     'between' => [],
@@ -36,7 +36,7 @@ use Illuminate\Support\Collection;
     }
 
     //Add append
-    $bcItems = $bcItems->merge(Collection::wrap($append)->toArray());
+    $bcItems = $bcItems->merge(Collection::wrap($append)->toArray())->filter();
 
     $bctitle = $bcItems->last();
 
@@ -48,7 +48,7 @@ use Illuminate\Support\Collection;
            $bcStyle .= "height: {$breadcrumbConfig->height}px; ";
         }
     if($bgImage) {
-           //$bcStyle .= "background-image: url('{$bgImage}'); ";
+           $bcStyle .= "background-image: url('{$bgImage}'); ";
         }
 @endphp
 <div id="breadcrumb-area"

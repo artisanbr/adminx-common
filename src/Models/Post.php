@@ -2,10 +2,13 @@
 
 namespace Adminx\Common\Models;
 
+use Adminx\Common\Facades\FrontendHtml;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
+use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
@@ -22,11 +25,14 @@ use Adminx\Common\Models\Traits\Relations\HasComments;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
 use Adminx\Common\Rules\HtmlEmptyRule;
+use Butschster\Head\Facades\Meta;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
@@ -42,7 +48,8 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
         'description',
         'content',
         'slug',
-        'cover_id',
+        'cover_url',
+        'assets',
         'seo',
         'published_at',
         'unpublished_at',
@@ -54,13 +61,14 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     protected $casts = [
         'seo'            => Seo::class,
+        'assets'         => FrontendAssetsBundle::class,
         'published_at'   => 'datetime:d/m/Y H:i',
         'unpublished_at' => 'datetime:d/m/Y H:i',
         'created_at'     => 'datetime:d/m/Y H:i:s',
         'updated_at'     => 'datetime:d/m/Y H:i:s',
-        'content'     => 'string',
-        'html'     => 'string',
-        'description'     => 'string',
+        'content'        => 'string',
+        //'html'     => 'string',
+        //'description'    => 'string',
     ];
 
     protected $appends = [
@@ -69,15 +77,15 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     protected $touches = ['page'];
 
-    protected $dates = ['published_at','unpublished_at'];
+    protected $dates = ['published_at', 'unpublished_at'];
 
     //region VALIDATION
     public static function createRules(FormRequest $request = null): array
     {
         return [
-            'title'   => ['required'],
-            'content' => [new HtmlEmptyRule],
-            'cover_file' => ['nullable', 'file']
+            'title'      => ['required'],
+            'content'    => [new HtmlEmptyRule],
+            'cover_file' => ['nullable', 'file'],
         ];
     }
 
@@ -91,14 +99,10 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     //region HELPERS
 
-    public function limitContent($limit = 300)
-    {
-        return Str::limit(strip_tags($this->content), $limit);
-    }
-
+    //region SEO
     public function seoDescription(): string
     {
-        return $this->seo->description ?? $this->description;
+        return $this->seo->description ?? $this->limitContent();
     }
 
     public function getDescription(): string
@@ -118,6 +122,51 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     //endregion
 
+    public function limitContent($limit = 300): string
+    {
+
+        return new HtmlString(Str::limit(strip_tags($this->content, '<p><br><strong><em><del><b><i>'), $limit));
+
+        //return Str::limit(strip_tags($this->content), $limit);
+    }
+
+    public function getBuildViewPath(): string
+    {
+        return $this->page->getBuildViewPath('post');
+    }
+
+    public function getBuildViewData(array $merge_data = []): array
+    {
+        $viewData = [
+            'post'          => $this,
+            'frontendBuild' => $this->frontendBuild(),
+            'comments'      => $this->comments()->paginate(5, ['*'], 'comments_page'),
+            'breadcrumbs'   => [$this->seoTitle()],
+        ];
+
+        return [...$this->page->getBuildViewData($viewData), ...$merge_data];
+    }
+
+    public function frontendBuild(): FrontendBuildObject
+    {
+        $frontendBuild = $this->page->frontendBuild();
+
+        $frontendBuild->head->gtag_script = $this->getGTagScript();
+        $frontendBuild->head->addBefore(Meta::toHtml());
+        $frontendBuild->head->css .= $this->css_html;
+        $frontendBuild->head->addAfter($this->assets->js->head_html ?? '');
+        $frontendBuild->head->addAfter($this->assets->head_script->html ?? '');
+
+        $frontendBuild->body->id = "post-{$this->public_id}";
+        $frontendBuild->body->class .= " post-{$this->public_id}";
+        $frontendBuild->body->addBefore($this->assets->js->before_body_html ?? '');
+        $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
+
+        return $frontendBuild;
+    }
+
+    //endregion
+
     //region ATTRIBUTES
     protected function slug(): Attribute
     {
@@ -131,7 +180,7 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
     {
         // get next user
         return Attribute::make(
-            get: fn($value) => self::where('id', '>', $this->id)->orderBy('id','asc')->first()
+            get: fn($value) => self::where('id', '>', $this->id)->orderBy('id', 'asc')->first()
         );
 
     }
@@ -140,9 +189,18 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
     {
         // get next user
         return Attribute::make(
-            get: fn($value) => self::where('id', '<', $this->id)->orderBy('id','desc')->first()
+            get: fn($value) => self::where('id', '<', $this->id)->orderBy('id', 'desc')->first()
         );
 
+    }
+
+    protected function buildedHtml(): Attribute
+    {
+        $page = $this;
+
+        return Attribute::make(
+            get: fn() => FrontendHtml::post($this),
+        );
     }
 
     //region GETS
@@ -164,10 +222,10 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
         return $this->page->url ? "{$this->page->url}/post/" . ($this->slug ?? $this->public_id) : '';
     }
 
-    protected function getDescriptionAttribute()
+    /*protected function getDescriptionAttribute()
     {
         return $this->attributes['description'] ?? $this->limitContent();
-    }
+    }*/
     //endregion
     //endregion
 
@@ -178,7 +236,7 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
         return $query->where(function (Builder $q) {
             $q->where('published_at', null)->orWhere('published_at', '<=', Carbon::now());
             $q->where('unpublished_at', null)->orWhere('unpublished_at', '>=', Carbon::now());
-        })->with(['cover','categories','tags','comments']);
+        })->with(['categories', 'tags', 'comments']);
     }
 
     public function scopeOrdered(Builder $query)
@@ -193,7 +251,7 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     public function scopeWithAll(Builder $query)
     {
-        return $query->with(['page','site','user','cover','categories','tags','comments']);
+        return $query->with(['page', 'site', 'categories', 'tags', 'comments']);
     }
 
     //endregion
@@ -224,11 +282,6 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
     //endregion
 
     //region RELATIONS
-
-    public function cover()
-    {
-        return $this->hasOne(File::class, 'id', 'cover_id');
-    }
 
     public function menu_items()
     {

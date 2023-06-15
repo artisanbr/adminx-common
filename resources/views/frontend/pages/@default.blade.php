@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \Adminx\Common\Models\Page $page
+ * @var \Adminx\Common\Models\Pages\Page $page
  */
 ?>
 @extends('adminx-frontend::layout.partials.content', compact('page'))
@@ -10,5 +10,5 @@
         <x-frontend::breadcrumb :page="$page"/>
     @endif
     {{--Home Content--}}
-    {!! $page->html_raw !!}
+    {!! $page->html !!}
 @endsection

@@ -3,9 +3,9 @@
 namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Models\Interfaces\HtmlModel;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Widgeteable;
+use Adminx\Common\Models\SiteWidget;
 use Illuminate\Support\Facades\View;
 use PragmaRX\Support\Exceptions\Exception;
 use Twig\Environment;
@@ -23,7 +23,7 @@ use Twig\TwigFunction;
 class AdvancedHtmlEngine
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Collection|mixed|Widgeteable[]
+     * @var \Illuminate\Database\Eloquent\Collection|mixed|SiteWidget[]
      */
     protected mixed       $widgeteables;
     protected ArrayLoader $twigLoader;

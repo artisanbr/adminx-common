@@ -16,6 +16,13 @@ enum ThemeFramework: string
     case Bootstrap4_JS = 'boostrap:4-js';
     case Bootstrap4_CSS = 'boostrap:4-css';
 
+    public function isBoostrap(){
+        return str_contains($this->value, 'boostrap');
+    }
+
+    public function boostrapVersion(){
+        return $this->isBoostrap() ? (str_contains($this->value, '5') ? 5 : 4) : false;
+    }
 
     public function title(): string
     {

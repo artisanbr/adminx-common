@@ -7,7 +7,7 @@ use Adminx\Common\Libs\Helpers\FileHelper;
 use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Generics\Configs\PageConfig;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Repositories\Base\Repository;
 use Exception;
 use Illuminate\Http\Request;

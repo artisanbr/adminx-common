@@ -3,7 +3,7 @@
 namespace Adminx\Common\Models\Traits;
 
 use Adminx\Common\Models\Generics\Seo\Seo;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Site;
 use Illuminate\Database\Eloquent\Model;
@@ -76,17 +76,17 @@ trait HasSEO
 
     public function getTitle(): string
     {
-        return $this->seo->title ?? $this->title;
+        return $this->seo->title ?? $this->title ?? '';
     }
 
     public function getDescription(): string
     {
 
-        if(get_class($this) !== Site::class && $this->site ?? false && $this->site->seo->config->use_defaults){
+        if(get_class($this) !== Site::class && ($this->site ?? false) && $this->site->seo->config->use_defaults){
             return $this->seo->description ?? $this->site->getDescription();
         }
 
-        return $this->seo->description;
+        return $this->seo->description ?? '';
     }
 
     public function getKeywords(): string
@@ -96,7 +96,7 @@ trait HasSEO
             return $this->seo->keywords ?? $this->site->getKeywords();
         }
 
-        return $this->seo->keywords;
+        return $this->seo->keywords ?? '';
 
         //return $this->seoKeywords($this->site->seo->keywords ?? '');
     }
@@ -108,6 +108,24 @@ trait HasSEO
         }
 
         return $this->seo->robots ?? 'noindex, nofollow';
+    }
+
+    public function getGTagScript(): string
+    {
+        $gtag = $this->seo->gtag ?? $this->site->seo->gtag ?? false;
+
+        return !$gtag ? '' : <<<html
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={$gtag}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '{$gtag}');
+</script>
+html;
+
     }
 
     //endregion

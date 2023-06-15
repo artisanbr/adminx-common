@@ -1,9 +1,9 @@
 <?php
 /**
  * @var \Adminx\Common\Models\Site                                               $site
- * @var \Adminx\Common\Models\Page                                               $page
+ * @var \Adminx\Common\Models\Pages\Page                                         $page
  * @var \Illuminate\Pagination\LengthAwarePaginator|\Adminx\Common\Models\Post[] $posts
- * @var string|null                                                                            $searchTerm
+ * @var string|null                                                              $searchTerm
  */
 ?>
 
@@ -30,39 +30,36 @@
                             @if($posts->count())
                                 <div class="col-12">
                                     <x-frontend::pages.Posts.post-miniature-1 :post="$posts->first()" big/>
+                                    <hr class="mb-5"/>
                                 </div>
                                 <div class="col-12">
                                     <div class="row">
                                         <div class="col-12 col-md-6">
-                                            @foreach($posts->getCollection()->forget(0)->chunk(2) as $chunk)
+                                            @foreach($posts->getCollection()->forget(0)->filter(fn ($post, $i) => $i % 2 !== 0)->values() as $post)
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <x-frontend::pages.Posts.post-miniature-1
+                                                                :post="$post"/>
 
-                                                @foreach($chunk as $post)
-                                                    @if($loop->odd)
-                                                        <div class="row">
-                                                            <div class="col-12">
-                                                                <x-frontend::pages.Posts.post-miniature-1
-                                                                    :post="$post"/>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-
+                                                        @if(!$loop->last)
+                                                            <hr class="mb-4"/>
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             @endforeach
                                         </div>
                                         <div class="col-12 col-md-6">
-                                            @foreach($posts->getCollection()->forget(0)->chunk(2) as $chunk)
+                                            @foreach($posts->getCollection()->forget(0)->filter(fn ($post, $i) => $i % 2 === 0)->values() as $post)
+                                                <div class="row">
+                                                    <div class="col-12">
+                                                        <x-frontend::pages.Posts.post-miniature-1
+                                                                :post="$post"/>
 
-                                                @foreach($chunk as $post)
-                                                    @if($loop->even)
-                                                        <div class="row">
-                                                            <div class="col-12">
-                                                                <x-frontend::pages.Posts.post-miniature-1
-                                                                    :post="$post"/>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                @endforeach
-
+                                                        @if(!$loop->last)
+                                                            <hr class="mb-4"/>
+                                                        @endif
+                                                    </div>
+                                                </div>
                                             @endforeach
                                         </div>
                                     </div>

@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \Adminx\Common\Models\Site $site
- * @var \Adminx\Common\Models\Page $page
+ * @var \Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject $frontendBuild
  */
 
 ?>
@@ -62,6 +62,6 @@
 @@stack('footer-includes')
 @@stack('js')
 {!! $site->theme->js_html ?? '' !!}
-@{!! $page->js_html ?? '' !!}
+@{!! $frontendBuild->body->after !!}
 </body>
 </html>

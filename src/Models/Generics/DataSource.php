@@ -7,7 +7,7 @@ use Adminx\Common\Facades\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\CustomListBase;
 use Adminx\Common\Models\Form;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Site;
 use ArtisanLabs\GModel\GenericModel;

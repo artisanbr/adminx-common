@@ -1,14 +1,14 @@
 <?php
 /**
- * @var \Adminx\Common\Models\Site $site
- * @var \Adminx\Common\Models\Page $page
+ * @var \Adminx\Common\Models\Site|null $site
+ * @var \Adminx\Common\Models\Pages\Page|null $page
  */
 
-if (!$site) {
+if (!isset($site)) {
     $site = FrontendSite::current();
 }
 
-if(!$page){
+if(!isset($page)){
     $page = FrontendPage::current();
 }
 
@@ -34,12 +34,13 @@ $includeData = [
     @yield('css')
 
     {!! $site->theme->js->head_js_html ?? '' !!}
-    {!! $page->js->head_js_html ?? '' !!}
+    {!! $page->assets->js->head_html ?? '' !!}
+    {!! $page->assets->head_script->html ?? '' !!}
 </head>
 <body id="page-{{ $page->is_home ? 'home' : $page->slug }}"
       class="page-{{ $page->is_home ?? false ? 'home' : $page->slug }} page-{{ $page->public_id }}">
 {!! $site->theme->js->after_body_js_html ?? '' !!}
-{!! $page->js->after_body_js_html ?? '' !!}
+{!! $page->assets->js->before_body_html ?? '' !!}
 @stack('body-js')
 @yield('body-js')
 
@@ -57,7 +58,7 @@ $includeData = [
 </div>
 {{--Scripts--}}
 {!! Meta::footer()->toHtml() !!}
-{!! $page->js_html ?? '' !!}
+{!! $page->assets->js->after_body_html ?? '' !!}
 
 <script>
     moment.locale("pt-br");

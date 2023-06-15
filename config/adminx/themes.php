@@ -46,11 +46,11 @@ return [
             'title' => 'Lazy Load',
             'js'    => [
                 'jquery.lazy.js' => [
-                    'src' => '//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js',
+                    'src' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js',
                 ],
 
                 'jquery.lazy.plugins.js' => [
-                    'src' => '//cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js',
+                    'src' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js',
                 ],
             ],
         ],

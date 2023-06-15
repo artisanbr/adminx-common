@@ -1,6 +1,6 @@
 <?php
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;

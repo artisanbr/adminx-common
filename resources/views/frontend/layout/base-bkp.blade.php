@@ -1,12 +1,12 @@
 <?php
 /**
  * @var \Adminx\Common\Models\Site $site
- * @var \Adminx\Common\Models\Page $page
+ * @var \Adminx\Common\Models\Pages\Page $page
  */
 
 
 $site = $site ?? \Adminx\Common\Libs\FrontendEngine\FrontendSite::current() ?? new \Adminx\Common\Models\Site();
-$page = $page ?? $homePage ?? new \Adminx\Common\Models\Page([
+$page = $page ?? $homePage ?? new \Adminx\Common\Models\Pages\Page([
                                                                                              'title'     => 'Erro',
                                                                                              'slug'      => 'error',
                                                                                              'public_id' => 'error',

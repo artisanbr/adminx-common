@@ -4,22 +4,17 @@
         'mb-5' => $big,
         'mb-4' => !$big,
         ]) }}>
-    @if($showCover && $post->cover)
+    @if($showCover && $post->cover_url)
         <div class="post-cover img-hover-effect mb-3">
             <a class="img-zoom-effect" href="{{ $post->dynamic_uri }}">
-                <img class="img-full img-fluid w-100" src="{{ $post->cover->url }}"
+                <img class="img-full img-fluid w-100" src="{{ $post->cover_url }}"
                      alt="{{ $post->title }}">
             </a>
         </div>
     @endif
-    <div class="post-content {{ $showCover && $post->cover ? 'pt-6' : '' }}">
-
-        @if($showMeta && !$bottomMeta)
-            <x-frontend::pages.Posts.shared.post-meta/>
-        @endif
-
+    <div class="post-content {{ $showCover && $post->cover_url ? 'pt-6' : '' }}">
         <a @class([
-        'post-title',
+        'post-title mt-3',
         'limit-lines' => !$big,
         'h2' => $big,
         'h5' => $small,
@@ -28,9 +23,13 @@
            data-bs-toggle="tooltip"
            title="{{ $post->title }}" style="-webkit-line-clamp: {{ $titleLines }};">{{ $post->title }}</a>
 
+        @if($showMeta && !$bottomMeta)
+            <x-frontend::pages.Posts.shared.post-meta/>
+        @endif
+
         @if($showDescription)
             <p class="post-description limit-lines mb-0"
-               style="-webkit-line-clamp: {{ $descriptionLines }};">{!! $post->description !!}</p>
+               style="-webkit-line-clamp: {{ $descriptionLines }};">{!! $post->description ?? $post->limitContent($big ? 500 : 150) !!}</p>
         @endif
 
         @if($showMeta && $bottomMeta)
@@ -39,7 +38,11 @@
         @endif
 
         @if($showReadMore || $showCategories)
-            <p class="button-wrap d-flex justify-content-between align-items-center mb-0 mt-5 post-footer">
+            <p @class([
+        'button-wrap d-flex justify-content-between align-items-center mb-0 post-footer',
+        'mt-5' => $big,
+        'mt-4' => !$big,
+])>
                 @if($showReadMore)
                     <a class="btn btn-primary px-4 py-2 my-auto post-readmore-button" href="{{ $post->dynamic_uri }}">
                         {!! $readMoreText !!}

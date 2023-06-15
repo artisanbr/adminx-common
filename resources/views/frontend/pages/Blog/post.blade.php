@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \Adminx\Common\Models\Page    $page
+ * @var \Adminx\Common\Models\Pages\Page    $page
  * @var \Adminx\Common\Models\Post    $post
  * @var \Illuminate\Pagination\LengthAwarePaginator $comments
  * @var string[] $breadcrumbs
@@ -10,8 +10,8 @@
 
 @section('content')
 
-    @if(!$page->is_home && ($page->config->breadcrumb ? $page->config->breadcrumb->enable : $page->site->theme->config->breadcrumb->enable))
-        <x-frontend::breadcrumb :page="$page" :append="$breadcrumbs"/>
+    @if($showBreadcrumb)
+        <x-frontend::breadcrumb :page="$page" :append="$breadcrumbs" :bg-image="$post->cover_url"/>
     @endif
 
     {!! $page->html !!}
@@ -28,39 +28,46 @@
                 {{--Post--}}
                 <div class="col-lg-8 order-lg-2 order-1">
                     <article class="blog-post">
-                        @if($post->cover)
+                        @if($post->cover_url)
                             <div class="blog-img img-hover-effect mb-3">
-                                <img class="img-full img-fluid w-100" src="{{ $post->cover->uri }}"
+                                <img class="img-full img-fluid w-100 d-none" src="{{ $post->cover_url }}"
                                      alt="{{ $post->title }}">
                             </div>
                         @endif
-                        <div class="blog-post-content {{ $post->cover ? 'pt-6' : '' }}">
-                            <div class="blog-post-meta mb-2 d-inline-row text-muted small">
+                        <div class="blog-post-content {{ $post->cover_url ? 'pt-6' : '' }}">
+
+                            @if(!$showBreadcrumb)
+                                <h1 class="title">{{ $post->title }}</h1>
+                            @endif
+
+
+                            <div class="blog-post-meta mb-2 mt-3 d-inline-row text-muted small">
                                 {{--todo: link do autor--}}
-                                <span class="me-3 mr-3" title="Autor">
+                                {{--<span class="me-3 mr-3" title="Autor">
                                         <i class="fa-solid fa-user me-1"></i>
                                         {{ $post->user->name }}
-                                    </span>
+                                    </span>--}}
                                 <span class="me-3 mr-3" data-toggle="tooltip"
                                       title="Postado {{ $post->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
                                         <i class="fa-solid fa-calendar-days me-1"></i>
                                         <time
-                                            datetime="{{ $post->published_at->format('Y-m-d H:i:S') }}">{{ $post->published_at->diffForHumans() }}</time>
+                                                datetime="{{ $post->published_at->format('Y-m-d H:i:S') }}">{{ $post->published_at->diffForHumans() }}</time>
                                     </span>
                                 <span title="Comentários">
                                         <i class="fa-solid fa-comments me-1"></i>
                                         {{ $post->comments()->count() }} Coment&aacute;rios
                                     </span>
                             </div>
-                            <h2 class="title mb-3">{{ $post->title }}</h2>
                             @if($post->categories->count())
                                 <p class="text-muted">
                                     Categorias: {{ $post->categories->pluck('title')->join(', ') }}
                                 </p>
                             @endif
+                            @if($post->description ?? false)
                             <p class="short-desc mb-5 pb-5">
                                 {!! $post->description !!}
                             </p>
+                            @endif
 
                             {!! $post->content !!}
 
@@ -107,10 +114,10 @@
 
                                         <div class="navigation-content w-100 ps-xl-4 pt-4 pt-xl-0">
                                             <div class="blog-post-meta mb-2 d-inline-row text-muted small">
-                                                    <span class="me-3 mr-3" title="Autor">
+                                                    {{--<span class="me-3 mr-3" title="Autor">
                                                         <i class="fa-solid fa-user me-1"></i>
                                                         {{ $post->previous->user->name }}
-                                                    </span>
+                                                    </span>--}}
                                                 <span class="me-3 mr-3"
                                                       title="Postado {{ $post->previous->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
                                                         <i class="fa-solid fa-calendar-days me-1"></i>
@@ -132,10 +139,10 @@
                                         <div
                                             class="navigation-content w-100 text-end text-right pe-xl-4 pb-4 pb-xl-0">
                                             <div class="blog-post-meta mb-2 d-inline-row text-muted small">
-                                                    <span class="me-3 mr-3" title="Autor">
+                                                    {{--<span class="me-3 mr-3" title="Autor">
                                                         <i class="fa-solid fa-user me-1"></i>
                                                         {{ $post->next->user->name }}
-                                                    </span>
+                                                    </span>--}}
                                                 <span class="me-3 mr-3"
                                                       title="Postado {{ $post->next->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
                                                         <i class="fa-solid fa-calendar-days me-1"></i>

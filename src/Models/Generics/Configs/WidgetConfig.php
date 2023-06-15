@@ -6,7 +6,7 @@ use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigPaging;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigSorting;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigVariable;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 

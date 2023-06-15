@@ -1,21 +1,25 @@
 <?php
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Pages;
 
+use Adminx\Common\Facades\FrontendHtml;
 use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
 use Adminx\Common\Models\Generics\Configs\PageConfig;
-use Adminx\Common\Models\Generics\Elements\HtmlElement;
 use Adminx\Common\Models\Generics\Elements\PageElements;
 use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Interfaces\BuildableModel;
 use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\MenuItem;
+use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
+use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
+use Adminx\Common\Models\Pages\Objects\PageContent;
+use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasAdvancedHtml;
 use Adminx\Common\Models\Traits\HasGenericConfig;
@@ -36,7 +40,6 @@ use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\Relations\HasPosts;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
-use Adminx\Common\Models\Traits\Relations\HasWidgets;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Butschster\Head\Contracts\MetaTags\RobotsTagsInterface;
 use Butschster\Head\Contracts\MetaTags\SeoMetaTagsInterface;
@@ -64,47 +67,64 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         //'form_id',
         'title',
         'slug',
+
+        'content',
+        'assets',
+
+
         'html',
         'html_raw',
         'internal_html',
-        'internal_html_raw',
         'css',
         'js',
+
+
         'is_home',
         'config',
         'seo',
         'published_at',
         'unpublished_at',
-        'elements'
+        'elements',
     ];
 
     protected $casts = [
-        'text'              => 'string',
-        'title'             => 'string',
-        'slug'              => 'string',
-        'is_home'           => 'boolean',
+        'text'  => 'string',
+        'title' => 'string',
+        'slug'  => 'string',
+
+
+        'content' => PageContent::class,
+        'assets'  => FrontendAssetsBundle::class,
+
+
         'config'            => PageConfig::class,
         'seo'               => Seo::class,
-        'css'               => GenericAssetElementCSS::class,
+        'css' => GenericAssetElementCSS::class,
         'js'                => GenericAssetElementJS::class,
         'elements'          => PageElements::class,
         'html'              => 'string',
         'html_raw'          => 'string',
-        'internal_html_raw' => 'string',
-        'published_at'      => 'datetime:d/m/Y H:i:s',
-        'unpublished_at'    => 'datetime:d/m/Y H:i:s',
+
+
+        'is_home'        => 'boolean',
+        'published_at'   => 'datetime:d/m/Y H:i:s',
+        'unpublished_at' => 'datetime:d/m/Y H:i:s',
     ];
 
     protected $appends = [
+        'content',
+        'assets',
         //'html',
         //'html_raw',
-        'internal_html_raw',
+        //'internal_html',
         'url',
 
     ];
 
     protected $attributes = [
         'is_home' => 0,
+        //'content' => [],
+        //'assets' => [],
     ];
 
     public $buildSchema = [
@@ -144,9 +164,16 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
     public function buildedInternalHtml($dataItem): string
     {
-        return $this->id && $this->site ? AdvancedHtmlEngine::start($this->site, $this, 'internal-html')->buildHtml([
+        if(!$this->id || !$this->site){
+            return '';
+        }
+
+        return FrontendHtml::html($this->content->internal->html, [...$this->getBuildViewData(), 'currentItem' => $dataItem]);
+
+        /*return $this->id && $this->site ? AdvancedHtmlEngine::start($this->site, $this, 'internal-html')->buildHtml([
                                                                                                                         'currentItem' => $dataItem,
-                                                                                                                    ], $this->internal_html_raw) : '';
+                                                                                                                    ], $this->internal_html_raw) : '';*/
+
     }
 
     public function internalUrl($dataItem, $prefix = null): string
@@ -177,26 +204,14 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         return $pageViewFinalPath;
     }
 
-    public function getBuildViewData(array $requestData = [], array $merge_data = []): array
+    public function getBuildViewData(array $merge_data = []): array
     {
-        //$request = request();
-        $this->site->load(['theme']);
-
-        $viewData = [
-            'site'        => $this->site,
-            'theme'       => $this->site->theme,
-            'page'        => $this,
-            'searchTerm'  => $requestData['q'] ?? null,
-            'breadcrumbs' => $requestData['q'] ?? null,
+        $viewData = [...$this->site->getBuildViewData(),
+                     'page' => $this,
+                     'showBreadcrumb' => !$this->is_home && ($this->config->breadcrumb ? $this->config->breadcrumb->enable : $this->site->theme->config->breadcrumb->enable)
         ];
 
-        if ($requestData['q'] ?? false) {
-            $viewData['searchTerm'] = $requestData['q'];
-            $viewData['breadcrumbs'] = ["Resultados da pesquisa: " . $requestData['q']];
-        }
-
-
-        //Meta::registerSeoMetaTagsForPage($this);
+        $requestData = request()->all() ?? [];
 
         if ($this->using_posts) {
 
@@ -254,6 +269,25 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
 
         return [...$viewData, ...$merge_data];
+    }
+    public function frontendBuild(): FrontendBuildObject
+    {
+        $frontendBuild = new FrontendBuildObject();
+
+        $frontendBuild->head->gtag_script = $this->getGTagScript();
+        $frontendBuild->head->addBefore(Meta::toHtml());
+        $frontendBuild->head->css = $this->css_html;
+        $frontendBuild->head->addAfter($this->assets->js->head_html ?? '');
+        $frontendBuild->head->addAfter($this->assets->head_script->html ?? '');
+
+        $slug = $this->is_home ? 'home' : $this->slug;
+
+        $frontendBuild->body->id = "page-{$slug}";
+        $frontendBuild->body->class = "page-{$slug} page-{$this->public_id}";
+        $frontendBuild->body->addBefore($this->assets->js->before_body_html ?? '');
+        $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
+
+        return $frontendBuild;
     }
 
     public function loadSEO()
@@ -321,43 +355,40 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         );
     }
 
-    protected function getJsHtmlAttribute()
+    protected function jsHtml(): Attribute
     {
-
-        //Todo: considerar tema do site e futuramente da pagina
-        $finalHtml = $this->js->html;
-
-        //Forms JS
-        /*if ($this->id && $this->can_use_forms && $this->has_form) {
-            $finalHtml .= $this->formView()->renderSections()['js'] ?? '';
-        }*/
-
-        return $finalHtml;
+        return Attribute::make(
+            get: fn() => $this->assets->js->html,
+        );
     }
 
-    protected function getCssHtmlAttribute()
+    protected function cssHtml(): Attribute
     {
 
-        //Todo: considerar tema do site e futuramente da pagina
-
-        return $this->css->html;
+        return Attribute::make(
+            get: fn() => $this->assets->css->html,
+        );
     }
+
+    protected function buildedHtml(): Attribute
+    {
+        $page = $this;
+        return Attribute::make(
+            get: fn() => FrontendHtml::page($page),
+        );
+    }
+
 
     //region GETS
 
-    /*protected function getHtmlAttribute()
+    public function getInternalHtmlAttribute()
     {
-        return $this->buildedHtml();
-    }*/
-
-    public function getInternalHtmlRawAttribute()
-    {
-        return $this->elements->internal_content->raw ?? '';
+        return $this->content->internal->html ?? '';
     }
 
-    protected function getHtmlRawAttribute()
+    protected function getHtmlAttribute()
     {
-        return $this->elements->content->raw ?? '';
+        return $this->content->main->html ?? '';
     }
 
     protected function getUrlAttribute()
@@ -372,25 +403,13 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
     //endregion
 
     //region SETS
-
     protected function setHtmlAttribute($value): void
     {
-        $this->setHtmlRawAttribute($value);
+        $this->content->main->html = $value;
     }
-
-    protected function setHtmlRawAttribute($value): void
-    {
-        $this->elements->content->raw = $value;
-    }
-
     protected function setInternalHtmlAttribute($value): void
     {
-        $this->setInternalHtmlRawAttribute($value);
-    }
-
-    protected function setInternalHtmlRawAttribute($value): void
-    {
-        $this->elements->internal_content->raw = $value;
+        $this->content->internal->html = $value;
     }
 
     //endregion
@@ -421,7 +440,6 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
     {
         return parent::save($options);
     }
-
     //endregion
 
     //region RELATIONS

@@ -5,7 +5,7 @@ namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Facades\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Site;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;

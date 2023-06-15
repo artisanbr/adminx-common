@@ -6,7 +6,7 @@ use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Menu;
 use Adminx\Common\Models\MenuItem;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Site;
 use Adminx\Common\Models\Theme;

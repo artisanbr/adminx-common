@@ -4,7 +4,7 @@ namespace Adminx\Common\Providers;
 
 use App\View\Components\Icon;
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Menu\Laravel\Html;

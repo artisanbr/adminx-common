@@ -1,6 +1,6 @@
 <?php
 /***
- * @var \Adminx\Common\Models\Widgeteable $widgeteable
+ * @var \Adminx\Common\Models\SiteWidget $widgeteable
  */
 ?>
 {{--Incluir view do widget--}}

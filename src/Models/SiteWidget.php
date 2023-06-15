@@ -9,6 +9,7 @@ use Adminx\Common\Models\Generics\Configs\WidgetConfig;
 use Adminx\Common\Models\Generics\DataSource;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Objects\Frontend\FrontendHtmlObject;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
@@ -20,14 +21,15 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphPivot;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 
-class Widgeteable extends EloquentModelBase implements PublicIdModel, OwneredModel
+class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
     use HasPublicIdAttribute, HasOwners, BelongsToSite, BelongsToUser;
 
     protected array $ownerTypes = ['site','user'];
 
-    protected $table        = 'widgeteables';
+    protected $table        = 'site_widgets';
     public    $timestamps   = false;
 
     protected $fillable = [
@@ -38,6 +40,7 @@ class Widgeteable extends EloquentModelBase implements PublicIdModel, OwneredMod
         'source',
         'title',
         'config',
+        'content',
     ];
 
     protected $casts = [
@@ -48,6 +51,7 @@ class Widgeteable extends EloquentModelBase implements PublicIdModel, OwneredMod
         'title'       => 'string',
         'sources'     => 'collection',
         'css_class'   => 'string',
+        'content'   => FrontendHtmlObject::class,
     ];
 
     protected $attributes = [
@@ -62,7 +66,7 @@ class Widgeteable extends EloquentModelBase implements PublicIdModel, OwneredMod
             'variables'   => $this->variables,
         ];
 
-        Debugbar::debug($this->source->type);
+        //Debugbar::debug($this->source->type);
 
         switch (true) {
             case $this->source->type === 'posts':
@@ -236,17 +240,22 @@ class Widgeteable extends EloquentModelBase implements PublicIdModel, OwneredMod
         static::addGlobalScope(new WhereSiteScope);
     }
 
-    /*public function save(array $options = [])
+    public function save(array $options = [])
     {
-        $retorno = parent::save($options);
+        parent::save($options);
 
-        if(empty($this->public_id)){
-            $this->public_id = Random::base32String($this->id.time());
-            $retorno = parent::save($options);
-        }
+        $renderView = $this->config->ajax_render ? 'adminx-common::Elements.Widgets.renders.ajax-render' : 'adminx-common::Elements.Widgets.renders.static-render';
 
-        return $retorno;
-    }*/
+        $renderData = $this->config->ajax_render ? [
+            'siteWidget' => $this,
+        ] : $this->getBuildViewData();
+
+        $widgetView = View::make($renderView, $renderData);
+
+        $this->content->html = $widgetView->render();
+
+        return parent::save($options);
+    }
 
     //endregion
 

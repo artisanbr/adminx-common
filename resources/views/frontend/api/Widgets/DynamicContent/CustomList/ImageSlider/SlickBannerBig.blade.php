@@ -1,10 +1,10 @@
 <?php
 /***
- * @var \Adminx\Common\Models\Widgeteable                                                       $widgeteable
- * @var \Adminx\Common\Models\CustomLists\CustomListImageSlider                                 $customList
- * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemImageSlider             $listItem
- * @var \Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas\Sliders\SliderDataButtons $button
- *                                                                                                                   @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemImageSlider[]|\Illuminate\Database\Eloquent\Collection $customListItems
+ * @var \Adminx\Common\Models\SiteWidget                                                                                       $widgeteable
+ * @var \Adminx\Common\Models\CustomLists\CustomListImageSlider                                                                $customList
+ * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemImageSlider                                            $listItem
+ * @var \Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas\Sliders\SliderDataButtons                                $button
+ * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemImageSlider[]|\Illuminate\Database\Eloquent\Collection $customListItems
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')
@@ -19,9 +19,10 @@
         <div class="banner-slider" id="bannerSlider-{{ $widgeteable->public_id }}">
             @foreach($customListItems as $listItem)
                 @push('css')
-                    <link rel="preload" as="image" href="{{ $listItem->data->image->file->url ?? '' }}" />
+                    <link rel="preload" as="image" href="{{ $listItem->data->image->file->url ?? '' }}"/>
                 @endpush
-                <div class="single-banner" style="background-image: url({{ $listItem->data->image->file->url ?? '' }});">
+                <div class="single-banner"
+                     style="background-image: url({{ $listItem->data->image->file->url ?? '' }});">
                     <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-lg-10">

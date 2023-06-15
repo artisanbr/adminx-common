@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \Adminx\Common\Models\Site $site
- * @var \Adminx\Common\Models\Page $page
+ * @var \Adminx\Common\Models\Pages\Page $page
  */
 ?>
 <div class="widgets-area mb-9">

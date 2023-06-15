@@ -59,7 +59,7 @@ class Widget extends EloquentModelBase
 
     //region Relations
     public function widgeteables(){
-        return $this->hasMany(Widgeteable::class, 'widget_id', 'id');
+        return $this->hasMany(SiteWidget::class, 'widget_id', 'id');
     }
 
     public function type()
@@ -69,7 +69,7 @@ class Widget extends EloquentModelBase
 
     public function pages()
     {
-        return $this->morphedByMany(Page::class, 'widgeteable')->using(Widgeteable::class);
+        return $this->morphedByMany(Page::class, 'widgeteable')->using(SiteWidget::class);
     }
 
     //endregion

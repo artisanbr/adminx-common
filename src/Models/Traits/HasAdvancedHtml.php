@@ -5,7 +5,7 @@ namespace Adminx\Common\Models\Traits;
 use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Interfaces\HtmlModel;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 
 
 trait HasAdvancedHtml

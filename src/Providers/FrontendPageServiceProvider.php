@@ -6,7 +6,7 @@ use Adminx\Common\Facades\FrontendPage;
 use Adminx\Common\Libs\FrontendEngine\FrontendPageEngine;
 use Adminx\Common\Models\Category;
 use Adminx\Common\Models\File;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Site;
 use Butschster\Head\Facades\Meta;

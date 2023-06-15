@@ -1,7 +1,7 @@
 <?php
 /**=
  * @var \Adminx\Common\Models\Form $form
- * @var \Adminx\Common\Models\Page $model
+ * @var \Adminx\Common\Models\Pages\Page $model
  */
 ?>
 

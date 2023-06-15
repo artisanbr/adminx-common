@@ -3,7 +3,7 @@
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Models\Widget;
-use Adminx\Common\Models\Widgeteable;
+use Adminx\Common\Models\SiteWidget;
 use Adminx\Common\Repositories\Base\Repository;
 use Exception;
 use Illuminate\Http\Request;
@@ -33,7 +33,7 @@ class WidgetRepository extends Repository
         return DB::transaction(function () {
 
             //Criar vinculo
-            $widgeteable = new Widgeteable();
+            $widgeteable = new SiteWidget();
             $widgeteable->fill($this->data);
 
             try{

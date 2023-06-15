@@ -3,7 +3,7 @@
 namespace Adminx\Common\Observers;
 
 use Adminx\Common\Models\Category;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Post;
 use Illuminate\Database\Eloquent\Model;
 

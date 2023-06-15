@@ -1,6 +1,6 @@
 @aware([
     'post' => new \Adminx\Common\Models\Post(),
-    'showAuthor' => true,
+    'showAuthor' => false,
     'showDate' => true,
     'showComments' => false,
     'showIcons' => true,

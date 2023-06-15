@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \Adminx\Common\Models\Page $page
+ * @var \Adminx\Common\Models\Pages\Page $page
  */
 
 ?>

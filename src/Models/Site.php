@@ -22,6 +22,7 @@ use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasPosts;
 use Adminx\Common\Rules\DomainRule;
+use Butschster\Head\Facades\Meta;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
@@ -99,6 +100,30 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
 
         return $site;
     }
+
+    public function getBuildViewData(array $merge_data = []): array
+    {
+        $requestData = request()->all() ?? [];
+
+        $this->load(['theme']);
+
+        $viewData = [
+            'site'        => $this,
+            'theme'       => $this->theme,
+            'searchTerm'       => '',
+            'breadcrumbs'       => null,
+        ];
+
+        if ($requestData['q'] ?? false) {
+            $viewData['searchTerm'] = $requestData['q'];
+            $viewData['breadcrumbs'] = ["Resultados da pesquisa: " . $requestData['q']];
+        }
+
+
+        //Meta::registerSeoMetaTagsForPage($this);
+
+        return [...$viewData, ...$merge_data];
+    }
     //endregion
 
     //region ATTRIBUTES
@@ -163,8 +188,8 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     //endregion
 
     //region RELATIONS
-    public function widgeteables(){
-        return $this->hasMany(Widgeteable::class);
+    public function widgets(){
+        return $this->hasMany(SiteWidget::class);
     }
 
     public function users(){
@@ -189,7 +214,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     }
 
     public function pages(){
-        return $this->hasMany(Page::class)->orderByDesc('is_home')->orderBy('created_at');
+        return $this->hasMany(\Adminx\Common\Models\Pages\Page::class)->orderByDesc('is_home')->orderBy('created_at');
     }
 
     public function categories(){

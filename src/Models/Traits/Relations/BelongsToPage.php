@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Models\Traits\Relations;
 
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Illuminate\Database\Eloquent\Model;
 
 /**

@@ -2,12 +2,16 @@
 
 namespace Adminx\Common\Libs\FrontendEngine;
 
+use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\FrontendHtml;
 use Adminx\Common\Facades\FrontendSite;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
+use Adminx\Common\Models\Pages\Page;
+use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Theme;
 use Adminx\Common\Models\ThemeBuild;
-use Adminx\Common\Models\Widgeteable;
+use Adminx\Common\Models\SiteWidget;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use PragmaRX\Support\Exceptions\Exception;
@@ -24,13 +28,15 @@ use voku\helper\HtmlMin;
 class FrontendHtmlEngine extends FrontendEngineBase
 {
     /**
-     * @var \Illuminate\Database\Eloquent\Collection|mixed|Widgeteable[]
+     * @var \Illuminate\Database\Eloquent\Collection|mixed|SiteWidget[]
      */
-    protected mixed $widgeteables;
+    protected mixed $widgets;
 
     protected ArrayLoader $twigLoader;
 
-    protected string|null $rawHtml = null;
+    protected string $headerHtml  = '';
+    protected string $contentHtml = '';
+    protected string $footerHtml  = '';
 
     protected array $customViewData = [];
 
@@ -53,6 +59,20 @@ class FrontendHtmlEngine extends FrontendEngineBase
 
     }
 
+    public function setViewData(array $viewData = []): static
+    {
+        $this->viewData = $viewData;
+
+        return $this;
+    }
+
+    public function addViewData(array $viewData = []): static
+    {
+        $this->viewData = [...$this->viewData, ...$viewData];
+
+        return $this;
+    }
+
     /**
      * Prepare Twig Filters and Functions
      */
@@ -60,7 +80,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
     {
 
         $this->twigLoader = new ArrayLoader([
-                                                $this->viewTemporaryName => $this->rawHtml,
+                                                $this->viewTemporaryName => $this->headerHtml . $this->contentHtml . $this->footerHtml,
                                             ]);
 
         $this->twig = new Environment($this->twigLoader, [
@@ -97,10 +117,10 @@ class FrontendHtmlEngine extends FrontendEngineBase
         $this->currentSite = $site;
 
         if ($this->currentSite) {
-            $this->widgeteables = $this->currentSite->widgeteables;
+            $this->widgets = $this->currentSite->widgets;
             $this->menus = $this->currentSite->menus;
 
-            if($changeData){
+            if ($changeData) {
                 $this->viewData = [
                     'site'  => $this->currentSite,
                     'theme' => $this->currentSite->theme,
@@ -112,9 +132,9 @@ class FrontendHtmlEngine extends FrontendEngineBase
         return $this;
     }
 
-    public function setViewName(string $viewTemporaryName = 'temp-html'): static
+    public function setViewName(string|null $viewTemporaryName = null): static
     {
-        $this->viewTemporaryName = $viewTemporaryName;
+        $this->viewTemporaryName = $viewTemporaryName ?? 'temp-html';
 
         return $this;
     }
@@ -122,39 +142,21 @@ class FrontendHtmlEngine extends FrontendEngineBase
     public function page(Page $page): string
     {
         $this->setCurrentSite($page->site, false);
-        $this->viewData = $page->getBuildViewData();
+        $this->setViewData($page->getBuildViewData());
+        $this->setViewName("page-tg-{$page->public_id}");
 
 
-        $themeBuild = $page->site->theme->build()->latest()->first();
-
-        if (!$themeBuild) {
-
-            $page->site->theme->compile();
-            $themeBuild = $page->site->theme->build()->latest()->first();
+        if($page->site->theme){
+            $this->theme($page->site->theme, $page->frontendBuild());
         }
 
-        if($themeBuild){
+        $this->contentHtml = View::make($page->getBuildViewPath(), $this->viewData)->render();
+        $this->startTwig();
 
-            //Montar Header
-            $pageBlade = $themeBuild->renderHeader($page);
+        $rawBlade = $this->renderTwig();
+       // dd($rawBlade);
 
-            //Montar Corpo
-            $pageBlade .= View::make($page->getBuildViewPath(), $this->viewData)->render();
-
-            //Montar footer
-            $pageBlade .= $themeBuild->renderFooter($page);
-
-            $this->rawHtml = $pageBlade;
-
-            $this->startTwig();
-
-
-        }else{
-            $this->rawHtml = View::make($page->getBuildViewPath(), $this->viewData)->render();
-            $this->startTwig();
-        }
-
-        $renderedBlade = Blade::render($this->renderTwig(), compact('page'));
+        $renderedBlade = Blade::render($rawBlade, $this->viewData);
 
         if ($this->currentSite->config->enable_html_minify) {
             $htmlMin = new HtmlMin();
@@ -165,13 +167,70 @@ class FrontendHtmlEngine extends FrontendEngineBase
         return $renderedBlade;
     }
 
-    public function html($rawHtml = null, $viewData = null): string
+    public function post(Post $post): string
     {
-        if($viewData){
-            $this->viewData = $viewData;
+        $this->setCurrentSite($post->site, false);
+        $this->setViewData($post->getBuildViewData());
+        $this->setViewName("post-tg-{$post->public_id}");
+
+
+        if($post->site->theme){
+            $this->theme($post->site->theme, $post->frontendBuild());
         }
 
-        $this->rawHtml = $rawHtml;
+        $this->contentHtml = View::make($post->getBuildViewPath(), $this->viewData)->render();
+        $this->startTwig();
+
+        $rawBlade = $this->renderTwig();
+        // dd($rawBlade);
+
+        $renderedBlade = Blade::render($rawBlade, $this->viewData);
+
+        if ($this->currentSite->config->enable_html_minify) {
+            $htmlMin = new HtmlMin();
+
+            $renderedBlade = $htmlMin->minify($renderedBlade);
+        }
+
+        return $renderedBlade;
+    }
+
+    /**
+     * @throws FrontendException
+     */
+    public function theme(Theme $theme, FrontendBuildObject $frontendBuild = new FrontendBuildObject()): static
+    {
+        $themeBuild = $theme->build;
+
+        if (!$themeBuild) {
+
+            $theme->compile();
+
+            $themeBuild = $theme->build()->latest()->first();
+
+            if (!$themeBuild) {
+                throw new FrontendException('Tema não compilado, salve seu tema.' . 404);
+            }
+        }
+
+        //Montar Header
+        $this->headerHtml = $themeBuild->renderHeader($frontendBuild);
+
+        //Montar footer
+        $this->footerHtml .= $themeBuild->renderFooter($frontendBuild);
+
+        return $this;
+    }
+
+    public function html($rawHtml = null, $viewData = null): string
+    {
+        if ($viewData) {
+           $this->addViewData($viewData);
+        }
+
+        $this->contentHtml = $rawHtml;
+
+        $this->setViewName('temp-html-' . time());
 
         $this->startTwig();
 
@@ -195,7 +254,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
             return $this->twig->render($this->viewTemporaryName, $this->viewData);
 
         } catch (\Exception $e) {
-            dump($this->viewTemporaryName, $this->viewData, $this->rawHtml);
+            dump($this->viewTemporaryName, $this->viewData, $this->contentHtml);
             throw $e;
         }
     }
@@ -203,25 +262,32 @@ class FrontendHtmlEngine extends FrontendEngineBase
     /**
      * @throws Exception
      */
-    public function widget($widgeteable_public_id): string
+    public function widget($widget_public_id): string
     {
 
 
-        $widgeteable = $this->widgeteables->firstWhere('public_id', $widgeteable_public_id);
+        $siteWidget = $this->widgets->firstWhere('public_id', $widget_public_id);
 
-        if (!$widgeteable) {
-            return "Widget {$widgeteable_public_id} não encontrado";
+
+        if (!$siteWidget) {
+            return "Widget {$widget_public_id} não encontrado";
         }
 
+        if (empty($siteWidget->content->html)) {
+            $siteWidget->save();
+        }
+
+        return $siteWidget->content->html;
+
         //Widget View
-        //Debugbar::debug($widgeteable->public_id, $widgeteable->config->ajax_render);
+        //Debugbar::debug($widget->public_id, $widget->config->ajax_render);
 
-        $renderView = $widgeteable->config->ajax_render ? 'adminx-common::Elements.Widgets.renders.ajax-render' : 'adminx-common::Elements.Widgets.renders.static-render';
-        $renderData = $widgeteable->config->ajax_render ? compact('widgeteable') : $widgeteable->getBuildViewData();
+        $renderView = $siteWidget->config->ajax_render ? 'adminx-common::Elements.Widgets.renders.ajax-render' : 'adminx-common::Elements.Widgets.renders.static-render';
+        $renderData = $siteWidget->config->ajax_render ? compact('siteWidget') : $siteWidget->getBuildViewData();
 
-        $widgeteableView = View::make($renderView, $renderData);
+        $widgetView = View::make($renderView, $renderData);
 
-        return $widgeteableView->render();
+        return $widgetView->render();
 
     }
 

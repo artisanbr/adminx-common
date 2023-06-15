@@ -4,7 +4,7 @@ namespace Adminx\Common\Observers;
 
 
 use Adminx\Common\Models\Interfaces\OwneredModel;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,8 +25,8 @@ class PageObserver
         if ($model->id) {
 
             //Comprimir CSS e JS personalizado da Página
-            $model->css->minify();
-            $model->js->minify();
+            $model->assets->css->minify();
+            $model->assets->js->minify();
         }
     }
 

@@ -21,7 +21,8 @@ class Seo extends GenericModel
         'description',
         'keywords',
         'robots',
-        'config'
+        'config',
+        'gtag'
     ];
 
     protected $attributes = [
@@ -30,6 +31,7 @@ class Seo extends GenericModel
         'keywords'    => '',
         'robots'      => 'index, follow',
         'config'      => [],
+        'gtag'    => null,
     ];
 
     protected $casts = [

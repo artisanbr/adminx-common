@@ -1,6 +1,6 @@
 <?php
 /***
- * @var \Adminx\Common\Models\Widgeteable $widgeteable
+ * @var \Adminx\Common\Models\SiteWidget $widgeteable
  */
 ?>
 
@@ -9,7 +9,8 @@
     @once
         @push('body-js')
             <div id="fb-root"></div>
-            <script async defer crossorigin="anonymous" src="https://connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v15.0"
+            <script async defer crossorigin="anonymous"
+                    src="https://connect.facebook.net/pt_BR/sdk.js#xfbml=1&version=v15.0"
                     nonce="MJf88bdf"></script>
         @endpush
     @endonce

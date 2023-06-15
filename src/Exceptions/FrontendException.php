@@ -47,7 +47,7 @@ class FrontendException extends Exception
                                     ], $this->getCode());
         }
 
-        return response()->view(['errors.frontend.'.$this->getCode(), 'errors.frontend.error'], [
+        return response()->view(['adminx-frontend::errors.'.$this->getCode(), 'adminx-frontend::errors.error'], [
             'exception' => $this,
             'message' => $this->getMessage()
         ], $this->getCode())->withException($this);

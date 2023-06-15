@@ -5,9 +5,9 @@ namespace Adminx\Common\Http\Controllers\API\Widgets;
 use App\Http\Controllers\Controller;
 use Adminx\Common\Facades\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Widgeteable;
+use Adminx\Common\Models\SiteWidget;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -29,7 +29,7 @@ class WidgetController extends Controller
     /**
      * @i
      */
-    protected function getViewData(Widgeteable $widgeteable, array $merge_data = []): array
+    protected function getViewData(SiteWidget $widgeteable, array $merge_data = []): array
     {
         $viewData = [
             'widgeteable' => $widgeteable,
@@ -100,8 +100,7 @@ class WidgetController extends Controller
             return Response::json('Unauthorized', 401);
         }
 
-        $widgeteable =  $this->site->widgeteables()->wherePublicId($public_id)->whereHas('widget')->first();
-        //$widgeteable = Widgeteable::wherePublicId($public_id)->whereHas('widget')->first();
+        $widgeteable =  $this->site->widgets()->wherePublicId($public_id)->whereHas('widget')->first();
 
         if (!$widgeteable) {
             return Response::json('Widget not found', 404);

@@ -3,7 +3,7 @@
 namespace Adminx\Common\Libs\AdvancedHtml;
 
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Widgeteable;
+use Adminx\Common\Models\SiteWidget;
 use Illuminate\Contracts\Support\Arrayable;
 
 class AdvancedTagsHelper

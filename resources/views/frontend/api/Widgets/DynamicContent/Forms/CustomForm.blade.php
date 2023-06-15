@@ -1,7 +1,7 @@
 <?php
 /***
- * @var \Adminx\Common\Models\Widgeteable $widgeteable
- * @var \Adminx\Common\Models\Form        $form
+ * @var \Adminx\Common\Models\SiteWidget $widgeteable
+ * @var \Adminx\Common\Models\Form       $form
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')

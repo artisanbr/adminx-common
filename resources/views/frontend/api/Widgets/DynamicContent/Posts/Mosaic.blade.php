@@ -1,9 +1,9 @@
 <?php
 /***
- * @var \Adminx\Common\Models\Widgeteable $widgeteable
- * @var \Adminx\Common\Models\Page        $page
- * @var \Adminx\Common\Models\Post        $post
- * @var \Adminx\Common\Models\Post[]|\Illuminate\Database\Eloquent\Collection        $posts
+ * @var \Adminx\Common\Models\SiteWidget                                      $widgeteable
+ * @var \Adminx\Common\Models\Pages\Page                                      $page
+ * @var \Adminx\Common\Models\Post                                            $post
+ * @var \Adminx\Common\Models\Post[]|\Illuminate\Database\Eloquent\Collection $posts
  */
 
 $postsQuery = $page->posts()->published();
@@ -17,9 +17,9 @@ $postsQuery = $page->posts()->published();
         @foreach($postsQuery->take(2)->get() as $post)
             <div class="col-xl-4 col-lg-6 col-md-6 posts-mosaic-left">
                 <x-frontend::pages.Posts.post-miniature-1 :post="$post"
-                                                              class="posts-mosaic-item posts-mosaic-featured-item widget-post-featured-item mb-30"
-                                                              :show-read-more="false" :show-categories="false"
-                                                              bottom-meta show-comments/>
+                                                          class="posts-mosaic-item posts-mosaic-featured-item widget-post-featured-item mb-30"
+                                                          :show-read-more="false" :show-categories="false"
+                                                          bottom-meta show-comments/>
             </div>
         @endforeach
 

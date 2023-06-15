@@ -1,9 +1,9 @@
 <?php
 /***
- * @var \Adminx\Common\Models\Widgeteable $widgeteable
- * @var \Adminx\Common\Models\Page        $page
- * @var \Adminx\Common\Models\Post        $post
- * @var \Adminx\Common\Models\Post[]|\Illuminate\Database\Eloquent\Collection        $posts
+ * @var \Adminx\Common\Models\SiteWidget                                      $widgeteable
+ * @var \Adminx\Common\Models\Pages\Page                                      $page
+ * @var \Adminx\Common\Models\Post                                            $post
+ * @var \Adminx\Common\Models\Post[]|\Illuminate\Database\Eloquent\Collection $posts
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')

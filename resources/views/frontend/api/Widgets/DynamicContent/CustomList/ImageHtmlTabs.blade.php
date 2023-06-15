@@ -1,6 +1,6 @@
 <?php
 /***
- * @var \Adminx\Common\Models\Widgeteable                                                                               $widgeteable
+ * @var \Adminx\Common\Models\SiteWidget                                                                                $widgeteable
  * @var \Adminx\Common\Models\CustomLists\CustomListHtml                                                                $customList
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml                                            $listItem
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml[]|\Illuminate\Database\Eloquent\Collection $customListItems

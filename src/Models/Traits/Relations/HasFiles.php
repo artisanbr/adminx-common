@@ -6,7 +6,7 @@ use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\File;
 use Adminx\Common\Models\Folder;
-use Adminx\Common\Models\Page;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Site;
 use Adminx\Common\Models\Theme;
