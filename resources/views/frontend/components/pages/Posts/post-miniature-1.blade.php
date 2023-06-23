@@ -5,14 +5,17 @@
         'mb-4' => !$big,
         ]) }}>
     @if($showCover && $post->cover_url)
-        <div class="post-cover img-hover-effect mb-3">
+        <div @class([
+                'post-cover img-hover-effect mb-3',
+                'mt-3' => $showCover && $post->cover_url
+                ])>
             <a class="img-zoom-effect" href="{{ $post->dynamic_uri }}">
                 <img class="img-full img-fluid w-100" src="{{ $post->cover_url }}"
                      alt="{{ $post->title }}">
             </a>
         </div>
     @endif
-    <div class="post-content {{ $showCover && $post->cover_url ? 'pt-6' : '' }}">
+    <div class="post-content">
         <a @class([
         'post-title mt-3',
         'limit-lines' => !$big,
