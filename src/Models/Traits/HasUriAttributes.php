@@ -44,7 +44,7 @@ trait HasUriAttributes
             return null;
         }
 
-        return (Str::of($this->attributes['url'])->startsWith('/') ? '' : '/') . $this->attributes['url'];
+        return (Str::of($this->attributes['url'])->startsWith('/') ? '' : '/') . $this->attributes['url'] . '/';
     }
 
     protected function getHttpProtocolAttribute()
@@ -72,7 +72,20 @@ trait HasUriAttributes
 
     public function uriTo($path)
     {
-        return ($model->uri ?? '') . $path;
+        return $this->uri . $this->traitPath($path, 'uri');
+    }
+
+    public function urlTo($path)
+    {
+        if(Str::startsWith($path, '/') && Str::endsWith($this->url, '/')){
+            $path = Str::substr($path, 0, -1);
+        }
+        return $this->url . $this->traitPath($path);
+    }
+
+    private function traitPath(string $path, $comparesWithAttr = 'url'): string
+    {
+        return (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, -1) : $path;
     }
     //endregion
 }

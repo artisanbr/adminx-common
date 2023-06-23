@@ -424,7 +424,10 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
             return '/';
         }
 
-        return "/{$this->slug}";
+
+        $urlId = $this->slug ?? $this->public_id;
+
+        return "/{$urlId}/";
     }
     //endregion
 

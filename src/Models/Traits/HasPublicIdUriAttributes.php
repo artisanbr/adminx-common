@@ -32,11 +32,11 @@ trait HasPublicIdUriAttributes
 
     protected function getPublicIdUrlAttribute()
     {
-        if(empty($this->attributes['public_id'])) {
+        if(empty($this->public_id)) {
             return null;
         }
 
-        return '/'.$this->attributes['public_id'];
+        return "/{$this->public_id}/";
     }
     //endregion
 
@@ -55,6 +55,16 @@ trait HasPublicIdUriAttributes
     public function PublicIdUriFrom($model, $dynamic = false)
     {
         return ($dynamic ? '' : "{$this->http_protocol}:") . '//' . $this->PublicIdUrlFrom($model);
+    }
+
+    public function PublicIdUrlTo($path)
+    {
+        return $this->public_id_url . $path;
+    }
+
+    public function PublicIdUriTo($path)
+    {
+        return $this->public_id_uri . $path;
     }
     //endregion
 }

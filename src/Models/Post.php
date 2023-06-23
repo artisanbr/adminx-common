@@ -207,7 +207,7 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
     protected function slug(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ?? Str::slug(Str::lower($this->title)),
+            get: fn($value) => $value,
             set: static fn($value) => Str::slug(Str::lower($value)),
         );
     }
@@ -254,8 +254,9 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     protected function getUrlAttribute(): string
     {
-
-        return $this->page->url ? "{$this->page->url}/post/" . ($this->slug ?? $this->public_id) : '';
+        $urlId = $this->slug ?? $this->public_id;
+        return $this->page->urlTo("post/{$urlId}/");
+        //return $this->page->url ? "{$this->page->url}/post/" . ($this->slug ?? $this->public_id) . '/' : '';
     }
 
     /*protected function getDescriptionAttribute()
