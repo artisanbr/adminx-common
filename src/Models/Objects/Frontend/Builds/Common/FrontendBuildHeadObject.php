@@ -2,8 +2,8 @@
 
 namespace Adminx\Common\Models\Objects\Frontend\Builds\Common;
 
-use Adminx\Common\Models\Objects\Abstract\Frontend\Builds\AbstractFrontendBuildSectionObject;
-use ArtisanLabs\GModel\GenericModel;
+
+use Adminx\Common\Models\Objects\Frontend\Builds\Common\Abstract\AbstractFrontendBuildSectionObject;
 
 /**
  * @property string $html

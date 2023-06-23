@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Models\Pages;
 
-use Adminx\Common\Facades\FrontendHtml;
+use Adminx\Common\Facades\Frontend\FrontendHtml;
 use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
@@ -100,6 +100,7 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
 
         'content' => PageContent::class,
+        'assets_old'  => 'object',
         'assets'  => FrontendAssetsBundle::class,
 
 
@@ -276,22 +277,24 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         return [...$viewData, ...$merge_data];
     }
 
-    public function frontendBuild(): FrontendBuildObject
+    public function frontendBuild(\Butschster\Head\MetaTags\Meta|null $meta = null): FrontendBuildObject
     {
+
+
         $frontendBuild = $this->site->frontendBuild();
 
         $frontendBuild->head->gtag_script = $this->getGTagScript();
-        $frontendBuild->head->addBefore(Meta::toHtml());
-        $frontendBuild->head->css = $this->css_html;
-        $frontendBuild->head->addAfter($this->assets->js->head_html ?? '');
+        $frontendBuild->head->addBefore($meta ? $meta->toHtml() : Meta::toHtml());
+        $frontendBuild->head->css = $this->assets->css_bundle_html;
+        $frontendBuild->head->addAfter($this->assets->js->head->html ?? '');
         $frontendBuild->head->addAfter($this->assets->head_script->html ?? '');
 
         $slug = $this->is_home ? 'home' : $this->slug;
 
         $frontendBuild->body->id = "page-{$slug}";
         $frontendBuild->body->class = "page-{$slug} page-{$this->public_id}";
-        $frontendBuild->body->addBefore($this->assets->js->before_body_html ?? '');
-        $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
+        $frontendBuild->body->addBefore($this->assets->js->before_body->html ?? '');
+        $frontendBuild->body->addAfter($this->assets->js->after_body->html ?? '');
 
         return $frontendBuild;
     }

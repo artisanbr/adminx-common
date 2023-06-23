@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Models;
 
-use Adminx\Common\Facades\FrontendHtml;
+use Adminx\Common\Facades\Frontend\FrontendHtml;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Interfaces\OwneredModel;

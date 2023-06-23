@@ -1,6 +1,6 @@
 <?php
 
-namespace Adminx\Common\Models\Objects\Abstract\Frontend\Builds;
+namespace Adminx\Common\Models\Objects\Frontend\Builds\Common\Abstract;
 
 use ArtisanLabs\GModel\GenericModel;
 

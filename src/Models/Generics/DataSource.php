@@ -3,7 +3,7 @@
 namespace Adminx\Common\Models\Generics;
 
 use Adminx\Common\Enums\CustomLists\CustomListType;
-use Adminx\Common\Facades\FrontendSite;
+use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\CustomListBase;
 use Adminx\Common\Models\Form;

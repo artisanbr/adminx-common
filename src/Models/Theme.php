@@ -6,13 +6,12 @@ use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
 use Adminx\Common\Models\Generics\Configs\ThemeConfig;
-use Adminx\Common\Models\Generics\Elements\Themes\ThemeFooter;
-use Adminx\Common\Models\Generics\Elements\Themes\ThemeFooterElement;
-use Adminx\Common\Models\Generics\Elements\Themes\ThemeHeader;
-use Adminx\Common\Models\Generics\Elements\Themes\ThemeHeaderElement;
-use Adminx\Common\Models\Generics\Elements\Themes\ThemeMediaElement;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
+use Adminx\Common\Models\Objects\Themes\ThemeFooterObject;
+use Adminx\Common\Models\Objects\Themes\ThemeHeaderObject;
+use Adminx\Common\Models\Objects\Themes\ThemeMediaBundleObject;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasSelect2;
@@ -24,7 +23,10 @@ use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\Relations\HasWidgets;
 use App\Providers\AppMetaTagsServiceProvider;
+use Butschster\Head\Contracts\Packages\ManagerInterface;
 use Butschster\Head\Facades\Meta;
+use Butschster\Head\Facades\PackageManager;
+use Butschster\Head\Packages\Package;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,31 +43,33 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         'site_id',
         'user_id',
         'parent_id',
-        'menu_id',
-        'menu_footer_id',
+        //'menu_id',
+        //'menu_footer_id',
         'public_id',
         'title',
         'media',
+        'assets',
         'css',
         'js',
         'config',
         'header',
-        'header_old',
+        //'header_old',
         'footer',
-        'footer_old',
+        //'footer_old',
     ];
 
     protected $casts = [
         'title'       => 'string',
-        'media'       => ThemeMediaElement::class,
         'config'      => ThemeConfig::class,
+        'media'       => ThemeMediaBundleObject::class,
+        'assets'      => FrontendAssetsBundle::class,
         'css'         => GenericAssetElementCSS::class,
         'js'          => GenericAssetElementJS::class,
-        'header'      => ThemeHeader::class,
-        'header_old'  => ThemeHeaderElement::class,
+        'header'      => ThemeHeaderObject::class,
+        //'header_old'  => ThemeHeaderElement::class,
         'header_html' => 'string',
-        'footer'      => ThemeFooter::class,
-        'footer_old'  => ThemeFooterElement::class,
+        'footer'      => ThemeFooterObject::class,
+        //'footer_old'  => ThemeFooterElement::class,
         'footer_html' => 'string',
         'created_at'  => 'datetime:d/m/Y H:i:s',
     ];
@@ -105,35 +109,66 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     public function compile()
     {
-        $this->load(['site']);
+        if (!$this->site) {
+            $this->load(['site']);
+        }
 
+        //Meta::reset();
         AppMetaTagsServiceProvider::registerFrontendPackages();
 
-        Meta::registerSeoMetaTagsForSite($this->site);
+
+        $meta = new \Butschster\Head\MetaTags\Meta(
+            app(ManagerInterface::class),
+            app('config')
+        );
+
+        //$meta->addCsrfToken();
+        $meta->initialize();
+
+        /*$this->registerMetaPackage();
+
+        $meta->setFavicon($this->media->favicon->url ?? '');
+
+        $meta->includePackages([$this->meta_pkg_name, 'frontend.pos']);*/
+
+        $meta->registerFromSiteTheme($this);
+        $meta->registerFromSite($this->site);
+        $meta->removeTag('description');
+        $meta->removeTag('keywords');
+        $meta->removeTag('viewport');
+        $meta->removeTag('charset');
+
+        /*Meta::addCsrfToken();
+        Meta::initialize();
+
+        Meta::registerFromSiteTheme($this);
+        Meta::registerFromSite($this->site);
         Meta::removeTag('description');
         Meta::removeTag('csrf-token');
         Meta::removeTag('keywords');
         Meta::removeTag('viewport');
-        Meta::removeTag('charset');
+        Meta::removeTag('charset');*/
 
-        $pages = $this->site->pages;
-
-        $theme = $this->site->theme;
+        //$pages = $this->site->pages;
 
         $htmlMin = new HtmlMin();
 
-        $themeBuild = $theme->build()->firstOrNew([
-                                                      'site_id'    => $this->site_id,
-                                                      'user_id'    => $this->user_id,
-                                                      'account_id' => $this->account_id,
-                                                  ]);
+        $themeBuild = $this->build()->firstOrNew([
+                                                     'site_id'    => $this->site_id,
+                                                     'user_id'    => $this->user_id,
+                                                     'account_id' => $this->account_id,
+                                                 ]);
 
         $headerHtml = View::make('adminx-frontend::layout.partials.header', [
-            'site' => $this->site,
+            'site'  => $this->site,
+            'theme' => $this,
+            'meta' => $meta,
         ])->render();
 
         $footerHtml = View::make('adminx-frontend::layout.partials.footer', [
-            'site' => $this->site,
+            'site'  => $this->site,
+            'theme' => $this,
+            'meta' => $meta,
         ])->render();
 
         $themeBuild->fill([
@@ -141,12 +176,74 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                               'footer' => $this->site->config->enable_html_minify ? $htmlMin->minify($footerHtml) : $footerHtml,
                           ]);
 
-        return $themeBuild->save() ? $themeBuild : null;
+        $retorno = $themeBuild->save() ? $themeBuild : null;
+
+        $this->unregisterMetaPackage();
+
+        return $retorno;
+    }
+
+    public function registerMetaPackage()
+    {
+        PackageManager::create($this->meta_pkg_name, function (Package $package) {
+
+            $packagesInclude = [];
+
+            //Frameworks
+            if ($this) {
+
+                if ($this->config->jquery) {
+                    $packagesInclude[] = 'jquery';
+                }
+
+                if (!$this->config->no_framework) {
+                    $packagesInclude[] = $this->config->framework->value;
+                }
+
+                $packagesInclude = [...$packagesInclude, ...($this->config->plugins->toArray() ?? [])];
+            }
+
+            $packagesInclude[] = 'frontend.pre';
+
+            $package->requires($packagesInclude);
+
+            /**
+             * @var File $file
+             */
+            foreach ($this->files()->themeBundleSortened()->values() as $file) {
+
+                if ($file->extension === 'css') {
+                    //Todo: habilitar DEFER
+
+                    /*[
+                        'rel'    => 'stylesheet',
+                        'media'  => 'print',
+                        'onload' => "this.media='all'",
+                    ]*/
+                    //dump($file->path);
+                    $package->addStyle($file->name, $file->url);
+                }
+                if ($file->extension === 'js') {
+                    $package->addScript($file->name, $file->url, ['defer']);
+                }
+            }
+        });
+    }
+
+    public function unregisterMetaPackage()
+    {
+        Meta::removePackage('frontend.pre');
+        Meta::removePackage($this->meta_pkg_name);
+        Meta::removePackage('frontend.pos');
     }
     //endregion
 
     //region ATTRIBUTES
-    //Select2
+    protected function metaPkgName(): Attribute
+    {
+        return Attribute::make(get: fn() => "theme_meta_pkg_{$this->id}");
+    }
+
     protected function text(): Attribute
     {
         return Attribute::make(get: fn() => ($this->parent && $this->parent->title ? "{$this->parent->title} &raquo; " : '') . ($this->title ?? ''),);
@@ -160,14 +257,26 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
     protected function footerTwigHtml(): Attribute
     {
 
-        return Attribute::make(get: fn() => preg_replace( '/[^\@]{{/m', "@{{", $this->footer->raw));
+        return Attribute::make(get: fn() => preg_replace('/[^\@]{{/m', "@{{", $this->footer->raw));
     }
 
     protected function headerTwigHtml(): Attribute
     {
         //return Attribute::make(get: fn() => $this->header->raw);
-        return Attribute::make(get: fn() => preg_replace( '/[^\@]{{/m', "@{{", $this->header->raw));
+        return Attribute::make(get: fn() => preg_replace('/[^\@]{{/m', "@{{", $this->header->raw));
     }
+
+
+    /*protected function getJsHtmlAttribute()
+    {
+        return $this->js->html;
+    }
+
+    protected function getCssHtmlAttribute()
+    {
+        return $this->css->html;
+    }*/
+
 
     /*protected function getLogoAttribute()
     {
@@ -184,15 +293,6 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         return $this->media->favicon->file->url ?? config('adminx.defines.files.default.files.theme.media.favicon');
     }*/
 
-    protected function getJsHtmlAttribute()
-    {
-        return $this->js->html;
-    }
-
-    protected function getCssHtmlAttribute()
-    {
-        return $this->css->html;
-    }
 
     //endregion
 
@@ -239,22 +339,24 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     public function save(array $options = []): bool
     {
-
-        //Minifies
-        $this->css->minify();
-        $this->js->minify();
-
-        /*if (!$this->id) {
-            //Salvar antes de gerar o HTML Avançado no caso de um novo tema
-            parent::save($options);
-            $this->refresh();
-        }*/
-
-        //Cache dos HTMLs
-        //$this->header_old->flushHtmlCache($this->site, $this);
-        //$this->footer_old->flushHtmlCache($this->site, $this);
+        //Minify
+        $this->assets->minify();
 
         return parent::save($options);
+    }
+
+    public function saveAndCompile(array $options = []): bool
+    {
+        $return = parent::save($options);
+
+        //Compile
+        if ($return) {
+            sleep(1);
+            $this->refresh();
+            $this->compile();
+        }
+
+        return $return;
     }
 
     public function delete()

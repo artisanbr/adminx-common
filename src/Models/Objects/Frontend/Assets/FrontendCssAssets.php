@@ -11,64 +11,33 @@ use ScssPhp\ScssPhp\Exception\SassException;
 class FrontendCssAssets extends AbstractFrontendAssetObject
 {
 
-    public function __construct(array $attributes = [])
-    {
-        $this->addCasts([
-                            'scss_raw' => 'string',
-                            'scss'     => 'string',
-                            'scss_minify'     => 'string',
-                        ]);
+    protected $casts = [
+        'scss' => 'string',
+        'scss_raw' => 'string',
+    ];
 
-        $this->addFillables([
-                                'scss_raw',
-                                'scss',
-                                'scss_minify',
-                            ]);
-
-        parent::__construct($attributes);
-    }
-
-    protected function getHtmlAttribute(): string{
-        return "{$this->resources_html} \n {$this->raw_html} \n {$this->scss_html}";
-    }
+    protected $fillable = [
+        'scss',
+        'scss_raw'
+    ];
 
 
     public function minify(): static
     {
         $minify = new CSS();
-        $this->raw_minify = $minify->add($this->raw)->minify();
-
-
-        $this->compile(true);
-
-        /*$minifyScss = new CSS();
-        $this->attributes['scss'] = $minifyScss->add($this->scss)->minify();*/
-
-        return $this;
-    }
-
-    /**
-     * @throws SassException
-     */
-    public function compile($compress = false): static
-    {
-        $this->attributes['scss'] = !empty($this->scss_raw ?? null) ? HtmlHelper::compileSCSS($this->scss_raw, false) : '';
-        if($compress){
-            $this->attributes['scss_minify'] = !empty($this->scss_raw ?? null) ? HtmlHelper::compileSCSS($this->scss_raw, true) : '';
-        }
+        $this->attributes['raw_minify'] = $minify->add($this->raw)->minify();
 
         return $this;
     }
 
     //region ATTRIBUTES
-    protected function setScssRawAttribute($value): ?string
-    {
-        $this->attributes['scss_raw'] = $value;
-
-        return $value;
-    }
 
     //region GETS
+
+    protected function getHtmlAttribute(): string
+    {
+        return "{$this->resources_html} \n {$this->raw_html}";
+    }
 
     protected function getResourcesHtmlAttribute(): string
     {
@@ -77,13 +46,15 @@ class FrontendCssAssets extends AbstractFrontendAssetObject
 
     protected function getRawHtmlAttribute(): string
     {
-        return '<style>' . parent::getRawHtmlAttribute() . '</style>';
+        $raw = parent::getRawHtmlAttribute();
+
+        if (!empty($raw)) {
+            return "<style>{$raw}</style>";
+        }
+
+        return '';
     }
 
-    protected function getScssHtmlAttribute(): string
-    {
-        return "<style>{$this->scss}</style>";
-    }
 
     //endregion
 

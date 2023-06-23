@@ -3,7 +3,7 @@
 namespace Adminx\Common\Libs\FrontendEngine;
 
 
-use Adminx\Common\Facades\FrontendSite;
+use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Site;

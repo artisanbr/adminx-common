@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Models\Scopes;
 
-use Adminx\Common\Facades\FrontendSite;
+use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

@@ -1,14 +1,16 @@
 <?php
 /**
- * @var \Adminx\Common\Models\Site $site
+ * @var \Adminx\Common\Models\Site                                        $site
+ * @var \Adminx\Common\Models\Theme                                       $theme
  * @var \Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject $frontendBuild
+ * @var \Butschster\Head\MetaTags\Meta                                    $meta
  */
 
 ?>
 
 
 {{--Footer--}}
-{!! $site->theme->footer_twig_html ?? '' !!}
+{!! $theme->footer->twig_html ?? '' !!}
 
 <footer id="footer-copyright" class="footer-bottom py-2">
     <div class="container">
@@ -34,7 +36,7 @@
 {{--</div>--}}
 
 {{--Scripts--}}
-{!! Meta::footer()->toHtml() !!}
+{!! $meta->footer()->toHtml() !!}
 @@stack('js-includes')
 
 <script>
@@ -61,7 +63,6 @@
 
 @@stack('footer-includes')
 @@stack('js')
-{!! $site->theme->js_html ?? '' !!}
+{!! $theme->assets->js->after_body->html ?? '' !!}
 @{!! $frontendBuild->body->after !!}
-</body>
-</html>
+{!! '</body></html>' !!}

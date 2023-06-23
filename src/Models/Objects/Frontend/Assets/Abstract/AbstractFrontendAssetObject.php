@@ -17,6 +17,7 @@ use Illuminate\Support\Collection;
 abstract class AbstractFrontendAssetObject extends GenericModel
 {
 
+
     public function __construct(array $attributes = [])
     {
 
@@ -37,8 +38,8 @@ abstract class AbstractFrontendAssetObject extends GenericModel
 
         $this->addAttributes([
                                  'resources'  => [],
-                                 'raw'        => '',
-                                 'raw_minify' => null,
+                                 //'raw'        => '',
+                                 //'raw_minify' => null,
                              ]);
 
         $this->addAppends([
@@ -65,19 +66,30 @@ abstract class AbstractFrontendAssetObject extends GenericModel
         return $this->resources->toJson();
     }
 
-    protected function getRawHtmlAttribute(): string
+    protected function getRawHtmlAttribute(): string|null
     {
-        return $this->raw_minify ?? $this->raw ?? '';
+        return match (true) {
+            !empty($this->raw_minify) => $this->raw_minify,
+            !empty($this->raw) => $this->raw,
+            default => null,
+        };
     }
 
     protected function getHtmlAttribute(): string
     {
-        return $this->resources_html . $this->raw_html;
+        return $this->resources_html ."\n". $this->raw_html;
     }
 
     //endregion
     //region SETS
+    /*protected function setRawAttribute($value): static
+    {
+        $this->attributes['raw'] = $value;
 
+        $this->minify();
+
+        return $this;
+    }*/
     //endregion
     //endregion
 }

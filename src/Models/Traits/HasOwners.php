@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Models\Traits;
 
-use Adminx\Common\Facades\FrontendSite;
+use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Facades\Auth;

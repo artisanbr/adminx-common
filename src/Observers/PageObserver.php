@@ -25,8 +25,7 @@ class PageObserver
         if ($model->id) {
 
             //Comprimir CSS e JS personalizado da Página
-            $model->assets->css->minify();
-            $model->assets->js->minify();
+            $model->assets->minify();
         }
     }
 

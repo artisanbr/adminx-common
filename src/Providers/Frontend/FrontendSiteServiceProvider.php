@@ -1,8 +1,8 @@
 <?php
 
-namespace Adminx\Common\Providers;
+namespace Adminx\Common\Providers\Frontend;
 
-use Adminx\Common\Facades\FrontendSite;
+use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\FrontendEngine\FrontendSiteEngine;
 use Adminx\Common\Models\Site;
 use Illuminate\Support\ServiceProvider;

@@ -1,14 +1,15 @@
 <?php
 
-namespace Adminx\Common\Providers;
+namespace Adminx\Common\Providers\Frontend;
 
-use Adminx\Common\Facades\FrontendPage;
+use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Libs\FrontendEngine\FrontendPageEngine;
 use Adminx\Common\Models\Category;
 use Adminx\Common\Models\File;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Theme;
 use Butschster\Head\Facades\Meta;
 use Butschster\Head\Facades\PackageManager;
 use Butschster\Head\Packages\Entities\OpenGraphPackage;
@@ -47,52 +48,7 @@ class FrontendPageServiceProvider extends ServiceProvider
     {
         //
 
-        Meta::macro('registerSeoMetaTagsForSite', function (Site $site) {
-
-            PackageManager::create('site_theme', function (Package $package) use ($site) {
-
-
-                $packagesInclude = [];
-
-                //Frameworks
-                if ($site->theme) {
-
-                    if ($site->theme->config->jquery) {
-                        $packagesInclude[] = 'jquery';
-                    }
-
-                    if (!$site->theme->config->no_framework) {
-                        $packagesInclude[] = $site->theme->config->framework->value;
-                    }
-
-                    $packagesInclude = [...$packagesInclude, ...$site->theme->config->plugins->toArray() ?? []];
-                }
-
-                $packagesInclude[] = 'frontend.pre';
-
-                $package->requires($packagesInclude);
-
-                /**
-                 * @var File $file
-                 */
-                if ($site->theme) {
-                    foreach ($site->theme->files()->themeBundleSortened()->values() as $file) {
-                        if ($file->extension === 'css') {
-                            //Todo: habilitar DEFER
-
-                            /*[
-                                'rel'    => 'stylesheet',
-                                'media'  => 'print',
-                                'onload' => "this.media='all'",
-                            ]*/
-                            $package->addStyle($file->name, $file->url);
-                        }
-                        if ($file->extension === 'js') {
-                            $package->addScript($file->name, $file->url, ['defer']);
-                        }
-                    }
-                }
-            });
+        \Butschster\Head\MetaTags\Meta::macro('registerFromSite', function (Site $site) {
 
             $metaOg = new OpenGraphPackage('site_og');
             $metaTwitter = new TwitterCardPackage('site_tt');
@@ -109,71 +65,60 @@ class FrontendPageServiceProvider extends ServiceProvider
             $this
                 //Site
                 ->addMeta('grecaptcha-key', ['content' => $site->config->recaptcha_site_key])
-                ->setFavicon($site->theme->media->favicon->file->url ?? '')
 
                 //Packages
                 ->registerPackage($metaOg)
-                ->registerPackage($metaTwitter)
-                ->includePackages(['site_theme', 'frontend.pos']);
+                ->registerPackage($metaTwitter);
 
         });
 
-        Meta::macro('registerMetaTagsForSiteTheme', function (Site $site) {
+        \Butschster\Head\MetaTags\Meta::macro('registerFromSiteTheme', function (Theme $theme) {
 
-            PackageManager::create('site_theme', function (Package $package) use ($site) {
+            /*PackageManager::create($theme->meta_pkg_name, function (Package $package) use ($theme) {
 
 
                 $packagesInclude = [];
 
                 //Frameworks
-                if ($site->theme) {
+                if ($theme) {
 
-                    if ($site->theme->config->jquery) {
+                    if ($theme->config->jquery) {
                         $packagesInclude[] = 'jquery';
                     }
 
-                    if (!$site->theme->config->no_framework) {
-                        $packagesInclude[] = $site->theme->config->framework->value;
+                    if (!$theme->config->no_framework) {
+                        $packagesInclude[] = $theme->config->framework->value;
                     }
 
-                    $packagesInclude = [...$packagesInclude, ...$site->theme->config->plugins->toArray() ?? []];
+                    $packagesInclude = [...$packagesInclude, ...$theme->config->plugins->toArray() ?? []];
                 }
 
                 $packagesInclude[] = 'frontend.pre';
 
                 $package->requires($packagesInclude);
+                foreach ($theme->files()->themeBundleSortened()->values() as $file) {
 
-                /**
-                 * @var File $file
-                 */
-                if ($site->theme) {
-                    foreach ($site->theme->files()->themeBundleSortened()->values() as $file) {
-
-                        if ($file->extension === 'css') {
-                            //Todo: habilitar DEFER
-
-                            /*[
-                                'rel'    => 'stylesheet',
-                                'media'  => 'print',
-                                'onload' => "this.media='all'",
-                            ]*/
-                            //dump($file->path);
-                            $package->addStyle($file->name, $file->url);
-                        }
-                        if ($file->extension === 'js') {
-                            $package->addScript($file->name, $file->url, ['defer']);
-                        }
+                    if ($file->extension === 'css') {
+                        $package->addStyle($file->name, $file->url);
+                    }
+                    if ($file->extension === 'js') {
+                        $package->addScript($file->name, $file->url, ['defer']);
                     }
                 }
-            });
+            });*/
 
-            $this->includePackages(['site_theme', 'frontend.pos']);
+            $theme->registerMetaPackage();
+
+
+            $this->setFavicon($theme->media->favicon->url ?? '');
+
+            $this->includePackages([$theme->meta_pkg_name, 'frontend.pos']);
 
         });
 
         Meta::macro('registerSeoMetaTagsForPage', function (Page $page) {
 
-            if($page->site->seo->config->show_parent_title){
+            if ($page->site->seo->config->show_parent_title) {
                 $this->prependTitle($page->site->getTitle());
             }
 
@@ -230,4 +175,6 @@ class FrontendPageServiceProvider extends ServiceProvider
                 ->setPaginationLinks($comments);
         });
     }
+
+
 }

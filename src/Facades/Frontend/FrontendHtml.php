@@ -1,14 +1,14 @@
 <?php
 
-namespace Adminx\Common\Facades;
+namespace Adminx\Common\Facades\Frontend;
 
 use Illuminate\Support\Facades\Facade;
 
-class FrontendPage extends Facade
+class FrontendHtml extends Facade
 {
 
     protected static function getFacadeAccessor()
     {
-        return 'FrontendPageEngine';
+        return 'FrontendHtmlEngine';
     }
 }

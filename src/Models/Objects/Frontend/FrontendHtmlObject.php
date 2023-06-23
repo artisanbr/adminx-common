@@ -30,9 +30,9 @@ class FrontendHtmlObject extends AbstractHtmlObject
     ];*/
 
     //region HELPERS
-    public function builtHtml(Site $site, HtmlModel $model, $viewTemporaryName = 'element-html'): string
+    /*public function builtHtml(Site $site, HtmlModel $model, $viewTemporaryName = 'element-html'): string
     {
         return AdvancedHtmlEngine::start($site, $model, $viewTemporaryName)->html($this->html)->buildHtml();
-    }
+    }*/
 
 }

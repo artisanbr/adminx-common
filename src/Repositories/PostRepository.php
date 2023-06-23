@@ -3,6 +3,8 @@
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Enums\FileType;
+use Adminx\Common\Facades\FileManager\FileUpload;
+use Adminx\Common\Facades\FileManager\FileUploadManager;
 use Adminx\Common\Libs\Helpers\FileHelper;
 use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Models\Post;
@@ -107,17 +109,10 @@ class PostRepository
 
         //Imagem Cover
         if ($data['cover_file'] ?? false) {
-            $coverFile = FileHelper::saveRequestToSite($this->post->site, $data['cover_file'], $uploadPathBase, 'cover', $this->post->cover);
 
-            $coverFile->fill([
-                                 'type'           => FileType::PostCover,
-                                 'title'           => "Imagem de Capa",
-                                 'description'     => "Capa de {$uploadableType} #{$this->post->public_id}",
-                                 'editable'     => false,
-                             ]);
-            $coverFile->assignTo($this->post, 'uploadable');
+            $coverFile = FileUpload::onSite($this->post->site)->upload($data['cover_file'], $uploadPathBase, 'cover');
 
-            $this->post->cover_id = $coverFile->id;
+            $this->post->cover_url = $coverFile->url;
         }
 
         //Imagem SEO

@@ -15,9 +15,8 @@ class AdminxCommonServiceProvider extends ServiceProvider
     private $views_path  = __DIR__ . '/../resources/views/';
 
     private $config_files = [
-        'tracker',
-        'visitor',
         'location',
+        'files',
         'adminx/app',
         'adminx/data-sources',
         'adminx/defines',
@@ -41,6 +40,10 @@ class AdminxCommonServiceProvider extends ServiceProvider
                 $this->config_path . $config_file . '.php', Str::replaceNative('/', '.', $config_file)
             );
         }
+
+        /*$this->mergeConfigFrom(
+            $this->config_path . '.php', Str::replaceNative('/', '.', $config_file)
+        );*/
 
 
     }

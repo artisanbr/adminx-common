@@ -1,19 +1,23 @@
 <?php
 /**
  * @var \Adminx\Common\Models\Site                                        $site
+ * @var \Adminx\Common\Models\Theme                                        $theme
  * @var \Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject $frontendBuild
+ * @var \Butschster\Head\MetaTags\Meta $meta
  */
 ?>
         <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+{!! '<html lang="'.str_replace('_', '-', app()->getLocale()).'">' !!}
+
 <head>
     {{--before--}}
     @{!! $frontendBuild->head->gtag_script !!}
     @{!! $frontendBuild->head->before !!}
     <!-- Assets -->
-    {!! Meta::toHtml() !!}
+    {{--{!! Meta::toHtml() !!}--}}
+    {!! $meta->toHtml() !!}
     {{--Site CSS--}}
-    {!! $site->theme->css_html ?? '' !!}
+    {!! $theme->assets->css_bundle_html ?? '' !!}
     {{--Page CSS--}}
     @{!! $frontendBuild->head->css !!}
     {{--@@yield('css-includes')
@@ -24,23 +28,25 @@
     <link rel="preload" as="image" href="{{ FrontendUtils::asset(config('adminx.app.provider.logo')) }}"/>
 
     @foreach(['logo','logo_secondary'] as $media)
-        @if(($site->theme->media->{$media} ?? false) && ($site->theme->media->{$media}->url ?? false))
-            <link rel="preload" as="image" href="{{ $site->theme->media->{$media}->url ?? '' }}"/>
+        @if(($theme->media->{$media} ?? false) && ($theme->media->{$media}->url ?? false))
+            <link rel="preload" as="image" href="{{ $theme->media->{$media}->url ?? '' }}"/>
         @endif
     @endforeach
 
 
-    {!! $site->theme->js->head_js_html ?? '' !!}
+    {!! $theme->assets->js->head->html ?? '' !!}
+    {!! $theme->assets->head_script->html ?? '' !!}
     @{!! $frontendBuild->head->after !!}
     {{--@@stack('head-js')
     @@yield('head-js')--}}
 
 </head>
-<body id="@{{ $frontendBuild->body->id }}"
-      class="@{{ $frontendBuild->body->class }}">
-{!! $site->theme->js->after_body_js_html ?? '' !!}
+
+{!! '<body id="@{{ $frontendBuild->body->id }}" class="@{{ $frontendBuild->body->class }}">' !!}
+
+{!! $theme->assets->js->before_body->html ?? '' !!}
 
 @{!! $frontendBuild->body->before !!}
 
 {{--Theme Header--}}
-{!! $site->theme->header_twig_html ?? '' !!}
+{!! $theme->header->twig_html ?? '' !!}

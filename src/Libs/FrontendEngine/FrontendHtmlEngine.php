@@ -3,8 +3,8 @@
 namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Exceptions\FrontendException;
-use Adminx\Common\Facades\FrontendHtml;
-use Adminx\Common\Facades\FrontendSite;
+use Adminx\Common\Facades\Frontend\FrontendHtml;
+use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Post;
