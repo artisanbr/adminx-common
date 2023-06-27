@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Models\Traits;
 
-use Adminx\Common\Models\Generics\Seo\Seo;
+use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Site;
@@ -58,8 +58,8 @@ trait HasSEO
     public function seoImage(): string
     {
 
-        if ($this->seo->image_id && $this->seo->image && $this->seo->image->url ?? false) {
-            return $this->seo->image->url;
+        if (!empty($this->seo->image_url)) {
+            return $this->seo->image_url;
         }
 
         if ($this->cover_url ?? false) {

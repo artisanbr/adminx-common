@@ -9,12 +9,14 @@ class CustomListItemTestimonialsData extends GenericModel
 {
 
     protected $fillable = [
+        'image_url',
         'image',
         'content',
     ];
 
     protected $casts = [
-        'image' => GenericImageFile::class,
+        'image_url' => 'string',
+        'image' => GenericImageFile::class, //todo: remove
         'content' => 'string',
     ];
 

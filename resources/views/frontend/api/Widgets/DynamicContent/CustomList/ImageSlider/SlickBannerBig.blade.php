@@ -19,10 +19,10 @@
         <div class="banner-slider" id="bannerSlider-{{ $widgeteable->public_id }}">
             @foreach($customListItems as $listItem)
                 @push('css')
-                    <link rel="preload" as="image" href="{{ $listItem->data->image->file->url ?? '' }}"/>
+                    <link rel="preload" as="image" href="{{ $listItem->data->image_url ?? '' }}"/>
                 @endpush
                 <div class="single-banner"
-                     style="background-image: url({{ $listItem->data->image->file->url ?? '' }});">
+                     style="background-image: url({{ $listItem->data->image_url ?? '' }});">
                     <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-lg-10">

@@ -12,9 +12,9 @@
     <div class="testimonials-slide testimonials-slide-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
         {{--Left--}}
         @foreach($customListItems as $listItem)
-            <div class="testimonials-item" data-thumb="{{ $listItem->data->image->file->url }}">
+            <div class="testimonials-item" data-thumb="{{ $listItem->data->image_url }}">
                 <div class="testimonials-author-image author-img">
-                    <img src="{{ $listItem->data->image->file->url }}" alt="Image">
+                    <img src="{{ $listItem->data->image_url }}" alt="Image">
                 </div>
                 <div class="content">
                     <div class="d-flex">

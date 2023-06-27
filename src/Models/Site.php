@@ -9,7 +9,8 @@ use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Generics\Configs\Site\SiteConfig;
 use Adminx\Common\Models\Generics\Contact\Contact;
-use Adminx\Common\Models\Generics\Seo\SiteSeo;
+use Adminx\Common\Models\Interfaces\UploadModel;
+use Adminx\Common\Models\Objects\Seo\SiteSeo;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
@@ -28,7 +29,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
 
-class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
+class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
     use HasUriAttributes, HasValidation, HasSEO, HasFiles, HasPosts, BelongsToUser, HasOwners, HasPublicIdAttribute, HasRelatedCache;
 
@@ -90,6 +91,11 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel
     //endregion
 
     //region HELPERS
+    public function uploadPathTo(?string $path = null): string
+    {
+        return "sites/{$this->public_id}" . ($path ? "/{$path}" : '');
+    }
+
     public static function getFromPreviousDomain($public_id): EloquentModelBase|Builder|Site|null
     {
         $site = self::where('public_id', $public_id)->with(['pages'])->first();

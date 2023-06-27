@@ -17,7 +17,7 @@
                     {!! $listItem->data->content !!}
                     <div class="testimonials-author d-flex align-items-center mt-30">
                         <div class="testimonials-author-image">
-                            <img class="h-auto" src="{{ $listItem->data->image->file->url }}"/>
+                            <img class="h-auto" src="{{ $listItem->data->image_url }}"/>
                         </div>
                         <div class="testimonials-author-name">
                             <h4 class="limit-1-line">{{ $listItem->title }}</h4>

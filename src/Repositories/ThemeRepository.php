@@ -36,7 +36,7 @@ class ThemeRepository extends Repository
 
         return DB::transaction(function () {
 
-            $this->theme = Theme::findOrNew($this->data[$this->idKey] ?? null);
+            $this->theme = Theme::findOrNew($this->getDataId());
 
             //$this->theme->header->is_html_advanced = $this->data['header']['is_html_advanced'];
             //$this->theme->footer->is_html_advanced = $this->data['footer']['is_html_advanced'] ?? false;

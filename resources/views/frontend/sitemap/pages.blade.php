@@ -54,9 +54,9 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
                         <lastmod>{{ $dataSourceItem->updated_at->toIso8601String() }}</lastmod>
                         <priority>0.5</priority>
 
-                        @if($dataSourceItem->data->image->file && $dataSourceItem->data->image->file->url)
+                        @if($dataSourceItem->data->image->file && $dataSourceItem->data->image_url)
                             <image:image>
-                                <image:loc>{{ FrontendUtils::url($dataSourceItem->data->image->file->url) }}</image:loc>
+                                <image:loc>{{ FrontendUtils::url($dataSourceItem->data->image_url) }}</image:loc>
                                 {{--<image:title>{{ $post->seoTitle() }}</image:title>--}}
                             </image:image>
                         @endif

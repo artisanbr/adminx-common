@@ -9,20 +9,29 @@ use Adminx\Common\Libs\Helpers\FileHelper;
 use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Tag;
+use Adminx\Common\Repositories\Base\Repository;
+use Adminx\Common\Repositories\Traits\SeoModelRepository;
 use Exception;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class PostRepository
+/**
+ * @property ?Post $model
+ */
+class PostRepository extends Repository
 {
+    use SeoModelRepository;
 
 
     public function __construct(
         protected int|null  $page_id = null,
         protected Post|null $post = null
-    ) {}
+    ) {
+
+    }
 
     public function page($page_id): static
     {
@@ -38,126 +47,88 @@ class PostRepository
         return $this;
     }
 
-    /**
-     * Salvar Post
-     *
-     * @param array $data
-     *
-     * @return Post|null
-     * @throws Throwable
-     */
-    public function save(array $data): ?Post
+    public function saveTransaction(): ?Post
     {
-        return DB::transaction(function () use ($data) {
-            $this->post = Post::findOrNew($data['id'] ?? null);
+        $this->setModel(Post::findOrNew($this->getDataId()));
 
-            $this->post->fill($data);
-            $this->post->page_id = $this->page_id;
-            $this->post->save();
-            $this->post->refresh();
+        $this->model->fill($this->data);
+        $this->model->page_id = $this->page_id;
+        $this->model->save();
+        $this->model->refresh();
 
-            if ($data['categories'] ?? false) {
-                $this->post->categories()->sync($data['categories']);
-            }
+        if ($this->data['categories'] ?? false) {
+            $this->model->categories()->sync($this->data['categories']);
+        }
 
-            if ($data['seo']['keywords'] ?? $data['tags'] ?? false) {
-                $tags_titles = $data['tags'] ?? false ? json_decode($data['tags']) : explode(',', $data['seo']['keywords']);
+        if ($this->data['seo']['keywords'] ?? $this->data['tags'] ?? false) {
+            $tags_titles = $this->data['tags'] ?? false ? json_decode($this->data['tags']) : explode(',', $this->data['seo']['keywords']);
 
-                if (collect($tags_titles)->diff($this->post->tags->pluck('title'))->count()) {
-                    $tags = [];
+            if (collect($tags_titles)->diff($this->model->tags->pluck('title'))->count()) {
+                $tags = [];
 
-                    foreach ($tags_titles as $tag_title) {
-                        $tag = $this->post->site->tags()->where('title', $tag_title)->first() ?? new Tag([
-                                                                                                             'title'      => $tag_title,
-                                                                                                             'user_id'    => Auth::user()->id,
-                                                                                                             'account_id' => Auth::user()->account_id,
-                                                                                                             'site_id'    => Auth::user()->site_id,
-                                                                                                         ]);
-                        $tag->save();
-                        $tags[] = $tag->id;
-                    }
-                    $this->post->tags()->sync($tags);
-                    $this->post->page->tags()->sync($tags);
+                foreach ($tags_titles as $tag_title) {
+                    $tag = $this->model->site->tags()->where('title', $tag_title)->first() ?? new Tag([
+                                                                                                         'title'      => $tag_title,
+                                                                                                         'user_id'    => Auth::user()->id,
+                                                                                                         'account_id' => Auth::user()->account_id,
+                                                                                                         'site_id'    => Auth::user()->site_id,
+                                                                                                     ]);
+                    $tag->save();
+                    $tags[] = $tag->id;
                 }
+                $this->model->tags()->sync($tags);
+                $this->model->page->tags()->sync($tags);
             }
+        }
 
-            $this->processUploads($data);
-            $this->post->save();
+        $this->processUploads();
+        $this->model->save();
 
-            return $this->post;
-        });
+        return $this->model;
     }
 
 
     /**
      * @throws Exception
      */
-    public function processUploads($data): void
+    public function processUploads(): void
     {
         /**
          * @var array{cover_file?: UploadedFile, seo: array{image_file?: UploadedFile}} $data
          */
 
-        if (!$this->post || !$this->post->site) {
+        if (!$this->model || !$this->model->site) {
             abort(404, 'Post não encontrado para salvar os arquivos');
         }
 
-        $this->post->refresh();
+        $this->model->refresh();
 
-        $uploadPathBase = "pages/{$this->post->page->public_id}/post/{$this->post->public_id}/images";
-        $uploadableType = MorphHelper::resolveMorphType($this->post);
+        $this->uploadPathBase = $this->model->uploadPathTo('images');
+
+        //Files
+        $coverUploadFile = $this->data['cover_file'] ?? false;
+        $seoFile = $this->processSeoUploads();
 
         //Imagem Cover
-        if ($data['cover_file'] ?? false) {
+        if ($coverUploadFile) {
 
-            $coverFile = FileUpload::onSite($this->post->site)->upload($data['cover_file'], $uploadPathBase, 'cover');
+            $coverFile = FileUpload::upload($coverUploadFile, $this->uploadPathBase, 'cover');
 
-            $this->post->cover_url = $coverFile->url;
+            $this->model->cover_url = $coverFile->url;
+
+            if(!$seoFile){
+                $this->model->seo->image_url = $coverFile->url;
+            }
         }
 
         //Imagem SEO
-        if ($data['seo']['image_file'] ?? false) {
-
-            $seoFile = FileHelper::saveRequestToSite($this->post->site, $data['seo']['image_file'], $uploadPathBase, 'seo', $this->post->seo->image);
-
-            $seoFile->fill([
-                                 'type'           => FileType::PostSeo,
-                                 'title'           => "Meta Imagem",
-                                 'description'     => "Meta Imagem de {$uploadableType} #{$this->post->public_id}",
-                                 'editable'     => false,
-                             ]);
-            $seoFile->assignTo($this->post, 'uploadable');
-
-            $this->post->seo->image_id = $seoFile->id;
+        if ($seoFile) {
+            $this->model->seo->image_url = $seoFile->url;
         }
-        $this->post->save();
-        $this->post->refresh();
+
+        $this->model->save();
+        $this->model->refresh();
     }
 
-    /**
-     * Atualizar um Post
-     *
-     * @param int $id
-     * @param     $data
-     *
-     * @return Post|null
-     * @throws Throwable
-     */
-    public function update(int $id, $data): ?Post
-    {
-        return $this->save(array_merge($data, ['id' => $id]));
-    }
 
-    /**
-     * Inserir um Post
-     *
-     * @param     $data
-     *
-     * @return Post|null
-     * @throws Throwable
-     */
-    public function insert($data): ?Post
-    {
-        return $this->save(array_merge($data, ['id' => null]));
-    }
 }

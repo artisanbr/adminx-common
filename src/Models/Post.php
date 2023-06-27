@@ -4,11 +4,12 @@ namespace Adminx\Common\Models;
 
 use Adminx\Common\Facades\Frontend\FrontendHtml;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
+use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
@@ -34,7 +35,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
-class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
+class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
     use HasUriAttributes, HasSelect2, SoftDeletes, HasValidation, HasSEO, HasFiles, BelongsToPage, BelongsToUser, BelongsToSite, HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes, HasPublicIdAttribute;
 
@@ -177,6 +178,12 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel
     }
 
     //endregion
+
+    public function uploadPathTo(?string $path = null): string
+    {
+        $uploadPath = "posts/{$this->public_id}";
+        return ($this->page ? $this->page->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
+    }
 
     //region ATTRIBUTES
     protected function ldJsonScript(): Attribute

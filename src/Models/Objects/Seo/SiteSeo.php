@@ -1,6 +1,6 @@
 <?php
 
-namespace Adminx\Common\Models\Generics\Seo;
+namespace Adminx\Common\Models\Objects\Seo;
 
 
 class SiteSeo extends Seo

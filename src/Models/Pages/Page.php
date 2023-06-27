@@ -3,7 +3,6 @@
 namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Facades\Frontend\FrontendHtml;
-use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
@@ -12,14 +11,15 @@ use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
 use Adminx\Common\Models\Generics\Configs\PageConfig;
 use Adminx\Common\Models\Generics\Elements\PageElements;
-use Adminx\Common\Models\Generics\Seo\Seo;
 use Adminx\Common\Models\Interfaces\BuildableModel;
 use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Models\MenuItem;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
+use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Pages\Objects\PageContent;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
@@ -57,7 +57,7 @@ use Illuminate\Support\Facades\View;
 /**
  * @property Collection|CustomList[]|CustomListHtml[] $data_sources
  */
-class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, HtmlModel, BuildableModel, SeoMetaTagsInterface, RobotsTagsInterface
+class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, HtmlModel, BuildableModel, UploadModel, SeoMetaTagsInterface, RobotsTagsInterface
 {
     use HasUriAttributes, HasSelect2, SoftDeletes, HasSlugAttribute, HasSEO, HasFiles, HasCategoriesMorph, HasTagsMorph, HasPosts, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasParent, HasOwners, HasGenericConfig, HasVisitCounter, HasAdvancedHtml, HasRelatedCache, HasHtmlBuilds;
 
@@ -168,6 +168,12 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
     //endregion
 
     //region HELPERS
+
+    public function uploadPathTo(?string $path = null): string
+    {
+        $uploadPath = "pages/{$this->public_id}";
+        return ($this->site ? $this->site->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
+    }
 
     public function buildedInternalHtml($dataItem): string
     {

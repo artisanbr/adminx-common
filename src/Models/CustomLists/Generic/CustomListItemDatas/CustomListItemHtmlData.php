@@ -6,7 +6,7 @@ use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas\Sliders\SliderDataButtons;
 use Adminx\Common\Models\Generics\Elements\HtmlElement;
 use Adminx\Common\Models\Generics\Files\GenericImageFile;
-use Adminx\Common\Models\Generics\Seo\Seo;
+use Adminx\Common\Models\Objects\Seo\Seo;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
@@ -14,6 +14,7 @@ class CustomListItemHtmlData extends GenericModel
 {
 
     protected $fillable = [
+        'image_url',
         'image',
         'description',
         'content',
@@ -22,7 +23,8 @@ class CustomListItemHtmlData extends GenericModel
     ];
 
     protected $casts = [
-        'image' => GenericImageFile::class,
+        'image_url' => 'string',
+        'image' => GenericImageFile::class, //todo: remove
         'description' => 'string',
         'content' => HtmlElement::class,
         //'raw_html' => 'string',

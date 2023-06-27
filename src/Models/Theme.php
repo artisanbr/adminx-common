@@ -8,6 +8,7 @@ use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
 use Adminx\Common\Models\Generics\Configs\ThemeConfig;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Themes\ThemeFooterObject;
 use Adminx\Common\Models\Objects\Themes\ThemeHeaderObject;
@@ -21,7 +22,6 @@ use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
-use Adminx\Common\Models\Traits\Relations\HasWidgets;
 use App\Providers\AppMetaTagsServiceProvider;
 use Butschster\Head\Contracts\Packages\ManagerInterface;
 use Butschster\Head\Facades\Meta;
@@ -34,7 +34,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\View;
 use voku\helper\HtmlMin;
 
-class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
+class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
     use SoftDeletes, HasUriAttributes, BelongsToSite, BelongsToUser, HasSelect2, HasParent, HasValidation, HasOwners, HasFiles, HasPublicIdAttribute;
 
@@ -90,6 +90,12 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
     //endregion
 
     //region HELPERS
+    public function uploadPathTo(?string $path = null): string
+    {
+        $uploadPath = "themes/{$this->public_id}";
+        return ($this->page ? $this->page->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
+    }
+
     public function prepareHtml()
     {
         $this->append(['logo', 'logo_secondary', 'favicon']);

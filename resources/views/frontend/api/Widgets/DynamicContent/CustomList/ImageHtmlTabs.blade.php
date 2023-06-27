@@ -33,7 +33,7 @@
                         @if($listItem->data->image)
                             <div @class(['col-lg-6 col-md-10', 'order-1' => $loop->odd])>
                                 <div class="block-image">
-                                    <img src="{{ $listItem->data->image->url }}" alt="Image">
+                                    <img src="{{ $listItem->data->image_url }}" alt="Image">
                                 </div>
                             </div>
                         @endif

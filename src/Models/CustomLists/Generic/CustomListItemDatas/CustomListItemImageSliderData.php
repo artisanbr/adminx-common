@@ -11,13 +11,15 @@ class CustomListItemImageSliderData extends GenericModel
 {
 
     protected $fillable = [
+        'image_url',
         'image',
         'description',
         'buttons',
     ];
 
     protected $casts = [
-        'image' => GenericImageFile::class,
+        'image_url' => 'string',
+        'image' => GenericImageFile::class, //todo: remove
         'description' => 'string',
         'buttons' => AsCollectionOf::class.':'.SliderDataButtons::class,
     ];

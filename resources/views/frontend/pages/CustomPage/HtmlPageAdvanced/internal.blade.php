@@ -11,7 +11,7 @@
 
     @if(!$page->is_home && ($page->config->breadcrumb ? $page->config->breadcrumb->enable : $site->theme->config->breadcrumb->enable))
         <x-frontend::breadcrumb :page="$page" :append="[$currentItem->title]"
-                                :bg-image="$currentItem->data->image->file->url ?? null"/>
+                                :bg-image="$currentItem->data->image_url ?? null"/>
     @endif
 
     {{--Home Content--}}

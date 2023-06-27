@@ -1,23 +1,20 @@
 <?php
 
-namespace Adminx\Common\Models\Generics\Seo;
+namespace Adminx\Common\Models\Objects\Seo;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\File;
-use Adminx\Common\Models\Generics\Seo\Config\SeoConfig;
+use Adminx\Common\Models\Objects\Seo\Config\SeoConfig;
 use Illuminate\Support\Collection;
 use ArtisanLabs\GModel\GenericModel;
 
-/**
- * @property File|null $image
- */
+
 class Seo extends GenericModel
 {
 
     protected $fillable = [
         'title',
-        'image',
-        'image_id',
+        'image_url',
         'description',
         'keywords',
         'robots',
@@ -36,7 +33,7 @@ class Seo extends GenericModel
 
     protected $casts = [
         'title'          => 'string',
-        'image'          => 'object',
+        'image_url'          => 'string',
         'description'    => 'string',
         'keywords'       => 'string',
         'keywords_array' => 'collection',
@@ -48,8 +45,6 @@ class Seo extends GenericModel
         'keywords_array',
         //'image',
     ];
-
-    protected File|null $imageCache = null;
 
 
     //region ATTRIBUTES
@@ -78,23 +73,6 @@ class Seo extends GenericModel
         return collect(explode(',', $this->attributes['keywords']));
     }
 
-    protected function getImageIdAttribute()
-    {
-        return $this->attributes['image_id'] ?? null;
-    }
-
-    protected function getImageAttribute(): File|null
-    {
-        if($this->image_id){
-            if(empty($this->imageCache) || (int) $this->imageCache->id !== (int) $this->image_id){
-                $this->imageCache = File::find($this->attributes['image_id']);
-            }
-        }else{
-            $this->imageCache = null;
-        }
-
-        return $this->imageCache;
-    }
     //endregion
 
     //endregion

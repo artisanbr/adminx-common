@@ -33,10 +33,18 @@ class FileUploadManager
         }
     }
 
-    public function onSite(Site $site): static
+    public function site(Site $site): static
     {
 
         $this->site = $site;
+
+        return $this;
+    }
+
+    public function onSite(Site $site): static
+    {
+
+        $this->site($site);
 
         $this->uploadPathBase = "sites/{$site->public_id}/";
 
@@ -100,7 +108,7 @@ class FileUploadManager
             //Converter para Webp
             $imageRelativePath = $this->fullPathTo("{$fileName}.webp");
 
-            $webpTempFileName = time() . random_int(1, 9999) . '-' . ($this->site->public_id ?? '') . "-{$fileName}.webp";
+            $webpTempFileName = time() . random_int(1, 9999) . "-{$fileName}.webp";
 
             $webpTempPath = $this->tempStorage->path($webpTempFileName);
 

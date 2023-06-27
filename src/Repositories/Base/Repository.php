@@ -2,25 +2,41 @@
 
 namespace Adminx\Common\Repositories\Base;
 
+use Adminx\Common\Models\Theme;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 abstract class Repository implements RepositoryInterface
 {
 
     public array $data = [];
+    protected ?Model $model = null;
     protected string $idKey = 'id';
     protected string $uploadPathBase = '';
     protected string $uploadableType = '';
 
+    protected function getDataId(){
+        return $this->data[$this->idKey] ?? null;
+    }
 
     /**
-     * Atualizar
+     * @param Model|null $model
+     */
+    public function setModel(?Model $model): void
+    {
+        $this->model = $model;
+    }
+
+    /**
+     * Atualizar model
      *
      * @param int           $id
      * @param array|Request $data
      * @param string        $idKey
      *
      * @return null
+     * @throws \Throwable
      */
     public function update(int $id, array|Request $data, string $idKey = 'id')
     {
@@ -29,18 +45,20 @@ abstract class Repository implements RepositoryInterface
     }
 
     /**
-     * Excluir
+     * Excluir Model
+     *
      * @param int           $id
      * @param array|Request $data
      * @param               $idKey
      *
      * @return bool
+     * @throws \Throwable
      */
     public function delete(int $id, array|Request $data, string $idKey = 'id'): bool
     {
         $this->idKey = $idKey;
         $this->traitData($data, [$idKey => $id]);
-        return true;
+        return DB::transaction(fn() => $this->deleteTransaction());
     }
 
     /**
@@ -75,4 +93,38 @@ abstract class Repository implements RepositoryInterface
 
         return $this->data;
     }
+
+    /**
+     * @param array|Request $data
+     *
+     * @return mixed
+     * @throws \Throwable
+     */
+    public function save(array|Request $data): mixed
+    {
+
+        $this->traitData($data);
+
+        return DB::transaction(fn() => $this->saveTransaction());
+
+    }
+
+    /**
+     * Executar as operações no banco ao salvar
+     * @return mixed
+     */
+    protected function saveTransaction(): mixed
+    {
+        return false;
+    }
+
+    /**
+     * Executar as operações no banco ao excluir
+     * @return bool
+     */
+    protected function deleteTransaction(): bool
+    {
+        return false;
+    }
+
 }

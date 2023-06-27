@@ -1,6 +1,6 @@
 <?php
 
-namespace Adminx\Common\Models\Generics\Seo\Config;
+namespace Adminx\Common\Models\Objects\Seo\Config;
 
 use ArtisanLabs\GModel\GenericModel;
 
