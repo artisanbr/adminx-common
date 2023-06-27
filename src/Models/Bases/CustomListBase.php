@@ -2,6 +2,7 @@
 
 namespace Adminx\Common\Models\Bases;
 
+use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Observers\OwneredModelObserver;
 use Adminx\Common\Observers\PublicIdModelObserver;
 use Adminx\Common\Enums\CustomLists\CustomListType;
@@ -24,7 +25,7 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 
-abstract class CustomListBase extends EloquentModelBase implements PublicIdModel, OwneredModel
+abstract class CustomListBase extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
     use HasValidation, HasOwners, BelongsToUser, BelongsToSite, BelongsToAccount, BelongsToPage, HasPublicIdAttribute, HasPublicIdUriAttributes, HasUriAttributes, HasSelect2;
 
@@ -97,6 +98,12 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
 
     //region HELPERS
 
+    public function uploadPathTo(?string $path = null): string
+    {
+        $uploadPath = "lists/{$this->public_id}";
+        return ($this->site ? $this->site->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
+    }
+
     public function mountAppends(){
 
     }
@@ -113,7 +120,7 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
     {
         if (!$type && $id) {
             //dd(CustomList::where('id',$id)->select(['type'])->get());
-            $listType = CustomList::where('id',$id)->select(['type'])->get()->type->value ?? null;
+            $listType = CustomList::where('id',$id)->select(['type'])->first()->type->value ?? null;
         }
         else {
             $listType = $type;

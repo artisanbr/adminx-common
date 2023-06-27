@@ -2,6 +2,7 @@
 
 namespace Adminx\Common\Models\Bases;
 
+use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Observers\OwneredModelObserver;
 use Adminx\Common\Observers\PublicIdModelObserver;
 use Adminx\Common\Enums\CustomLists\CustomListItemType;
@@ -23,7 +24,7 @@ use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Illuminate\Support\Facades\DB;
 
-abstract class CustomListItemBase extends EloquentModelBase implements OwneredModel, PublicIdModel
+abstract class CustomListItemBase extends EloquentModelBase implements OwneredModel, PublicIdModel, UploadModel
 {
     use HasParent, HasOwners, BelongsToUser, BelongsToSite, BelongsToAccount, HasMorphAssigns, HasValidation, HasSelect2, HasPublicIdAttribute, HasPublicIdUriAttributes, HasUriAttributes, HasFiles;
 
@@ -50,6 +51,7 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
 
     protected $attributes = [
         'type' => 'image',
+        'data' => [],
     ];
 
     protected $casts = [
@@ -63,6 +65,12 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
         'created_at' => 'datetime:d/m/Y H:i:s',
     ];
 
+    public function __construct(array $attributes = [])
+    {
+        $this->attributes['data'] = [];
+        parent::__construct($attributes);
+    }
+
     //protected $dates = ['created_at'];
 
     public static function boot()
@@ -73,6 +81,11 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
     }
 
     //region HELPERS
+
+    public function uploadPathTo(?string $path = null): string
+    {
+        return ($this->list ? $this->list->uploadPathTo('items') : 'items') . ($path ? "/{$path}" : '');
+    }
 
     public function newPosition(): void
     {

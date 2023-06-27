@@ -40,7 +40,7 @@ use Illuminate\Support\Collection;
 
     $bctitle = $bcItems->last();
 
-    $bgImage = $bgImage ?? $breadcrumbConfig->background->file->url ?? false;
+    $bgImage = $bgImage ?? $breadcrumbConfig->background->url ?? false;
 
     $bcStyle = '';
 

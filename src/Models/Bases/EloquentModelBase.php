@@ -3,12 +3,10 @@
 namespace Adminx\Common\Models\Bases;
 
 use DateTimeInterface;
-use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Model;
 
 abstract class EloquentModelBase extends Model
 {
-    use Cachable;
 
     public $timestamps = true;
 

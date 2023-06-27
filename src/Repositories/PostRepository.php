@@ -42,7 +42,7 @@ class PostRepository extends Repository
 
     public function post(Post $post): static
     {
-        $this->post = $post;
+        $this->setModel($post);
 
         return $this;
     }

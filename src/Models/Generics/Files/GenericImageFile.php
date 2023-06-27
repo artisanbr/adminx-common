@@ -14,7 +14,7 @@ class GenericImageFile extends GenericFileBase
 
     protected $appends = [
         'html',
-        'file'
+        //'file'
     ];
 
     protected function getRenderHtmlAttributesAttribute()

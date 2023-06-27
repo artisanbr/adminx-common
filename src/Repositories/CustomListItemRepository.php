@@ -2,6 +2,8 @@
 
 namespace Adminx\Common\Repositories;
 
+use Adminx\Common\Facades\FileManager\FileUpload;
+use Adminx\Common\Models\Post;
 use App\Repositories\Exception;
 use Adminx\Common\Enums\FileType;
 use Adminx\Common\Libs\Helpers\FileHelper;
@@ -12,7 +14,9 @@ use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
 use Adminx\Common\Repositories\Base\Repository;
 use Illuminate\Support\Facades\DB;
-
+/**
+ * @property ?CustomListItemBase $model
+ */
 class CustomListItemRepository extends Repository
 {
     public int|null $list_id;
@@ -32,31 +36,25 @@ class CustomListItemRepository extends Repository
     }
 
 
-    public function save(array $data): ?CustomListItemBase
+    public function saveTransaction(): ?CustomListItemBase
     {
-        $this->traitData($data);
+        $this->setModel($this->customList->items()->findOrNew($this->data['id'] ?? null));
 
+        $this->model->fill($this->data);
+        $this->model->list_id = $this->list_id;
 
-        return DB::transaction(function(){
+        if(!$this->model->id){
+            $this->model->newPosition();
+        }
 
-            $this->listItem = $this->customList->items()->findOrNew($this->data['id'] ?? null);
+        $this->model->save();
+        $this->model->refresh();
 
-            $this->listItem->fill($this->data);
-            $this->listItem->list_id = $this->list_id;
+        $this->processUploads();
 
-            if(!$this->listItem->id){
-                $this->listItem->newPosition();
-            }
+        $this->model->save();
 
-            $this->listItem->save();
-            $this->listItem->refresh();
-
-            $this->processUploads();
-
-            $this->listItem->save();
-
-            return $this->listItem;
-        });
+        return $this->model;
     }
 
     /**
@@ -65,35 +63,28 @@ class CustomListItemRepository extends Repository
     public function processUploads(): void
     {
 
-        if (!$this->listItem || !$this->listItem->site) {
+        if (!$this->model || !$this->model->site) {
             abort(404);
         }
 
-        $this->listItem->refresh();
+        $this->model->refresh();
 
-        $this->uploadPathBase = "lists/{$this->listItem->list->public_id}/items";
-        $this->uploadableType = MorphHelper::resolveMorphType($this->listItem);
+        //$this->uploadPathBase = "lists/{$this->model->list->public_id}/items";
+
+        $this->uploadPathBase = $this->model->uploadPathTo();
 
         //Media
-
         if($this->data['data']['image']['file_upload'] ?? false){
 
-            $mediaFile = FileHelper::saveRequestToSite($this->listItem->site, $this->data['data']['image']['file_upload'], $this->uploadPathBase, $this->listItem->public_id, $this->listItem->data->image->file ?? null);
+            //$mediaFile = FileHelper::saveRequestToSite($this->model->site, $this->data['data']['image']['file_upload'], $this->uploadPathBase, $this->model->public_id, $this->model->data->image->file ?? null);
+
+            $mediaFile = FileUpload::upload($this->data['data']['image']['file_upload'], $this->uploadPathBase, $this->model->public_id);
 
             if(!$mediaFile){
                 abort(500);
             }
 
-            $mediaFile->fill([
-                                 'title'           => "Item de Lista #{$this->listItem->public_id}",
-                                 'type'           => FileType::CustomListItem,
-                                 'description'     => "Item #{$this->listItem->public_id} da lista #{$this->listItem->list->public_id}",
-                                 'editable'     => false,
-                             ]);
-
-            $mediaFile->assignTo($this->listItem, 'uploadable');
-
-            $this->listItem->data->image->file_id = $mediaFile->id;
+            $this->model->data->image_url = $mediaFile->url;
         }
 
 

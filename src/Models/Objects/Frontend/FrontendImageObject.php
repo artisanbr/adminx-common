@@ -27,7 +27,7 @@ class FrontendImageObject extends GenericModel
         'file_id'         => null,
         'html_attributes' => [],
         'html'            => '',
-        'file'            => null,
+        //'file'            => null,
 
         'external'            => false,
         'attrs' => [],
@@ -47,29 +47,15 @@ class FrontendImageObject extends GenericModel
 
     protected $temporary = [
         'html',
-        'file'
+        //'file'
     ];
 
     protected $appends = [
         'html',
-        'file'
+        //'file'
     ];
 
-    //region HELPERS
-    public function loadFile(){
-        if ($this->file_id ?? false) {
 
-            if (!$this->attributes['file'] || (int)$this->attributes['file']->id !== (int)$this->file_id) {
-                $this->attributes['file'] = File::find($this->file_id);
-            }
-        }
-        else {
-            $this->attributes['file'] = null;
-        }
-
-        return $this->attributes['file'];
-    }
-    //endregion
 
     //region ATTRIBUTES
     //region SET
@@ -86,9 +72,7 @@ class FrontendImageObject extends GenericModel
 
     protected function getHtmlAttribute(): string
     {
-        $fileUrl = $this->file->url ?? '';
-
-        return "<img src=\"{$fileUrl}\" {$this->render_html_attributes} />";
+        return "<img src=\"{$this->url}\" {$this->render_html_attributes} />";
     }
 
     protected function getImageAttribute(): File|null
@@ -101,7 +85,7 @@ class FrontendImageObject extends GenericModel
         return $this->loadFile();
     }
 
-    protected function getNameAttribute()
+    /*protected function getNameAttribute()
     {
         return $this->file->name ?? '';
     }
@@ -114,7 +98,7 @@ class FrontendImageObject extends GenericModel
     protected function getUriAttribute()
     {
         return $this->file->uri ?? '';
-    }
+    }*/
     //endregion
     //endregion
 
