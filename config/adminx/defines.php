@@ -12,6 +12,7 @@ use Adminx\Common\Models\Site;
 use Adminx\Common\Models\Theme;
 use Adminx\Common\Models\Report;
 use Adminx\Common\Models\FormAnswer;
+use Adminx\Common\Models\User;
 
 return [
     'adminx_domain' => env('ADMINX_DOMAIN'),
@@ -32,6 +33,7 @@ return [
             'theme'     => Theme::class,
             'list'      => CustomList::class,
             'list.item' => CustomListItem::class,
+            'user' => User::class,
         ],
     ],
 

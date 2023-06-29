@@ -5,6 +5,7 @@ namespace Adminx\Common\Providers;
 use App\View\Components\Icon;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Pages\Page;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
 use Spatie\Menu\Laravel\Html;
@@ -40,6 +41,35 @@ class MenusServiceProvider extends ServiceProvider
         });
 
         //region General
+
+        Html::macro('kicon', function ($icon = null, $class = '', $paths = 2) {
+
+            $size = 2;
+
+            if(is_array($icon)){
+
+                $iconArray = $icon;
+
+                $class = $iconArray['class'] ?? $class ?? '';
+                $paths = $iconArray['paths'] ?? $paths ?? 2;
+                $size = $iconArray['size'] ?? $size;
+                $icon = $iconArray['icon'] ?? $icon;
+            }
+
+            if (!is_null($icon)) {
+                $html = "<span class='menu-icon'>" .
+                    Blade::render(<<<blade
+<x-kicon i="$icon" class="$class" paths="$paths" size="$size" />
+blade, compact('icon', 'class', 'paths', 'size')) . "</span>";
+
+            }
+            else {
+                $html = '<span class="menu-bullet"><span class="bullet bullet-dot"></span></span>';
+            }
+
+            return Html::raw($html . $this->render());
+        });
+
         Html::macro('icon', function ($icon, $class = '') {
             if (is_string($icon)) {
                 $html = "<span class='menu-icon {$class}'>" . (Str::contains($icon, [
@@ -80,7 +110,7 @@ class MenusServiceProvider extends ServiceProvider
         });
 
         Link::macro('item', static function ($title, $to, $icon = null) {
-            return Link::to($to, Html::itemTitle($title)->icon($icon)->render())
+            return Link::to($to, Html::itemTitle($title)->kicon($icon)->render())
                        ->addClass('menu-link')
                        ->addParentClass('menu-item');
         });

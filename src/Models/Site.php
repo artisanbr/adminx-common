@@ -154,19 +154,19 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         //Todo: busca personalizada https://developers.google.com/search/docs/appearance/site-names?hl=pt-br
 
         $script = HtmlHelper::ldJsonScript([
-                                                  "@context"      => "https://schema.org",
-                                                  "@type"         => "WebSite",
-                                                  "name"          => $this->title,
-                                                  "alternateName" => $this->seo->title,
-                                                  "url"           => $this->uri,
-                                              ]);
+                                               "@context"      => "https://schema.org",
+                                               "@type"         => "WebSite",
+                                               "name"          => $this->title,
+                                               "alternateName" => $this->seo->title,
+                                               "url"           => $this->uri,
+                                           ]);
 
         $script .= HtmlHelper::ldJsonScript([
-                                                   "@context" => "https://schema.org",
-                                                   "@type"    => "Organization",
-                                                   "url"      => $this->uri,
-                                                   "logo"     => $this->theme->media->logo->uri,
-                                               ]);
+                                                "@context" => "https://schema.org",
+                                                "@type"    => "Organization",
+                                                "url"      => $this->uri,
+                                                "logo"     => $this->theme->media->logo->uri,
+                                            ]);
 
         return Attribute::make(
             get: fn() => $script,
@@ -245,6 +245,15 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     {
         return $this->belongsToMany(User::class, 'site_users', 'site_id', 'user_id')->using(SiteUser::class);
         //return $this->hasMany(User::class, 'site_id', 'id');
+    }
+
+    public function usersAccessLog()
+    {
+        return $this->belongsToMany(User::class, 'site_access_log', 'site_id', 'user_id')
+            ->using(SiteAccessLog::class)
+            ->withPivot(['id', 'user_id', 'site_id', 'ip_address', 'created_at', 'updated_at'])
+            ->withTimestamps()
+            ->orderBy('site_access_log.created_at', 'desc')->limit(10);
     }
 
     public function themes()

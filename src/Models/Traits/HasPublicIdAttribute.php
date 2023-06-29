@@ -22,7 +22,7 @@ trait HasPublicIdAttribute
     {
         $startHash = $this->id ?? 0;
 
-        if($this->user_id ?? false){
+        if(@$this->user_id ?? false){
             $startHash .= $this->user_id;
         }
 

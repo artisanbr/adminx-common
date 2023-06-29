@@ -46,6 +46,7 @@
         "scssphp/scssphp": "^1.11",
         "prologue/alerts": "^1.0",
         "genealabs/laravel-model-caching": "^0.13.2",
+        "santigarcor/laratrust": "*",
         "voku/html-min": "^4.5"
     },
     "require-dev": {

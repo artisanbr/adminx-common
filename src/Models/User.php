@@ -4,13 +4,19 @@ namespace Adminx\Common\Models;
 
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\UserConfig;
+use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Interfaces\UploadModel;
+use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\HasPosts;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Laratrust\Contracts\LaratrustUser;
+use Laratrust\Traits\HasRolesAndPermissions;
 use Laravel\Passport\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -23,10 +29,13 @@ use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 
 class User extends EloquentModelBase implements AuthenticatableContract,
-                                                   AuthorizableContract,
-                                                   CanResetPasswordContract
+                                                AuthorizableContract,
+                                                CanResetPasswordContract,
+                                                UploadModel,
+                                                PublicIdModel,
+                                                LaratrustUser
 {
-    use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasApiTokens, Notifiable, HasRoles, HasValidation, HasPosts;
+    use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasApiTokens, Notifiable, HasValidation, HasPosts, HasPublicIdAttribute, HasRolesAndPermissions;
 
     protected $connection = 'mysql';
 
@@ -37,11 +46,13 @@ class User extends EloquentModelBase implements AuthenticatableContract,
      * @var array<int, string>
      */
     protected $fillable = [
+        'public_id',
         'name',
         'email',
         //'password',
         'new_password',
         'config',
+        'avatar_url',
         'site_id',
         'account_id',
     ];
@@ -65,6 +76,7 @@ class User extends EloquentModelBase implements AuthenticatableContract,
         'email_verified_at' => 'datetime:d/m/Y H:i:s',
         'created_at'        => 'datetime:d/m/Y H:i:s',
         'config'            => UserConfig::class,
+        'avatar_url'        => 'string',
     ];
 
     public function __construct(array $attributes = [])
@@ -86,6 +98,13 @@ class User extends EloquentModelBase implements AuthenticatableContract,
     }
     //endregion
 
+    //region HELPERS
+    public function uploadPathTo(?string $path = null): string
+    {
+        return "users/{$this->public_id}" . ($path ? "/{$path}" : '');
+    }
+    //endregion
+
     //region Attributes
     //region Sets
     protected function setNewPasswordAttribute($value)
@@ -93,6 +112,14 @@ class User extends EloquentModelBase implements AuthenticatableContract,
         if (!empty($value)) {
             $this->attributes['password'] = Hash::make($value);
         }
+    }
+    //endregion
+
+    //region Gets
+    protected function avatarUrl(): Attribute {
+        return Attribute::make(
+            get: fn() => $this->attributes['avatar_url'] ?? appThemeAsset('media/icons/duotune/communication/com006.svg')
+        );
     }
     //endregion
     //endregion
@@ -142,6 +169,15 @@ class User extends EloquentModelBase implements AuthenticatableContract,
         return $this->belongsToMany(Site::class, 'site_users', 'user_id', 'site_id')->using(SiteUser::class);
     }
 
+    public function sitesAccessLog()
+    {
+        return $this->belongsToMany(Site::class, 'site_access_log', 'user_id', 'site_id')
+                    ->using(SiteAccessLog::class)
+                    ->withPivot(['id', 'user_id', 'site_id', 'ip_address', 'created_at', 'updated_at'])
+                    ->withTimestamps()
+                    ->orderBy('site_access_log.created_at', 'desc')->limit(10);
+    }
+
     public function account()
     {
         return $this->hasOne(Account::class, 'id', 'account_id');
@@ -172,7 +208,8 @@ class User extends EloquentModelBase implements AuthenticatableContract,
         return $this->hasMany(Page::class);
     }
 
-    public function widgeteables(){
+    public function widgeteables()
+    {
         return $this->hasMany(SiteWidget::class);
     }
 
