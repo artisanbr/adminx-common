@@ -5,7 +5,7 @@ namespace Adminx\Common\Libs\Helpers;
 
 
 use Adminx\Common\Models\Custom\MailTo;
-use Adminx\Common\Models\User;
+use Adminx\Common\Models\Users\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;

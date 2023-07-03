@@ -2,10 +2,10 @@
 
 namespace Adminx\Common\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\User;
+use Adminx\Common\Models\Users\User;
 use ArtisanLabs\Breadcrumbs\Providers\Breadcrumbs;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 abstract class ControllerBase extends Controller

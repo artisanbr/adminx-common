@@ -4,7 +4,7 @@ namespace Adminx\Common\Repositories\Base;
 
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Theme;
-use Adminx\Common\Models\User;
+use Adminx\Common\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

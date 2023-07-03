@@ -12,7 +12,7 @@ use Adminx\Common\Models\Site;
 use Adminx\Common\Models\Theme;
 use Adminx\Common\Models\Report;
 use Adminx\Common\Models\FormAnswer;
-use Adminx\Common\Models\User;
+use Adminx\Common\Models\Users\User;
 
 return [
     'adminx_domain' => env('ADMINX_DOMAIN'),
@@ -27,7 +27,7 @@ return [
             'page'      => Page::class,
             'category'  => Category::class,
             'menu'      => Menu::class,
-            'menu_item' => MenuItem::class,
+            'menu_item' => MenuItem::class, //todo: change to .
             'form'      => Form::class,
             'form_answer' => FormAnswer::class,
             'theme'     => Theme::class,
@@ -191,14 +191,14 @@ return [
 
     'medias' => [
         'logo'    => [
-            'light' => 'assets/media/images/logo-light.png',
-            'dark'  => 'assets/media/images/logo-dark.png',
+            'light' => env('APP_LOGO_LIGHT', 'assets/media/images/logo-light.png'),
+            'dark'  => env('APP_LOGO_DARK', 'assets/media/images/logo-dark.png'),
 
             'small' => [
-                'light' => 'assets/media/images/logo-light-small.png',
-                'dark'  => 'assets/media/images/logo-dark-small.png',
+                'light' => env('APP_LOGO_SMALL_LIGHT', 'assets/media/images/logo-light-small.png'),
+                'dark'  => env('APP_LOGO_SMALL_DARK', 'assets/media/images/logo-dark-small.png'),
             ],
         ],
-        'favicon' => 'assets/media/images/favicon.png',
+        'favicon' => env('APP_FAVICON', 'assets/media/images/favicon.png'),
     ],
 ];

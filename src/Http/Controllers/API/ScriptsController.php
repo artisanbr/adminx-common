@@ -2,10 +2,10 @@
 
 namespace Adminx\Common\Http\Controllers\API;
 
-use App\Http\Controllers\Controller;
 use App\Libs\Helpers\HtmlHelper;
 use App\Libs\Support\Url;
 use App\Models\Site;
+use App\Http\Controllers\Controller;
 use JShrink\Minifier;
 
 /**

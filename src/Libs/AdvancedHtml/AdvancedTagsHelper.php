@@ -71,10 +71,10 @@ class AdvancedTagsHelper
             ->values();
 
         //Widgets
-        if ($site->widgeteables()->count()) {
-            $widgeteables = $site->widgeteables->map(fn($widgeteable) => [
-                'id'       => "widget('{$widgeteable->public_id}')",
-                'text'     => "<h4 class='text-gray-800'>{$widgeteable->title}</h4><code class='small'>{{ widget('{$widgeteable->public_id}') }}</code>",
+        if ($site->widgets()->count()) {
+            $widgeteables = $site->widgets->map(fn(SiteWidget $siteWidget) => [
+                'id'       => "widget('{$siteWidget->public_id}')",
+                'text'     => "<h4 class='text-gray-800'>{$siteWidget->title}</h4><code class='small'>{{ widget('{$siteWidget->public_id}') }}</code>",
                 'category' => 'widget',
                 'icon'     => config('adminx.defines.kicons.references.widget'),
             ])->values();

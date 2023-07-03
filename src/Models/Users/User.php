@@ -1,23 +1,38 @@
 <?php
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Users;
 
+use Adminx\Common\Models\Account;
+use Adminx\Common\Models\AccountUser;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Comment;
+use Adminx\Common\Models\File;
 use Adminx\Common\Models\Generics\Configs\UserConfig;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
+use Adminx\Common\Models\Pages\Page;
+use Adminx\Common\Models\Site;
+use Adminx\Common\Models\SiteAccessLog;
+use Adminx\Common\Models\SiteUser;
+use Adminx\Common\Models\SiteWidget;
+use Adminx\Common\Models\Theme;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\HasPosts;
+use Cog\Laravel\Ban\Traits\Bannable;
+use EloquentFilter\Filterable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Laratrust\Contracts\LaratrustUser;
-use Laratrust\Traits\HasRolesAndPermissions;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Passport\HasApiTokens;
+use Questocat\Referral\Traits\UserReferral;
 use Spatie\Permission\Traits\HasRoles;
 
 use Illuminate\Auth\Authenticatable;
@@ -27,15 +42,33 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Yadahan\AuthenticationLog\AuthenticationLogable;
 
 class User extends EloquentModelBase implements AuthenticatableContract,
                                                 AuthorizableContract,
                                                 CanResetPasswordContract,
                                                 UploadModel,
-                                                PublicIdModel,
-                                                LaratrustUser
+                                                PublicIdModel
 {
-    use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, HasApiTokens, Notifiable, HasValidation, HasPosts, HasPublicIdAttribute, HasRolesAndPermissions;
+    use Authenticatable,
+        Authorizable,
+        CanResetPassword,
+        MustVerifyEmail,
+        HasApiTokens,
+        Notifiable,
+        HasValidation,
+        HasPosts,
+        HasPublicIdAttribute,
+        HasRoles,
+        Bannable,
+        HasFactory,
+        //HasProfilePhoto,
+        Notifiable,
+        //TwoFactorAuthenticatable,
+        AuthenticationLogable,
+        UserReferral,
+        Filterable,
+        SoftDeletes;
 
     protected $connection = 'mysql';
 
@@ -65,6 +98,8 @@ class User extends EloquentModelBase implements AuthenticatableContract,
     protected $hidden = [
         'password',
         'remember_token',
+        'two_factor_recovery_codes',
+        'two_factor_secret',
     ];
 
     /**
@@ -106,6 +141,7 @@ class User extends EloquentModelBase implements AuthenticatableContract,
     //endregion
 
     //region Attributes
+
     //region Sets
     protected function setNewPasswordAttribute($value)
     {
@@ -116,9 +152,22 @@ class User extends EloquentModelBase implements AuthenticatableContract,
     //endregion
 
     //region Gets
-    protected function avatarUrl(): Attribute {
+
+    public function getGravatarAttribute()
+    {
+        if(!$this->email){
+            return appThemeAsset('media/icons/duotune/communication/com006.svg');
+        }
+
+        $hash = md5(strtolower(trim($this->attributes['email'])));
+
+        return "//www.gravatar.com/avatar/$hash";
+    }
+
+    protected function avatarUrl(): Attribute
+    {
         return Attribute::make(
-            get: fn() => $this->attributes['avatar_url'] ?? appThemeAsset('media/icons/duotune/communication/com006.svg')
+            get: fn() => $this->attributes['avatar_url'] ?? $this->gravatar
         );
     }
     //endregion
@@ -188,10 +237,10 @@ class User extends EloquentModelBase implements AuthenticatableContract,
         return $this->belongsToMany(Account::class, 'account_users', 'user_id', 'account_id')->using(AccountUser::class);
     }
 
-    public function files()
+    /*public function files()
     {
         return $this->hasMany(File::class);
-    }
+    }*/
 
     public function themes()
     {

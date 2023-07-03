@@ -28,6 +28,7 @@ use App\Libs\Utils\FrontendUtils;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
+use Adminx\Common\Models\Users\User;
 
 class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {

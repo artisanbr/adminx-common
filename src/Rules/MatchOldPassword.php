@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Rules;
 
-use Adminx\Common\Models\User;
+use Adminx\Common\Models\Users\User;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Facades\Hash;
 

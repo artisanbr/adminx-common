@@ -3,10 +3,12 @@
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Facades\FileManager\FileUpload;
-use Adminx\Common\Models\User;
+use Adminx\Common\Models\Users\AccessRules\Role;
+use Adminx\Common\Models\Users\User;
 use Adminx\Common\Repositories\Base\Repository;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Laravel\Passport\Client;
 use Laravel\Passport\ClientRepository;
 
@@ -49,6 +51,36 @@ class UserRepository extends Repository
         $this->model->sites()->sync($this->data['sites'] ?? []);
 
         Artisan::call('passport:install');
+
+        //Permissions
+        if(Auth::user()->can(['update permission'])){
+
+            if($this->model->config->custom_permissions){
+
+                //Permissões Customizadas
+                //$this->model->syncRoles([]);
+                $this->model->syncPermissions($this->data['permissions_list'] ?? []);
+
+            }else{
+                $this->model->syncPermissions([]);
+            }
+
+            if($this->data['roles'] ?? false){
+
+                //Grupo de Permissões
+                $selected_roles = Role::whereIn("id", array_values($this->data['roles']))->get();
+                $this->model->syncRoles($selected_roles);
+
+
+            }else if(!($this->data['id'] ?? false)){
+
+                //Novo usuário
+                $this->model->syncPermissions([]);
+                $this->model->syncRoles(['guest']);
+            }
+        }
+
+        Artisan::call("permission:cache-reset");
 
         return $this->model;
     }

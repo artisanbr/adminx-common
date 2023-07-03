@@ -2,13 +2,13 @@
 
 namespace Adminx\Common\Http\Controllers\API\Widgets;
 
-use App\Http\Controllers\Controller;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Site;
 use Adminx\Common\Models\SiteWidget;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;

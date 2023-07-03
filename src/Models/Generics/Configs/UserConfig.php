@@ -24,6 +24,6 @@ class UserConfig extends GenericModel
     ];
 
     protected function getHasCustomPermissionsAttribute(){
-        return $this->custom_permissions;
+        return $this->custom_permissions ?? false;
     }
 }
