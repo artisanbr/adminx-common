@@ -122,6 +122,6 @@
         </script>
     @endprepend
 @endonce
-{{ Form::hidden('recaptcha_token', "", ["id" => "recaptcha-token"]) }}
-{{ Form::hidden('recaptcha_action', "", ["id" => "recaptcha-action"]) }}
+<input type="hidden" name="recaptcha_token" id="recaptcha-token">
+<input type="hidden" name="recaptcha_action" id="recaptcha-action">
 
