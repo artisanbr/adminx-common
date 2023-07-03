@@ -6,6 +6,7 @@ use Adminx\Common\Enums\FileType;
 use Adminx\Common\Facades\FileManager\FileUpload;
 use Adminx\Common\Libs\Helpers\FileHelper;
 use Adminx\Common\Libs\Helpers\MorphHelper;
+use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Generics\Elements\Themes\ThemeMediaElement;
 use Adminx\Common\Models\Post;
@@ -23,6 +24,8 @@ use Illuminate\Support\Facades\DB;
 class ThemeRepository extends Repository
 {
 
+    protected string $modelClass = Theme::class;
+
     public function __construct(
     ) {}
 
@@ -31,8 +34,6 @@ class ThemeRepository extends Repository
      */
     public function saveTransaction(): ?Theme
     {
-        $this->setModel(Theme::findOrNew($this->getDataId()));
-
         //$this->model->header->is_html_advanced = $this->data['header']['is_html_advanced'];
         //$this->model->footer->is_html_advanced = $this->data['footer']['is_html_advanced'] ?? false;
 

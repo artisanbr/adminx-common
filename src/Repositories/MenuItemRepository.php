@@ -3,91 +3,77 @@
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Libs\Helpers\MorphHelper;
+use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\MenuItem;
+use Adminx\Common\Models\Pages\Page;
+use Adminx\Common\Repositories\Base\Repository;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
-class MenuItemRepository
+/***
+ * @property ?MenuItem $model
+ */
+class MenuItemRepository extends Repository
 {
     public int|null $menu_id;
+
+    protected string $modelClass = MenuItem::class;
 
     public function menu($menu_id): static
     {
         $this->menu_id = $menu_id;
+
         return $this;
     }
 
     /**
      * Salvar um item com ou sem atribuição a uma Model
+     *
      * @param array $data
      *
      * @return MenuItem|null
      * @throws Throwable
      */
-    public function save(array $data): ?MenuItem
+    public function saveTransaction(): ?MenuItem
     {
-        return DB::transaction(function() use($data){
-            $menuItem = MenuItem::findOrNew($data['id'] ?? null);
-            $menuItem->fill($data);
-            $menuItem->menu_id = $this->menu_id;
+        $this->model->fill($this->data);
+        $this->model->menu_id = $this->menu_id;
 
-            //Associate
-            $menuable_type = $data['menuable_type'] ?? null;
-            $menuable_id = $data["menuable_type_{$menuable_type}_id"] ?? null;
+        //Associate
+        $menuable_type = $data['menuable_type'] ?? null;
+        $menuable_id = $data["menuable_type_{$menuable_type}_id"] ?? null;
 
-            if($menuable_type && $menuable_type !== 'link' && $menuable_type !== 'menu'){
+        if ($menuable_type && $menuable_type !== 'link' && $menuable_type !== 'menu') {
 
-                $menuable_type = MorphHelper::resolveMorphType($menuable_type);
+            $menuable_type = MorphHelper::resolveMorphType($menuable_type);
 
-                $menuItem->menuable_type = $menuable_type;
-                $menuItem->menuable_id = $menuable_id ?? null;
-                $menuItem->save();
+            $this->model->menuable_type = $menuable_type;
+            $this->model->menuable_id = $menuable_id ?? null;
+            $this->model->save();
 
-            }else{
-                $menuItem->menuable_type = $menuable_type;
-                $menuItem->menuable_id = null;
+        }
+        else {
+            $this->model->menuable_type = $menuable_type;
+            $this->model->menuable_id = null;
 
-                if($menuable_type === 'menu'){
-                    $menuItem->url = null;
-                }
+            if ($menuable_type === 'menu') {
+                $this->model->url = null;
             }
+        }
 
-            $menuItem->menu_id = $this->menu_id;
-            $menuItem->newPosition();
+        $this->model->menu_id = $this->menu_id;
+        $this->model->newPosition();
 
-            $menuItem->save();
+        $this->model->save();
 
-            return $menuItem;
-        });
+        return $this->model;
     }
 
-    /**
-     * Atualizar um item com ou sem atribuição a uma model
-     * @param int $id
-     * @param     $data
-     *
-     * @return MenuItem|null
-     * @throws Throwable
-     */
-    public function update(int $id, $data): ?MenuItem
-    {
-        return $this->save(array_merge($data, ['id' => $id]));
-    }
 
-    /**
-     * Inserir um item com ou sem atribuição a uma model
-     * @param     $data
-     *
-     * @return MenuItem|null
-     * @throws Throwable
-     */
-    public function insert($data): ?MenuItem
-    {
-        return $this->save(array_merge($data, ['id' => null]));
-    }
 
     /**
      * Salvar um item e atribui-lo a uma Model
+     *
      * @param array $data
      * @param       $menuable_type
      * @param       $menuable_id
@@ -99,12 +85,13 @@ class MenuItemRepository
     {
         return $this->save(array_merge($data, [
             'menuable_type' => $menuable_type,
-            'menuable_id' => $menuable_id
+            'menuable_id'   => $menuable_id,
         ]));
     }
 
     /**
      * Atualizar um item e atribui-lo a uma Model
+     *
      * @param int   $id
      * @param array $data
      * @param       $menuable_type
@@ -116,14 +103,15 @@ class MenuItemRepository
     public function updateAndAssignTo(int $id, array $data, $menuable_type, $menuable_id): ?MenuItem
     {
         return $this->save(array_merge($data, [
-            'id' => $id,
+            'id'            => $id,
             'menuable_type' => $menuable_type,
-            'menuable_id' => $menuable_id
+            'menuable_id'   => $menuable_id,
         ]));
     }
 
     /**
      * Atualizar um item e atribui-lo a uma Model
+     *
      * @param array $data
      * @param       $menuable_type
      * @param       $menuable_id
@@ -134,9 +122,9 @@ class MenuItemRepository
     public function insertAndAssignTo(array $data, $menuable_type, $menuable_id): ?MenuItem
     {
         return $this->save(array_merge($data, [
-            'id' => null,
+            'id'            => null,
             'menuable_type' => $menuable_type,
-            'menuable_id' => $menuable_id
+            'menuable_id'   => $menuable_id,
         ]));
     }
 
@@ -145,21 +133,23 @@ class MenuItemRepository
      *
      * @return bool
      */
-    public function updateList(array $items): bool{
+    public function updateList(array $items): bool
+    {
         $retorno = true;
-        foreach ($items as $item){
-            $menuItem = MenuItem::find($item['id']);
+        foreach ($items as $item) {
+            $this->model = MenuItem::find($item['id']);
 
-            if($menuItem) {
-                $menuItem->parent_id = $item['parentId'] ?? null;
-                $menuItem->position = $item['order'];
+            if ($this->model) {
+                $this->model->parent_id = $item['parentId'] ?? null;
+                $this->model->position = $item['order'];
 
-                $retorno = $menuItem->save();
-            }else{
+                $retorno = $this->model->save();
+            }
+            else {
                 $retorno = false;
             }
 
-            if(!$retorno){
+            if (!$retorno) {
                 return $retorno;
                 break;
             }

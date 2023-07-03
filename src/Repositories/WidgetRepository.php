@@ -2,6 +2,7 @@
 
 namespace Adminx\Common\Repositories;
 
+use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Widget;
 use Adminx\Common\Models\SiteWidget;
@@ -17,6 +18,7 @@ use Illuminate\Support\Facades\DB;
  */
 class WidgetRepository extends Repository
 {
+    protected string $modelClass = SiteWidget::class;
 
     public function __construct(
     ) {}
@@ -28,7 +30,6 @@ class WidgetRepository extends Repository
     {
 
         //Criar vinculo
-        $this->setModel(SiteWidget::findOrNew($this->getDataId()));
         $this->model->fill($this->data);
 
         $this->model->save();

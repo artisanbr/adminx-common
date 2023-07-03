@@ -6,6 +6,7 @@ use Adminx\Common\Enums\FileType;
 use Adminx\Common\Facades\FileManager\FileUpload;
 use Adminx\Common\Libs\Helpers\FileHelper;
 use Adminx\Common\Libs\Helpers\MorphHelper;
+use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Generics\Configs\PageConfig;
 use Adminx\Common\Models\Pages\Page;
@@ -26,6 +27,8 @@ class PageRepository extends Repository
 {
     use SeoModelRepository;
 
+    protected string $modelClass = Page::class;
+
     public function __construct(
         protected Page|null $page = null,
     ) {}
@@ -36,7 +39,7 @@ class PageRepository extends Repository
     public function saveTransaction(): ?Page
     {
 
-        $this->setModel(Page::findOrNew($this->data[$this->idKey] ?? null));
+        //$this->setModel(Page::findOrNew($this->data[$this->idKey] ?? null));
 
         //$this->theme->header->is_html_advanced = $this->data['header']['is_html_advanced'];
         //$this->theme->footer->is_html_advanced = $this->data['footer']['is_html_advanced'] ?? false;

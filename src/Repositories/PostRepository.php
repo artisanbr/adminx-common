@@ -7,6 +7,7 @@ use Adminx\Common\Facades\FileManager\FileUpload;
 use Adminx\Common\Facades\FileManager\FileUploadManager;
 use Adminx\Common\Libs\Helpers\FileHelper;
 use Adminx\Common\Libs\Helpers\MorphHelper;
+use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Post;
 use Adminx\Common\Models\Tag;
 use Adminx\Common\Repositories\Base\Repository;
@@ -24,6 +25,8 @@ use Throwable;
 class PostRepository extends Repository
 {
     use SeoModelRepository;
+
+    protected string $modelClass = Post::class;
 
 
     public function __construct(
@@ -49,7 +52,6 @@ class PostRepository extends Repository
 
     public function saveTransaction(): ?Post
     {
-        $this->setModel(Post::findOrNew($this->getDataId()));
 
         $this->model->fill($this->data);
         $this->model->page_id = $this->page_id;
