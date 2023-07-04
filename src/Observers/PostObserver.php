@@ -4,6 +4,7 @@ namespace Adminx\Common\Observers;
 
 
 use Adminx\Common\Models\Post;
+use Carbon\Carbon;
 
 class PostObserver
 {
@@ -15,7 +16,7 @@ class PostObserver
         }
 
         if(empty($model->published_at)){
-            $model->published_at = $model->created_at;
+            $model->published_at = $model->created_at ?? Carbon::now();
         }
 
         /*if ($model->id) {
