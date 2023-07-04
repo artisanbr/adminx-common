@@ -3,6 +3,7 @@
 namespace Adminx\Common\Models;
 
 use Adminx\Common\Facades\Frontend\FrontendHtml;
+use Adminx\Common\Libs\Helpers\DateTimeHelper;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
@@ -54,6 +55,7 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         'seo',
         'published_at',
         'unpublished_at',
+        'unpublish',
     ];
 
     protected $attributes = [
@@ -63,11 +65,13 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     protected $casts = [
         'seo'            => Seo::class,
         'assets'         => FrontendAssetsBundle::class,
-        'published_at'   => 'datetime:d/m/Y H:i',
-        'unpublished_at' => 'datetime:d/m/Y H:i',
+        'published_at'   => 'datetime:d/m/Y H:i:s',
+        'unpublished_at' => 'datetime:d/m/Y H:i:s',
         'created_at'     => 'datetime:d/m/Y H:i:s',
         'updated_at'     => 'datetime:d/m/Y H:i:s',
         'content'        => 'string',
+        'is_published'   => 'bool',
+        'is_unpublished' => 'bool',
         //'html'     => 'string',
         //'description'    => 'string',
     ];
@@ -182,6 +186,7 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     public function uploadPathTo(?string $path = null): string
     {
         $uploadPath = "posts/{$this->public_id}";
+
         return ($this->page ? $this->page->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
     }
 
@@ -246,6 +251,33 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         );
     }
 
+    protected function isPublished(): Attribute
+    {
+
+        $published = true;
+
+        if ($this->published_at && $this->published_at->greaterThan(Carbon::now())) {
+            $published = false;
+        }
+
+        if ($this->unpublished_at && $this->unpublished_at->lessThan(Carbon::now())) {
+            $published = false;
+        }
+
+
+        return Attribute::make(
+            get: fn() => $published
+        );
+    }
+
+    protected function isUnpublished(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => !$this->is_published
+        );
+
+    }
+
     //region GETS
 
     /*protected function getPublishedAtAttribute($value)
@@ -262,6 +294,7 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     protected function getUrlAttribute(): string
     {
         $urlId = $this->slug ?? $this->public_id;
+
         return $this->page->urlTo("post/{$urlId}/");
         //return $this->page->url ? "{$this->page->url}/post/" . ($this->slug ?? $this->public_id) . '/' : '';
     }
@@ -270,6 +303,33 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     {
         return $this->attributes['description'] ?? $this->limitContent();
     }*/
+    //endregion
+
+    //region SETS
+    protected function setUnpublishAttribute($value): static
+    {
+        if ($value) {
+            $this->unpublished_at = Carbon::now();
+        }
+
+        return $this;
+
+    }
+
+    protected function setPublishedAtAttribute($value): static
+    {
+        $this->attributes['published_at'] = DateTimeHelper::DBTrait($value);
+
+        return $this;
+
+    }
+
+    protected function setUnpublishedAtAttribute($value): static
+    {
+        $this->attributes['unpublished_at'] = DateTimeHelper::DBTrait($value);
+
+        return $this;
+    }
     //endregion
     //endregion
 

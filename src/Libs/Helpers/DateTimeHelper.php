@@ -23,15 +23,16 @@ class DateTimeHelper
      *
      * @return Carbon|null
      */
-    public static function DBTrait($value, $from_format = null, $to_format = null){
+    public static function DBTrait($value = null, $from_format = null, $to_format = null)
+    {
 
-        if(!empty($value) && !Str::contains($value,"null")) {
+        if (!empty($value) && !Str::contains($value, "null")) {
 
-            if(empty($from_format)){
+            if (empty($from_format)) {
                 $from_format = self::getFromFormat($value);
             }
 
-            if(empty($to_format)) {
+            if (empty($to_format)) {
                 $to_format = self::getToFormat($value);
             }
 
@@ -41,22 +42,24 @@ class DateTimeHelper
             else if (Str::contains($value, '-')) {
                 return Carbon::parse($value);
             }
-            else if(is_int($value)) {
+            else if (is_int($value)) {
                 return Carbon::createFromTimestamp($value);
             }
-            else if(is_object($value) && get_class($value) == Carbon::class) {
+            else if (is_object($value) && get_class($value) == Carbon::class) {
                 return $value;
             }
             else {
                 return Carbon::parse($value);
             }
-        }else{
+        }
+        else {
             return NULL;
         }
 
     }
 
-    public static function isFeriado($value){
+    public static function isFeriado($value)
+    {
         $value = self::DBTrait($value);
 
         $mes = intval($value->format("m"));
@@ -65,18 +68,24 @@ class DateTimeHelper
         return isset(config("pagamentos.faturas.feriados")[$mes]) && config("pagamentos.faturas.feriados")[$mes]->contains($dia);
     }
 
-    private static function getFromFormat($value){
+    private static function getFromFormat($value)
+    {
 
-        if(Str::contains($value, "/")){
-            return Str::contains($value, ":") ? "d/m/Y H:i:s" : "d/m/Y";
+        if (Str::contains($value, "/")) {
+            if (!Str::contains($value, ":")) {
+                return "d/m/Y";
+            }
+
+            return Str::contains($value, ",") ? "d/m/Y, H:i:s" : "d/m/Y H:i:s";
         }
 
         return null;
     }
 
-    private static function getToFormat($value){
+    private static function getToFormat($value)
+    {
 
-        if(Str::contains($value, "/")){
+        if (Str::contains($value, "/")) {
             return Str::contains($value, ":") ? "Y-m-d H:i:s" : "Y-m-d";
         }
 
@@ -91,21 +100,25 @@ class DateTimeHelper
     public static function checkDate($date, $format = 'Y-m-d')
     {
         $d = \DateTime::createFromFormat($format, $date);
+
         return $d && $d->format($format) == $date;
     }
 
 
-    public static function DiaSemana($id){
+    public static function DiaSemana($id)
+    {
         return config("agenda.dias_semana")[$id];
     }
 
-    public static function GetDiaSemana($data){
+    public static function GetDiaSemana($data)
+    {
         $num_semana = date("w", strtotime($data));
 
         return self::DiaSemana($num_semana);
     }
 
-    public static function GetDiaSemanaId($data){
+    public static function GetDiaSemanaId($data)
+    {
         return date("w", strtotime($data));
     }
 }
