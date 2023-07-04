@@ -48,7 +48,7 @@
                                         {{ $post->user->name }}
                                     </span>--}}
                                 <span class="me-3 mr-3" data-toggle="tooltip"
-                                      title="Postado {{ $post->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
+                                      title="Postado {{ @$post->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
                                         <i class="fa-solid fa-calendar-days me-1"></i>
                                         <time
                                                 datetime="{{ $post->published_at->format('Y-m-d H:i:S') }}">{{ $post->published_at->diffForHumans() }}</time>
@@ -119,7 +119,7 @@
                                                         {{ $post->previous->user->name }}
                                                     </span>--}}
                                                 <span class="me-3 mr-3"
-                                                      title="Postado {{ $post->previous->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
+                                                      title="Postado {{ @$post->previous->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
                                                         <i class="fa-solid fa-calendar-days me-1"></i>
                                                         <time
                                                             datetime="{{ $post->previous->published_at->format('Y-m-d H:i:S') }}">{{ $post->previous->published_at->diffForHumans() }}</time>
@@ -144,7 +144,7 @@
                                                         {{ $post->next->user->name }}
                                                     </span>--}}
                                                 <span class="me-3 mr-3"
-                                                      title="Postado {{ $post->next->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
+                                                      title="Postado {{ @$post->next->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
                                                         <i class="fa-solid fa-calendar-days me-1"></i>
                                                         <time
                                                             datetime="{{ $post->next->published_at->format('Y-m-d H:i:S') }}">{{ $post->next->published_at->diffForHumans() }}</time>

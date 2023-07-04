@@ -25,7 +25,7 @@
 
     @if($showDate)
         <span class="me-3 mr-3 post-meta-date"
-              title="Postado {{ $post->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
+              title="Postado {{ @$post->published_at->translatedFormat(config('location.formats.datetime.full')) }}">
             {!! $showIcons ? $dateIcon : '' !!}
             <time datetime="{{ $post->published_at->format('Y-m-d H:i:S') }}">
                 {{ $dateHumanFormat ? $post->published_at->diffForHumans() : $post->published_at->format($dateFormat) }}

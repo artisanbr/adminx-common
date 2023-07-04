@@ -14,6 +14,10 @@ class PostObserver
             $model->slug = $model->title;
         }
 
+        if(empty($model->published_at)){
+            $model->published_at = $model->created_at;
+        }
+
         /*if ($model->id) {
 
             //Comprimir CSS e JS personalizado da Página

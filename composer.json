@@ -37,6 +37,7 @@
         "artisan-labs/laravel-gmodel": "*",
         "artisan-labs/laravel-router": "*",
         "artisan-labs/laravel-ide-helper-plus": "*",
+        "artisan-labs/laravel-bs-components": "*",
         "delight-im/random": "^1.0",
         "league/flysystem-ftp": "^3.0",
         "butschster/meta-tags": "^2.2",
