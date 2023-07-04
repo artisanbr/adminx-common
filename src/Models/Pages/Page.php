@@ -29,6 +29,7 @@ use Adminx\Common\Models\Traits\HasHtmlBuilds;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasPublicIdUriAttributes;
+use Adminx\Common\Models\Traits\HasPublishTimestamps;
 use Adminx\Common\Models\Traits\HasRelatedCache;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasSEO;
@@ -59,7 +60,7 @@ use Illuminate\Support\Facades\View;
  */
 class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, HtmlModel, BuildableModel, UploadModel, SeoMetaTagsInterface, RobotsTagsInterface
 {
-    use HasUriAttributes, HasSelect2, SoftDeletes, HasSlugAttribute, HasSEO, HasFiles, HasCategoriesMorph, HasTagsMorph, HasPosts, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasParent, HasOwners, HasGenericConfig, HasVisitCounter, HasAdvancedHtml, HasRelatedCache, HasHtmlBuilds;
+    use HasUriAttributes, HasSelect2, HasPublishTimestamps, SoftDeletes, HasSlugAttribute, HasSEO, HasFiles, HasCategoriesMorph, HasTagsMorph, HasPosts, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasParent, HasOwners, HasGenericConfig, HasVisitCounter, HasAdvancedHtml, HasRelatedCache, HasHtmlBuilds;
 
     protected $connection = 'mysql';
 

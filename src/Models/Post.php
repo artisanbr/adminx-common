@@ -15,6 +15,7 @@ use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasPublicIdUriAttributes;
+use Adminx\Common\Models\Traits\HasPublishTimestamps;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasSEO;
 use Adminx\Common\Models\Traits\HasUriAttributes;
@@ -38,7 +39,7 @@ use Illuminate\Support\Str;
 
 class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
-    use HasUriAttributes, HasSelect2, SoftDeletes, HasValidation, HasSEO, HasFiles, BelongsToPage, BelongsToUser, BelongsToSite, HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes, HasPublicIdAttribute;
+    use HasUriAttributes, HasSelect2, HasPublishTimestamps, SoftDeletes, HasValidation, HasSEO, HasFiles, BelongsToPage, BelongsToUser, BelongsToSite, HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes, HasPublicIdAttribute;
 
     protected $fillable = [
         'site_id',
@@ -82,7 +83,6 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
     protected $touches = ['page'];
 
-    protected $dates = ['published_at', 'unpublished_at'];
 
     //region VALIDATION
     public static function createRules(FormRequest $request = null): array
@@ -306,30 +306,7 @@ class Post extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     //endregion
 
     //region SETS
-    protected function setUnpublishAttribute($value): static
-    {
-        if ($value) {
-            $this->unpublished_at = Carbon::now();
-        }
 
-        return $this;
-
-    }
-
-    protected function setPublishedAtAttribute($value): static
-    {
-        $this->attributes['published_at'] = DateTimeHelper::DBTrait($value);
-
-        return $this;
-
-    }
-
-    protected function setUnpublishedAtAttribute($value): static
-    {
-        $this->attributes['unpublished_at'] = DateTimeHelper::DBTrait($value);
-
-        return $this;
-    }
     //endregion
     //endregion
 

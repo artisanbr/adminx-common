@@ -5,6 +5,7 @@ namespace Adminx\Common\Libs\AdvancedHtml;
 use Adminx\Common\Models\Site;
 use Adminx\Common\Models\SiteWidget;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Blade;
 
 class AdvancedTagsHelper
 {
@@ -17,11 +18,13 @@ class AdvancedTagsHelper
         $siteCollection = collect($site->toArray())->except(['config', 'theme', 'widgeteables']);
 
         $siteTags = collect([
-                                ['title' => 'Site',  'category' => 'site'],
+                                ['title' => 'Site', 'category' => 'site'],
                             ]);
 
+        $getIcon = fn($icon) => Blade::render('<x-kicon :icon="$icon" size="2" color="primary" />', compact('icon'));
 
-        $processData = function (Arrayable|array $data, $category, $icon, $path = null) use (&$processData) {
+
+        $processData = function (Arrayable|array $data, $category, $icon, $path = null) use (&$processData, $getIcon) {
 
             if (!($path ?? false)) {
                 $path = $category;
@@ -45,7 +48,7 @@ class AdvancedTagsHelper
                                                  'id'       => $finalPath,
                                                  'text'     => "<h4 class='text-gray-800'>{$translation}</h4><code class='small'>{{ {$finalPath} }}</code>",
                                                  'category' => $category,
-                                                 'icon'     => $icon,
+                                                 'icon'     => $getIcon($icon),
                                              ]);
                     }
 
@@ -61,13 +64,13 @@ class AdvancedTagsHelper
         };
 
         $siteTags = $siteTags
-            ->merge($processData($siteCollection, 'site', config('adminx.defines.kicons.references.site')))
+            ->merge($processData($siteCollection, 'site', 'site'))
             ->values()
             ->merge([
-                        ['title' => 'Tema',  'category' => 'theme'],
+                        ['title' => 'Tema', 'category' => 'theme'],
                     ])
             ->values()
-            ->merge($processData($site->theme->toArray(), 'theme', config('adminx.defines.kicons.references.theme')))
+            ->merge($processData($site->theme->toArray(), 'theme', 'theme'))
             ->values();
 
         //Widgets
@@ -76,10 +79,10 @@ class AdvancedTagsHelper
                 'id'       => "widget('{$siteWidget->public_id}')",
                 'text'     => "<h4 class='text-gray-800'>{$siteWidget->title}</h4><code class='small'>{{ widget('{$siteWidget->public_id}') }}</code>",
                 'category' => 'widget',
-                'icon'     => config('adminx.defines.kicons.references.widget'),
+                'icon'     => $getIcon('widget'),
             ])->values();
             $siteTags = $siteTags->merge([
-                                             ['title' => 'Widgets',  'category' => 'widget'],
+                                             ['title' => 'Widgets', 'category' => 'widget'],
                                          ])
                                  ->values()
                                  ->merge($widgeteables)->values();
@@ -92,11 +95,11 @@ class AdvancedTagsHelper
                 'id'       => "menu('{$menu->slug}')",
                 'text'     => "<h4 class='text-gray-800'>{$menu->title}</h4><code class='small'>{{ menu('{$menu->slug}') }}</code>",
                 'category' => 'menu',
-                'icon'     => config('adminx.defines.kicons.references.menu', 'menu'),
+                'icon'     =>  $getIcon('menu'),
             ])->values();
 
             $siteTags = $siteTags->merge([
-                                             ['title' => 'Menus',  'category' => 'menu'],
+                                             ['title' => 'Menus', 'category' => 'menu'],
                                          ])
                                  ->values()
                                  ->merge($menus);

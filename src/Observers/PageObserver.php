@@ -5,6 +5,7 @@ namespace Adminx\Common\Observers;
 
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Pages\Page;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,6 +27,10 @@ class PageObserver
 
             //Comprimir CSS e JS personalizado da Página
             $model->assets->minify();
+        }
+
+        if(empty($model->published_at)){
+            $model->published_at = $model->created_at ?? Carbon::now();
         }
     }
 

@@ -28,11 +28,6 @@
             "options": {
                 "symlink": true
             }
-        },
-        {
-            "type": "vcs",
-            "url": "https://github.com/artisanbr/laravel-bs-components.git",
-            "reference": "master"
         }
     ],
     "require": {
