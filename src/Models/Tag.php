@@ -11,6 +11,7 @@ use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Facades\Auth;
+use Adminx\Common\Models\Pages\Page;
 
 class Tag extends EloquentModelBase
 {
@@ -93,8 +94,8 @@ class Tag extends EloquentModelBase
         //return $this->hasMany(Taggable::class, 'tag_id', 'id');
     }
 
-    public function posts(){
-        return $this->morphedByMany(Post::class, 'taggable');
+    public function articles(){
+        return $this->morphedByMany(Article::class, 'taggable');
     }
     public function pages(){
         return $this->morphedByMany(Page::class, 'taggable');

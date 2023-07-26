@@ -10,7 +10,7 @@ abstract class FrontendEngineBase
 
     protected Site|null $currentSite = null;
 
-    protected int $cacheMinutes = 60 * 24 * 7;
+    protected int $cacheMinutes = 1; // 24 * 7;
 
     protected string|null $cacheName = null;
 

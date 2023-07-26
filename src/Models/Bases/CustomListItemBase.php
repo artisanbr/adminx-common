@@ -65,6 +65,8 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
         'created_at' => 'datetime:d/m/Y H:i:s',
     ];
 
+    //protected $with = ['list'];
+
     public function __construct(array $attributes = [])
     {
         $this->attributes['data'] = [];
@@ -119,7 +121,7 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
     //region ATTRIBUTES
     protected function getUrlAttribute()
     {
-        return "{$this->list->url}/i/" . ($this->slug ?? $this->public_id);
+        return $this->slug ?? $this->public_id;
     }
     //endregion
 

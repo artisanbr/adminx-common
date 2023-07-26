@@ -39,9 +39,11 @@ class ThemeBuild extends EloquentModelBase implements PublicIdModel, OwneredMode
         'footer'        => 'string',
     ];
 
-    protected $appends = [];
+    /*protected $appends = [];
 
-    protected $attributes = [];
+    protected $attributes = [];*/
+
+    //protected $with = ['site'];
 
     public function renewPublicId(): void
     {
@@ -52,7 +54,7 @@ class ThemeBuild extends EloquentModelBase implements PublicIdModel, OwneredMode
     public function render(FrontendBuildObject $frontendBuild, $area = 'header'): string
     {
         if ($this->attributes[$area] ?? false) {
-            return Blade::render($this->attributes[$area], compact('frontendBuild'));
+            return Blade::render($this->attributes[$area], compact('frontendBuild'), true);
         }
 
         return '';

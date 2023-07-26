@@ -8,9 +8,9 @@ use Adminx\Common\Libs\Helpers\FileHelper;
 use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
-use Adminx\Common\Models\Generics\Configs\PageConfig;
+use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Post;
+use Adminx\Common\Models\Article;
 use Adminx\Common\Repositories\Base\Repository;
 use Adminx\Common\Repositories\Traits\SeoModelRepository;
 use Exception;
@@ -52,10 +52,19 @@ class PageRepository extends Repository
         $this->model->refresh();
         //dd('chegou', $this->model);
 
+
+        //region Defaults
+
         //Generate breadcrumb
+
         $this->model->config->breadcrumb = $this->model->config->breadcrumb ?? $this->model->site->theme->config->breadcrumb ?? new BreadcrumbConfig();
 
         $this->model->config->breadcrumb->default_items = $this->data['config']['breadcrumb']['default_items'] ?? [];
+
+        //Modules
+        $this->model->config->allowed_modules = $this->model->type->allowed_modules->toArray();
+
+        //endregion
 
         //$this->model->config->useModule('data_source', (bool) ($this->model->config->source->id ?? false));
 

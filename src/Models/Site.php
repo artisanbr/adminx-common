@@ -22,9 +22,9 @@ use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
-use Adminx\Common\Models\Traits\Relations\HasPosts;
+use Adminx\Common\Models\Traits\Relations\HasArticles;
 use Adminx\Common\Rules\DomainRule;
-use App\Libs\Utils\FrontendUtils;
+use Adminx\Common\Models\Pages\Page;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
@@ -32,7 +32,7 @@ use Adminx\Common\Models\Users\User;
 
 class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
-    use HasUriAttributes, HasValidation, HasSEO, HasFiles, HasPosts, BelongsToUser, HasOwners, HasPublicIdAttribute, HasRelatedCache;
+    use HasUriAttributes, HasValidation, HasSEO, HasFiles, HasArticles, BelongsToUser, HasOwners, HasPublicIdAttribute, HasRelatedCache;
 
     protected $connection = 'mysql';
 
@@ -72,6 +72,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         'account_id',
         'theme_id',
     ];
+    //protected $with   = ['theme'];
 
     //region VALIDATIONS
     public static function createRules(FormRequest $request = null): array
@@ -120,7 +121,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
             'site'        => $this,
             'theme'       => $this->theme,
             'searchTerm'  => '',
-            'breadcrumbs' => null,
+            'breadcrumb' => $this->theme->config->breadcrumb,
         ];
 
         if ($requestData['q'] ?? false) {
@@ -129,7 +130,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         }
 
 
-        //Meta::registerSeoMetaTagsForPage($this);
+        //Meta::registerSeoForPage($this);
 
         return [...$viewData, ...$merge_data];
     }
@@ -251,10 +252,10 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     public function usersAccessLog()
     {
         return $this->belongsToMany(User::class, 'site_access_log', 'site_id', 'user_id')
-            ->using(SiteAccessLog::class)
-            ->withPivot(['id', 'user_id', 'site_id', 'ip_address', 'created_at', 'updated_at'])
-            ->withTimestamps()
-            ->orderBy('site_access_log.created_at', 'desc')->limit(10);
+                    ->using(SiteAccessLog::class)
+                    ->withPivot(['id', 'user_id', 'site_id', 'ip_address', 'created_at', 'updated_at'])
+                    ->withTimestamps()
+                    ->orderBy('site_access_log.created_at', 'desc')->limit(10);
     }
 
     public function themes()
@@ -279,7 +280,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
     public function pages()
     {
-        return $this->hasMany(\Adminx\Common\Models\Pages\Page::class)->orderByDesc('is_home')->orderBy('created_at');
+        return $this->hasMany(Page::class)->orderByDesc('is_home')->orderBy('created_at');
     }
 
     public function categories()

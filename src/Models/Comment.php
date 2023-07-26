@@ -40,6 +40,7 @@ class Comment extends EloquentModelBase
         'gravatar',
     ];
 
+
     //region VALIDATIONS
     public static function createRules(FormRequest $request = null): array {
         return [

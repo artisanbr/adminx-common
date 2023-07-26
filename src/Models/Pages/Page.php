@@ -2,14 +2,15 @@
 
 namespace Adminx\Common\Models\Pages;
 
+use Adminx\Common\Enums\ContentEditorType;
 use Adminx\Common\Facades\Frontend\FrontendHtml;
-use Adminx\Common\Libs\Support\Str;
+use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListHtml;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
-use Adminx\Common\Models\Generics\Configs\PageConfig;
+use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Generics\Elements\PageElements;
 use Adminx\Common\Models\Interfaces\BuildableModel;
 use Adminx\Common\Models\Interfaces\HtmlModel;
@@ -20,12 +21,17 @@ use Adminx\Common\Models\MenuItem;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
+use Adminx\Common\Models\Pages\Objects\PageBreadcrumb;
+use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Pages\Objects\PageContent;
-use Adminx\Common\Models\Post;
+use Adminx\Common\Models\Pages\Types\Abstract\AbstractPageType;
+use Adminx\Common\Models\Pages\Types\Manager\Facade\PageTypeManager;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
+use Adminx\Common\Models\Templates\Global\Abstract\AbstractPageTemplate;
+use Adminx\Common\Models\Templates\Global\Manager\Facade\PageTemplateManager;
 use Adminx\Common\Models\Traits\HasAdvancedHtml;
+use Adminx\Common\Models\Traits\HasBreadcrumbs;
 use Adminx\Common\Models\Traits\HasGenericConfig;
-use Adminx\Common\Models\Traits\HasHtmlBuilds;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasPublicIdUriAttributes;
@@ -34,14 +40,15 @@ use Adminx\Common\Models\Traits\HasRelatedCache;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasSEO;
 use Adminx\Common\Models\Traits\HasSlugAttribute;
+use Adminx\Common\Models\Traits\HasTemplates;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasVisitCounter;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
+use Adminx\Common\Models\Traits\Relations\HasArticles;
 use Adminx\Common\Models\Traits\Relations\HasCategoriesMorph;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
-use Adminx\Common\Models\Traits\Relations\HasPosts;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Butschster\Head\Contracts\MetaTags\RobotsTagsInterface;
@@ -53,14 +60,45 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\ViewErrorBag;
 
 /**
  * @property Collection|CustomList[]|CustomListHtml[] $data_sources
+ * @property AbstractPageType                         $type
+ * @property AbstractPageTemplate                     $template_global
  */
-class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, HtmlModel, BuildableModel, UploadModel, SeoMetaTagsInterface, RobotsTagsInterface
+class Page extends EloquentModelBase implements BuildableModel,
+                                                HtmlModel,
+                                                OwneredModel,
+                                                PublicIdModel,
+                                                RobotsTagsInterface,
+                                                SeoMetaTagsInterface,
+                                                UploadModel
 {
-    use HasUriAttributes, HasSelect2, HasPublishTimestamps, SoftDeletes, HasSlugAttribute, HasSEO, HasFiles, HasCategoriesMorph, HasTagsMorph, HasPosts, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasParent, HasOwners, HasGenericConfig, HasVisitCounter, HasAdvancedHtml, HasRelatedCache, HasHtmlBuilds;
+    use BelongsToSite,
+        BelongsToUser,
+        HasAdvancedHtml,
+        HasArticles,
+        HasBreadcrumbs,
+        HasCategoriesMorph,
+        HasFiles,
+        HasGenericConfig,
+        HasOwners,
+        HasParent,
+        HasPublicIdAttribute,
+        HasPublicIdUriAttributes,
+        HasPublishTimestamps,
+        HasRelatedCache,
+        HasSelect2,
+        HasSEO,
+        HasSlugAttribute,
+        HasTagsMorph,
+        HasTemplates,
+        HasUriAttributes,
+        HasVisitCounter,
+        SoftDeletes;
 
     protected $connection = 'mysql';
 
@@ -70,7 +108,9 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         'account_id',
         'parent_id',
         'type_id',
+        'type_name',
         'model_id',
+        'template_name',
         //'form_id',
         'title',
         'slug',
@@ -100,9 +140,9 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         'slug'  => 'string',
 
 
-        'content' => PageContent::class,
-        'assets_old'  => 'object',
-        'assets'  => FrontendAssetsBundle::class,
+        'content'    => PageContent::class,
+        'assets_old' => 'object',
+        'assets'     => FrontendAssetsBundle::class,
 
 
         'config'   => PageConfig::class,
@@ -114,17 +154,18 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         'html_raw' => 'string',
 
 
-        'is_home'        => 'boolean',
-        'published_at'   => 'datetime:d/m/Y H:i:s',
-        'unpublished_at' => 'datetime:d/m/Y H:i:s',
+        'is_home'         => 'boolean',
+        'show_breadcrumb' => 'boolean',
+        'published_at'    => 'datetime:d/m/Y H:i:s',
+        'unpublished_at'  => 'datetime:d/m/Y H:i:s',
+
+        'breadcrumb' => PageBreadcrumb::class,
     ];
 
     protected $appends = [
-        'content',
-        'assets',
+        //'content',
+        //'assets',
         //'html',
-        //'html_raw',
-        //'internal_html',
         'url',
 
     ];
@@ -135,15 +176,16 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         //'assets' => [],
     ];
 
-    public $buildSchema = [
-        'posts' => [
+    //protected $with = ['site'];
+
+    public array $buildSchema = [
+        /*'articles' => [
             'categories',
-            'user',
+            'tags',
         ],
         'categories',
-        'tags',
+        'tags',*/
     ];
-
 
     protected ViewContract|null $viewCache = null;
 
@@ -173,6 +215,7 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
     public function uploadPathTo(?string $path = null): string
     {
         $uploadPath = "pages/{$this->public_id}";
+
         return ($this->site ? $this->site->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
     }
 
@@ -201,7 +244,8 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
     public function getBuildViewPath($append = null): string
     {
-        $pageViewPathType = "adminx-frontend::pages.{$this->type->slug}" . ($append ? ".{$append}" : '');
+
+        /*$pageViewPathType = "adminx-frontend::pages.{$this->type->slug}" . ($append ? ".{$append}" : '');
         $pageViewPathModel = "adminx-frontend::pages.{$this->type->slug}.{$this->model->slug}" . ($append ? ".{$append}" : '');
 
         $pageViewFinalPath = 'adminx-frontend::pages.@default';
@@ -214,29 +258,48 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
             $pageViewFinalPath = $pageViewPathType;
         }
 
-        return $pageViewFinalPath;
+        return $pageViewFinalPath;*/
+
+
+        $pageDefaultView = 'adminx-frontend::pages.@default';
+
+        $pageView = $pageDefaultView;
+
+        if (!empty($this->template_name)) {
+            $pageTemplateView = "pages-templates::{$this->template_name}." . ($append ?? 'index');
+            if (View::exists($pageTemplateView)) {
+                $pageView = $pageTemplateView;
+            }
+        }
+
+        return $pageView;
     }
 
     public function getBuildViewData(array $merge_data = []): array
     {
+        $errors = request()->session()->has('errors') ? request()->session()->get('errors') : new ViewErrorBag();
+        //$errors = $errors->getBag('default');
         $viewData = [
             ...$this->site->getBuildViewData(),
-            'page'           => $this,
-            'showBreadcrumb' => !$this->is_home && ($this->config->breadcrumb ? $this->config->breadcrumb->enable : $this->site->theme->config->breadcrumb->enable),
+            'page'       => $this,
+            'recaptcha'  => '<div class="g-recaptcha mb-3" data-sitekey="' . $this->site->config->recaptcha_site_key . '"></div>',
+            //Blade::render('<x-common::recaptcha :site="$page->site" no-ajax/>', ['page' => $this]),
+            'errors'     => $errors,
+            'breadcrumb' => $this->show_breadcrumb ? $this->breadcrumb() : false,
         ];
 
         $requestData = request()->all() ?? [];
 
-        if ($this->using_posts) {
+        if ($this->can_use_articles && !Route::current()->parameter('first_url')) {
 
             //Posts
-            $posts = $this->posts()->published();
+            $articles = $this->articles()->published();
 
             //Categorias
             if ($requestData['categorySlug'] ?? false) {
                 $category = $this->categories()->where('slug', $requestData['categorySlug'])->first();
                 if ($category) {
-                    $posts = $posts->whereHas('categories', function (Builder $query) use ($category) {
+                    $articles = $articles->whereHas('categories', function (Builder $query) use ($category) {
                         $query->where('id', $category->id);
                     });
                     Meta::registerSeoMetaTagsForCategory($this, $category);
@@ -246,39 +309,32 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
             //Tags
             if ($requestData['tagSlug'] ?? false) {
                 $tag = $this->tags()->whereSlug($requestData['tagSlug'])->first();
-                $posts = $posts->whereHas('tags', function (Builder $query) use ($tag) {
+                $articles = $articles->whereHas('tags', function (Builder $query) use ($tag) {
                     $query->where('id', $tag->id);
                 });
             }
 
             //Busca
             if ($requestData['q'] ?? false) {
-                $posts = $posts->whereLike(['title', 'description', 'content', 'slug'], $requestData['q']);
+                $articles = $articles->whereLike(['title', 'description', 'content', 'slug'], $requestData['q']);
 
                 Meta::setTitle('Resultados da pesquisa: ' . $requestData['q']);
             }
 
-
-            $posts = $posts->paginate(9);
-
-            $viewData['posts'] = $posts;
-            //Meta::setPaginationLinks($posts);
+            $viewData['articles'] = $articles->paginate(9);
+            //Meta::setPaginationLinks($articles);
         }
-        else if ($this->config->sources && $this->config->sources->count()) {
+        //todo: remove
+        /*else if ($this->config->sources && $this->config->sources->count()) {
 
             $sourceData = [];
 
             foreach ($this->config->sources as $source) {
                 $sourceData[$source->name] = $source->data;
-                /*if ($this->config->isUsingModule('internal_pages')) {
-                    foreach ($sourceData[$source->name]->items as $dataItem) {
-                        $dataItem->internal_url = $this->internalUrl($dataItem, $source->internal_url);
-                    }
-                }*/
             }
 
             $viewData['data'] = $sourceData;
-        }
+        }*/
 
 
         return [...$viewData, ...$merge_data];
@@ -317,6 +373,38 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
     //region ATTRIBUTES
 
+    protected function getShowBreadcrumbAttribute(): bool
+    {
+        return $this->is_home ? false : ($this->breadcrumb_config->enable ?? false);
+    }
+
+    protected function getBreadcrumbConfigAttribute()
+    {
+        return $this->config->breadcrumb ?? $this->site->theme->config->breadcrumb ?? new BreadcrumbConfig();
+    }
+
+
+    protected function type(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => PageTypeManager::getType($this->type_name)
+        );
+    }
+
+    protected function templateGlobal(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => PageTemplateManager::getTemplate($this->template_name)
+        );
+    }
+
+    protected function editorType(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->config->editor_type ?? auth()->user()->config->editor_type ?? ContentEditorType::from('tinymce')
+        );
+    }
+
     //region Modules
     protected function usingAdvancedHtml(): Attribute
     {
@@ -338,22 +426,22 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
             get: fn() => @$this->config->canUseModule('forms') ?: @$this->model->can_use_forms ?: false);
     }
 
-    protected function usingPosts(): Attribute
+    protected function usingArticles(): Attribute
     {
         return Attribute::make(
-            get: fn() => @$this->config->isUsingModule('posts') ?: @$this->model->using_posts ?: false);
+            get: fn() => ((bool)$this->config?->isUsingModule('articles')) || ((bool)$this->type?->isUsingModule('articles')));
     }
 
-    protected function canUsePosts(): Attribute
+    protected function canUseArticles(): Attribute
     {
         return Attribute::make(
-            get: fn() => @$this->config->canUseModule('posts') ?: @$this->model->can_use_posts ?: false);
+            get: fn() => ((bool)$this->config?->canUseModule('articles')) || ((bool)$this->type?->canUseModule('articles')));
     }
 
     protected function usingList(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->can_use_list && $this->posts()->count()); //todo
+            get: fn() => $this->can_use_list && $this->articles()->count()); //todo
     }
 
     protected function canUseList(): Attribute
@@ -367,7 +455,7 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
     protected function text(): Attribute
     {
         return Attribute::make(
-            get: fn() => "<h2>{$this->title}</h2>{$this->model->title}",
+            get: fn() => "<h4>{$this->title}</h4>{$this->type->title}",
         );
     }
 
@@ -401,10 +489,10 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         $sources = collect();
 
         //CustomLists
-        if ($this->custom_lists->count()) {
+        /*if ($this->custom_lists->count()) {
             $sources = $this->custom_lists->keyBy(fn($customList, $key) => Str::camel($customList->slug))
                                           ->map(fn($customList) => $customList->mountModel());
-        }
+        }*/
 
         return Attribute::make(
             get: fn() => $sources,
@@ -413,7 +501,6 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
 
 
     //region GETS
-
     public function getInternalHtmlAttribute()
     {
         return $this->content->internal->html ?? '';
@@ -477,18 +564,37 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
     {
         return parent::save($options);
     }
+
     //endregion
 
     //region RELATIONS
-    public function posts()
+    public function page_template()
     {
-        return $this->hasMany(Post::class, 'page_id', 'id')->ordered();
+        return $this->modelTemplate();
     }
 
     public function custom_lists()
     {
-        return $this->hasMany(CustomList::class, 'page_id', 'id');
+        return $this->morphToMany(CustomList::class, 'model', 'page_models');
     }
+
+    //region Articles
+    public function articles()
+    {
+        return $this->hasMany(Article::class, 'page_id', 'id')->ordered();
+    }
+
+    public function last_articles()
+    {
+        return $this->articles()->published();
+    }
+    //endregion
+
+
+    /*public function custom_lists()
+    {
+        return $this->hasMany(CustomList::class, 'page_id', 'id');
+    }*/
 
     public function menu_items()
     {
@@ -516,7 +622,7 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
         return $this->morphMany(FormAnswer::class, 'formulable');
     }*/
 
-    public function type()
+    /*public function type()
     {
         return $this->belongsTo(PageType::class);
     }
@@ -524,6 +630,11 @@ class Page extends EloquentModelBase implements PublicIdModel, OwneredModel, Htm
     public function model()
     {
         return $this->belongsTo(PageModel::class);
+    }*/
+
+    public function pageModels()
+    {
+        return $this->hasMany(PageModel::class);
     }
 
     //endregion

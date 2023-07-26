@@ -3,7 +3,6 @@
  * @var \Adminx\Common\Models\SiteWidget $siteWidget
  */
 ?>
-
 <div class="row">
     <div class="col-12 {{ $siteWidget->css_class ?? '' }} widget-portal widget-{{ $siteWidget->public_id }}"
          id="widget-{{ $siteWidget->public_id }}">

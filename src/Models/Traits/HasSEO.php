@@ -4,15 +4,15 @@ namespace Adminx\Common\Models\Traits;
 
 use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Post;
+use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Site;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @var Model|Site|Post|Page $this
- * @property Model|Site|Post|Page self
- * @property Model|Seo $seo
+ * @var Model|Site|Article|Page      $this
+ * @property Model|Site|Article|Page self
+ * @property Model|Seo               $seo
  */
 trait HasSEO
 {

@@ -4,6 +4,8 @@ namespace Adminx\Common;
 
 use Adminx\Common\Libs\Support\Str;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +19,10 @@ class AdminxCommonServiceProvider extends ServiceProvider
     private $config_files = [
         'location',
         'files',
-        'adminx/app',
+
+        'common/app',
+        'common/morphs',
+
         'adminx/data-sources',
         'adminx/defines',
         'adminx/pages',
@@ -35,16 +40,22 @@ class AdminxCommonServiceProvider extends ServiceProvider
     public function register()
     {
         //Configs
-        foreach ($this->config_files as $config_file) {
-            $this->mergeConfigFrom(
-                $this->config_path . $config_file . '.php', Str::replaceNative('/', '.', $config_file)
-            );
+        foreach (File::allFiles($this->config_path) as $file){
+
+            if($file->isFile() && $file->getExtension() === 'php'){
+                $relativePathName = Str::replaceNative('/', '.', $file->getRelativePathname());
+
+                $relativePathName = Str::replaceNative('.php', '', $relativePathName);
+
+                $this->mergeConfigFrom(
+                    $file->getPathname(), $relativePathName
+                );
+            }
+
+
+
+
         }
-
-        /*$this->mergeConfigFrom(
-            $this->config_path . '.php', Str::replaceNative('/', '.', $config_file)
-        );*/
-
 
     }
 
@@ -55,14 +66,15 @@ class AdminxCommonServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $commonViewPath = $this->views_path.'common';
-        $frontendViewPath = $this->views_path.'frontend';
+        $commonViewPath = $this->views_path . 'common';
+        $frontendViewPath = $this->views_path . 'frontend';
         //Common Views
         $this->loadViewsFrom($commonViewPath, 'adminx-common');
         $this->loadViewsFrom($frontendViewPath, 'adminx-frontend');
+        $this->loadViewsFrom($frontendViewPath.'/pages/templates', 'pages-templates');
 
-        Blade::anonymousComponentPath($commonViewPath.'/components', 'common');
-        Blade::anonymousComponentPath($frontendViewPath.'/components', 'frontend');
+        Blade::anonymousComponentPath($commonViewPath . '/components', 'common');
+        Blade::anonymousComponentPath($frontendViewPath . '/components', 'frontend');
 
         Blade::componentNamespace('Adminx\Common\View\Common\Components', 'common');
         Blade::componentNamespace('Adminx\Common\View\Frontend\Components', 'frontend');
@@ -76,7 +88,7 @@ class AdminxCommonServiceProvider extends ServiceProvider
                       ->as('api.')
                       ->middleware('api.internal')
                       ->namespace('API')
-                      ->group($this->routes_path.'api.php');
+                      ->group($this->routes_path . 'api.php');
              });
     }
 }

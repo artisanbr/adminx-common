@@ -14,7 +14,7 @@ class EloquentServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+
     }
 
     /**
@@ -24,6 +24,6 @@ class EloquentServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Relation::enforceMorphMap(config('adminx.defines.morphs.map'));
+        Relation::enforceMorphMap(config('common.morphs.map'));
     }
 }

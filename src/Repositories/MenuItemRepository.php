@@ -2,8 +2,10 @@
 
 namespace Adminx\Common\Repositories;
 
+use Adminx\Common\Enums\MenuItemType;
 use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Menu;
 use Adminx\Common\Models\MenuItem;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Repositories\Base\Repository;
@@ -15,13 +17,17 @@ use Throwable;
  */
 class MenuItemRepository extends Repository
 {
-    public int|null $menu_id;
+    public function __construct(
+        protected ?Menu $menu = null
+    ) {
+
+    }
 
     protected string $modelClass = MenuItem::class;
 
-    public function menu($menu_id): static
+    public function menu(Menu $menu): static
     {
-        $this->menu_id = $menu_id;
+        $this->menu = $menu;
 
         return $this;
     }
@@ -37,13 +43,13 @@ class MenuItemRepository extends Repository
     public function saveTransaction(): ?MenuItem
     {
         $this->model->fill($this->data);
-        $this->model->menu_id = $this->menu_id;
+        $this->model->menu_id = $this->menu->id;
 
         //Associate
-        $menuable_type = $data['menuable_type'] ?? null;
-        $menuable_id = $data["menuable_type_{$menuable_type}_id"] ?? null;
+        $menuable_type = $this->data['menuable_type'] ?? null;
+        $menuable_id = $this->data["menuable_type_{$menuable_type}_id"] ?? null;
 
-        if ($menuable_type && $menuable_type !== 'link' && $menuable_type !== 'menu') {
+        if ($menuable_type && !$this->model->type->is(MenuItemType::Link)) {
 
             $menuable_type = MorphHelper::resolveMorphType($menuable_type);
 
@@ -56,15 +62,16 @@ class MenuItemRepository extends Repository
             $this->model->menuable_type = $menuable_type;
             $this->model->menuable_id = null;
 
-            if ($menuable_type === 'menu') {
+            if ($this->model->type->is(MenuItemType::Submenu)) {
                 $this->model->url = null;
             }
         }
 
-        $this->model->menu_id = $this->menu_id;
+        $this->model->menu_id = $this->menu->id;
         $this->model->newPosition();
 
         $this->model->save();
+        $this->model->menu->save();
 
         return $this->model;
     }

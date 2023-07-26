@@ -40,4 +40,12 @@ class BreadcrumbConfig extends GenericModel
         'css_class' => 'string',
         'default_items' => 'collection',
     ];
+
+
+    protected function setBackgroundUrlAttribute($value)
+    {
+        $this->background->url = $value;
+
+        return $this;
+    }
 }

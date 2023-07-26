@@ -2,6 +2,7 @@
 
 namespace Adminx\Common\Http\Controllers\API\Widgets;
 
+use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Pages\Page;
@@ -40,7 +41,7 @@ class WidgetController extends Controller
         Debugbar::debug($widgeteable->source->type);
 
         switch (true) {
-            case $widgeteable->source->type === 'posts':
+            case $widgeteable->source->type === 'articles':
                 /**
                  * @var Page|null $page ;
                  */
@@ -49,12 +50,12 @@ class WidgetController extends Controller
 
                 if ($page) {
 
-                    $postsQuery = $page->posts()->published();
+                    $articlesQuery = $page->articles()->published();
                     if ($widgeteable->config->sorting->enable || $widgeteable->widget->config->sorting->enable) {
-                        $postsQuery = $postsQuery->orderBy($widgeteable->config->sort_column, $widgeteable->config->sort_direction);
+                        $articlesQuery = $articlesQuery->orderBy($widgeteable->config->sort_column, $widgeteable->config->sort_direction);
                     }
                     $viewData['page'] = $page;
-                    $viewData['posts'] = $postsQuery->take(10)->get();
+                    $viewData['articles'] = $articlesQuery->take(10)->get();
                 }
                 break;
             case Str::contains($widgeteable->source->type, 'list'):
@@ -76,7 +77,7 @@ class WidgetController extends Controller
             /*case 'page':
             case 'products':
             case 'form':
-            case 'post':
+            case 'article':
             case 'address':*/
 
         }
@@ -91,8 +92,6 @@ class WidgetController extends Controller
      */
     public function render(Request $request, $public_id)
     {
-        Debugbar::startMeasure('start', "Widget Init #{$public_id}");
-
         $this->site = FrontendSite::current();
 
 
@@ -108,23 +107,16 @@ class WidgetController extends Controller
 
         $widgetView = "adminx-frontend::api.Widgets.{$widgeteable->widget->type->slug}.{$widgeteable->widget->slug}";
 
+
         if (!View::exists($widgetView)) {
             return Response::json('Widget View not Found', 501);
         }
 
         $viewData = $widgeteable->getBuildViewData();
 
-        Debugbar::stopMeasure('start');
-
-        Debugbar::debug($widgetView);
-        Debugbar::debug($viewData);
-
-
         $htmlMin = new HtmlMin();
 
-        Debugbar::startMeasure('render', "Widget Render #{$public_id}");
         $viewRender = View::make($widgetView, $viewData)->render();
-        Debugbar::stopMeasure('render');
 
         /*return $viewRender;*/
 

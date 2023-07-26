@@ -10,7 +10,7 @@ return [
                                          'title'       => 'Página Individual',
                                          'description' => 'Possível vincular uma página como fonte de dados.',
                                      ],
-                                     'posts'    => [
+                                     'articles'    => [
                                          'title'       => 'Postagens',
                                          'description' => 'Possível vincular as postagens de uma página como fonte de dados.',
                                          'sorting_columns' => [
@@ -24,7 +24,7 @@ return [
                                          'title'       => 'Produtos',
                                          'description' => 'Possível vincular os produtos de uma página como fonte de dados.',
                                      ],
-                                     'post'          => [
+                                     'article'          => [
                                          'title'       => 'Postagem Individual',
                                          'description' => 'Possível vincular uma única postagem de qualquer página como fonte de dados.',
                                      ],

@@ -1,22 +1,22 @@
 <?php
 /***
- * @var \Adminx\Common\Models\SiteWidget                                      $widgeteable
- * @var \Adminx\Common\Models\Pages\Page                                      $page
- * @var \Adminx\Common\Models\Post                                            $post
- * @var \Adminx\Common\Models\Post[]|\Illuminate\Database\Eloquent\Collection $posts
+ * @var \Adminx\Common\Models\SiteWidget                                         $widgeteable
+ * @var \Adminx\Common\Models\Pages\Page                                         $page
+ * @var \Adminx\Common\Models\Article                                            $article
+ * @var \Adminx\Common\Models\Article[]|\Illuminate\Database\Eloquent\Collection $articles
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')
 
-@if($posts->count())
+@if($articles->count())
     <div
-            class="row posts-carousel posts-carousel-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
+            class="row articles-carousel articles-carousel-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
         {{--Left--}}
-        @foreach($posts as $post)
-            <div class="col-lg-3 col-md-3 posts-carousel-left">
-                <x-frontend::pages.Posts.post-miniature-2 :post="$post"
+        @foreach($articles as $article)
+            <div class="col-lg-3 col-md-3 articles-carousel-left">
+                <x-frontend::pages.Articles.article-miniature-2 :article="$article"
                                                           :show-description="$variables['show_description'] ?? false"
-                                                          class="posts-carousel-item widget-post-item mb-30"
+                                                          class="articles-carousel-item widget-article-item mb-30"
                                                           :show-read-more="$variables['show_read_more'] ?? false"
                                                           :read-more-text="$variables['read_more_text'] ?? 'Leia Mais'"
                                                           :show-categories="$variables['show_categories'] ?? false"
@@ -33,18 +33,18 @@
     <style>
 
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item {
+        .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item {
             margin-bottom: 30px;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-thumb-wrap {
+        .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item .article-thumb-wrap {
             width: 100%;
             height: 270px;
             overflow: hidden;
             position: relative;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-thumb-wrap .post-thumb {
+        .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item .article-thumb-wrap .article-thumb {
             height: 100%;
             width: 100%;
             -webkit-transition: all 0.3s ease-out 0s;
@@ -54,7 +54,7 @@
             transition: all 0.3s ease-out 0s;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-thumb-wrap .post-date {
+        .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item .article-thumb-wrap .article-date {
             position: absolute;
             left: 30px;
             bottom: 30px;
@@ -73,7 +73,7 @@
             text-transform: uppercase;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc .post-date {
+        .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item .article-desc .article-date {
             height: 40px;
             padding: 0px 20px;
             width: auto;
@@ -88,11 +88,11 @@
             text-transform: uppercase;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-date i {
+        .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item .article-date i {
             margin-right: 10px;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc {
+        .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item .article-desc {
             background-color: #f5f5f5;
             padding: 40px 30px;
             -webkit-transition: all 0.3s ease-out 0s;
@@ -103,12 +103,12 @@
         }
 
         @media (max-width: 1199px) {
-            .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc {
+            .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item .article-desc {
                 padding: 35px 25px;
             }
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc .title {
+        .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item .article-desc .title {
             font-size: 26px;
             font-weight: 600;
             letter-spacing: -1px;
@@ -116,42 +116,42 @@
             line-height: 33px;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc .post-description {
+        .articles-carousel-{{ $widgeteable->public_id }} .articles-carousel-item .article-desc .article-description {
             margin-bottom: 20px;
         }
 
         @media (max-width: 1199px) {
-            .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc .title {
+            .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .article-desc .title {
                 font-size: 22px;
             }
         }
 
         @media (max-width: 767px) {
-            .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc .title {
+            .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .article-desc .title {
                 font-size: 20px;
             }
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc .post-link {
+        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .article-desc .article-link {
             font-weight: 700;
             color: #333333;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc .post-link i {
+        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .article-desc .article-link i {
             margin-left: 10px;
             position: relative;
             top: 2px;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .post-desc .post-link:hover {
+        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item .article-desc .article-link:hover {
             color: #333;
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item:hover .post-thumb {
+        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item:hover .article-thumb {
             transform: scale(1.1);
         }
 
-        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item:hover .post-desc {
+        .posts-carousel-{{ $widgeteable->public_id }} .posts-carousel-item:hover .article-desc {
             background-color: #fff;
             box-shadow: 0px 10px 30px 0px rgba(203, 203, 203, 0.3);
         }

@@ -23,7 +23,7 @@ enum CustomListType: string
     case ImageGallery = 'gallery.image';
     case VideoGallery = 'gallery.video';
     case Files = 'files';
-    case Posts = 'posts';
+    case Posts = 'articles';
     case HTML = 'html';
     //todo: Carousel
 

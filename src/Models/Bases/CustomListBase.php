@@ -22,12 +22,22 @@ use Adminx\Common\Models\Traits\Relations\BelongsToPage;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 
 abstract class CustomListBase extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
-    use HasValidation, HasOwners, BelongsToUser, BelongsToSite, BelongsToAccount, BelongsToPage, HasPublicIdAttribute, HasPublicIdUriAttributes, HasUriAttributes, HasSelect2;
+    use BelongsToAccount,
+        BelongsToPage,
+        BelongsToSite,
+        BelongsToUser,
+        HasOwners,
+        HasPublicIdAttribute,
+        HasPublicIdUriAttributes,
+        HasSelect2,
+        HasUriAttributes,
+        HasValidation;
 
     protected $table = 'custom_lists';
 
@@ -63,8 +73,10 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
     ];
 
     protected $appends = [
-        'text',
+        //'text',
     ];
+
+    //protected $with = ['page'];
 
     public static function boot()
     {
@@ -147,20 +159,28 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
 
     public function itemUrl(CustomListItemBase $listItem): string
     {
-        return $this->url . '/i/' . ($listItem->slug ?? $listItem->public_id);
+        return $this->url . '/' . ($listItem->slug ?? $listItem->public_id);
     }
 
     public function itemUri(CustomListItemBase $listItem): string
     {
-        return $this->uri . '/i/' . ($listItem->slug ?? $listItem->public_id);
+        return $this->uri . '/' . ($listItem->slug ?? $listItem->public_id);
     }
 
     //endregion
 
     //region ATTRIBUTES
+
+    protected function text(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => "<h4>{$this->title}</h4>{$this->type->title()}",
+        );
+    }
+
     protected function getUrlAttribute()
     {
-        return ($this->page->url ?? '') . '/l/' . ($this->slug ?? $this->public_id);
+        return ($this->page->url ?? '') . '/' . ($this->slug ?? $this->public_id);
     }
     //endregion
 

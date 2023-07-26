@@ -9,7 +9,7 @@ use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Generics\Elements\Themes\ThemeMediaElement;
-use Adminx\Common\Models\Post;
+use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Theme;
 use Adminx\Common\Repositories\Base\Repository;
 use Exception;

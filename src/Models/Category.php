@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Adminx\Common\Models\Pages\Page;
 
 class Category extends EloquentModelBase
 {
@@ -127,9 +128,9 @@ class Category extends EloquentModelBase
         return $this->hasMany(Categorizable::class, 'category_id', 'id');
     }
 
-    public function posts()
+    public function articles()
     {
-        return $this->morphedByMany(Post::class, 'categorizable');
+        return $this->morphedByMany(Article::class, 'categorizable');
     }
 
     public function pages()

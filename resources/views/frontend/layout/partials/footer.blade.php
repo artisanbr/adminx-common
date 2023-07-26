@@ -3,8 +3,10 @@
  * @var \Adminx\Common\Models\Site                                        $site
  * @var \Adminx\Common\Models\Theme                                       $theme
  * @var \Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject $frontendBuild
- * @var \Butschster\Head\MetaTags\Meta                                    $meta
+ * @var \Butschster\Head\MetaTags\Meta                                    $themeMeta
  */
+
+$captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_key, $site->config->recaptcha_site_key);
 
 ?>
 
@@ -19,13 +21,13 @@
                 <div
                         class="footer-copyright footer-copyright-3 text-center d-flex align-items-center justify-content-center">
                     <span class="mt-1">
-                        {{ date("Y") }} © <b>{{ $site->title }}</b> — {{ config('adminx.app.provider.copyright') }}
+                        {{ date("Y") }} © <b>{{ $site->title }}</b> — {{ config('common.app.provider.copyright') }}
                     </span>
-                    <a href="{{ config('adminx.app.provider.url') }}" target="_blank"
-                       title="Powered by {{ config('adminx.app.provider.name') }}"
+                    <a href="{{ config('common.app.provider.url') }}" target="_blank"
+                       title="Powered by {{ config('common.app.provider.name') }}"
                        class="ms-2 ml-2">
-                        <img src="{{ FrontendUtils::asset(config('adminx.app.provider.logo')) }}" height="18"
-                             alt="{{ config('adminx.app.provider.name') }}"/>
+                        <img src="{{ FrontendUtils::asset(config('common.app.provider.logo')) }}" height="18"
+                             alt="{{ config('common.app.provider.name') }}"/>
                     </a>
                 </div>
             </div>
@@ -36,7 +38,11 @@
 {{--</div>--}}
 
 {{--Scripts--}}
-{!! $meta->footer()->toHtml() !!}
+@if($themeMeta ?? false)
+    {!! $themeMeta->footer()->toHtml() !!}
+@endif
+
+{{--<script src="https://www.google.com/recaptcha/api.js?render=explicit"></script>--}}
 @@stack('js-includes')
 
 <script>
@@ -57,7 +63,20 @@
         }
     });
 
+    //recaptcha
+    /*window.onload = function() {
+        const recaptchaDivs = document.getElementsByClassName('g-recaptcha');
+
+        Array.prototype.forEach.call(recaptchaDivs, function(div) {
+            let sitekey = div.getAttribute('data-sitekey');
+            grecaptcha.render(div, {
+                'sitekey' : sitekey
+            });
+        });
+    };*/
+
 </script>
+{!! $captcha->renderJs() !!}
 
 @include('adminx-frontend::layout.inc.alerts')
 
@@ -65,4 +84,5 @@
 @@stack('js')
 {!! $theme->assets->js->after_body->html ?? '' !!}
 @{!! $frontendBuild->body->after !!}
+
 {!! '</body></html>' !!}

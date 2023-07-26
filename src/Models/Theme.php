@@ -78,6 +78,8 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
         'text',
     ];
 
+    //protected $with = ['site'];
+
     //region VALIDATION
     public static function createRules(FormRequest $request = null): array
     {
@@ -123,13 +125,13 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
         AppMetaTagsServiceProvider::registerFrontendPackages();
 
 
-        $meta = new \Butschster\Head\MetaTags\Meta(
+        $themeMeta = new \Butschster\Head\MetaTags\Meta(
             app(ManagerInterface::class),
             app('config')
         );
 
         //$meta->addCsrfToken();
-        $meta->initialize();
+        $themeMeta->initialize();
 
         /*$this->registerMetaPackage();
 
@@ -137,12 +139,13 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
 
         $meta->includePackages([$this->meta_pkg_name, 'frontend.pos']);*/
 
-        $meta->registerFromSiteTheme($this);
-        $meta->registerFromSite($this->site);
-        $meta->removeTag('description');
-        $meta->removeTag('keywords');
-        $meta->removeTag('viewport');
-        $meta->removeTag('charset');
+        $themeMeta->reset();
+        $themeMeta->registerFromSiteTheme($this);
+        $themeMeta->registerFromSite($this->site);
+        $themeMeta->removeTag('description');
+        $themeMeta->removeTag('keywords');
+        $themeMeta->removeTag('viewport');
+        $themeMeta->removeTag('charset');
 
         /*Meta::addCsrfToken();
         Meta::initialize();
@@ -168,13 +171,13 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
         $headerHtml = View::make('adminx-frontend::layout.partials.header', [
             'site'  => $this->site,
             'theme' => $this,
-            'meta' => $meta,
+            'themeMeta' => $themeMeta,
         ])->render();
 
         $footerHtml = View::make('adminx-frontend::layout.partials.footer', [
             'site'  => $this->site,
             'theme' => $this,
-            'meta' => $meta,
+            'themeMeta' => $themeMeta,
         ])->render();
 
         $themeBuild->fill([
@@ -328,16 +331,16 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
         return $this->hasOne(ThemeBuild::class, 'theme_id', 'id');
     }
 
-    public function menu()
-    {
-        return $this->hasOne(Menu::class, 'id', 'menu_id');
-    }
 
-    public function menu_footer()
-    {
-        return $this->hasOne(Menu::class, 'id', 'menu_footer_id');
-    }
+    /*public function menu()
+        {
+            return $this->hasOne(Menu::class, 'id', 'menu_id');
+        }
 
+        public function menu_footer()
+        {
+            return $this->hasOne(Menu::class, 'id', 'menu_footer_id');
+        }*/
 
     //endregion
 

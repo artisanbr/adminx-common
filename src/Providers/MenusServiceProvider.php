@@ -238,13 +238,13 @@ blade, compact('icon', 'class', 'paths', 'size')) . "</span>";
 
                 foreach ($pages as $page) {
 
-                    if ($page->using_posts) {
+                    if ($page->using_articles) {
                         //Posts
                         $this->itemSubmenu($page->title, function (Menu $submenu) use ($page) {
-                            $submenu->subItem("Configurar Página", route('app.pages.cadastro', $page->id));
+                            $submenu->subItem("Configurar Página", route('app.pages.cadastro', $page->public_id));
 
-                            $submenu->subItem('Gerenciar Postagens', route('app.pages.posts.index', $page->id))
-                                    ->subItem('Nova Postagem', route('app.pages.posts.cadastro', $page->id));
+                            $submenu->subItem('Gerenciar Artigos', route('app.pages.articles.index', $page->id))
+                                    ->subItem('Novo Artigo', route('app.pages.articles.cadastro', $page->id));
 
 
                             return $submenu;
@@ -253,7 +253,7 @@ blade, compact('icon', 'class', 'paths', 'size')) . "</span>";
                     }
                     else {
                         //Default
-                        $this->item($page->title, route('app.pages.cadastro', $page->id), $page->is_home ? 'home' : 'page');
+                        $this->item($page->title, route('app.pages.cadastro', $page->public_id), $page->is_home ? 'home' : 'page');
                     }
 
                 }

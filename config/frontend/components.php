@@ -3,7 +3,7 @@
 return [
     'props' => [
         'pages'   => [
-            'Posts' => [
+            'Articles' => [
                 'miniature' => [
                     'big' => false,
                     'small' => false,
@@ -37,7 +37,7 @@ return [
                 ]
             ]
         ],
-        'posts'   => 'Posts',
+        'articles'   => 'Posts',
         'widgets' => 'Elementos Dinâmicos (Widgets)',
     ],
 ];

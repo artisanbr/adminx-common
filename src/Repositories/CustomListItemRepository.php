@@ -3,7 +3,7 @@
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Facades\FileManager\FileUpload;
-use Adminx\Common\Models\Post;
+use Adminx\Common\Models\Article;
 use App\Repositories\Exception;
 use Adminx\Common\Enums\FileType;
 use Adminx\Common\Libs\Helpers\FileHelper;

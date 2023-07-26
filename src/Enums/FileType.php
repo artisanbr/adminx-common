@@ -18,9 +18,9 @@ enum FileType: string
     case PageUpload = 'page.upload';
 
     //Post
-    case PostSeo = 'post.seo';
-    case PostCover = 'post.cover';
-    case PostUpload = 'post.upload';
+    case PostSeo = 'article.seo';
+    case PostCover = 'article.cover';
+    case PostUpload = 'article.upload';
 
     //CustomLists
     case CustomListItem = 'list.item';

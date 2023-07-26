@@ -4,6 +4,7 @@ namespace Adminx\Common\Models;
 
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Illuminate\Support\Facades\Storage;
+use Adminx\Common\Models\Users\User;
 
 class UserInfo extends EloquentModelBase
 {

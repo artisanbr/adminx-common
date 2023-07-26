@@ -9,6 +9,11 @@
 namespace Adminx\Common\Libs\Helpers;
 
 
+use Adminx\Common\Libs\Support\HtmlString;
+use Collective\Html\HtmlFacade;
+use DOMDocument;
+use HTMLPurifier;
+use HTMLPurifier_Config;
 use Illuminate\Support\Str;
 use ScssPhp\ScssPhp\Compiler;
 use ScssPhp\ScssPhp\Exception\SassException;
@@ -214,4 +219,15 @@ class HtmlHelper
     }
 
 
+    public static function fixTags(string $html): string {
+        $config = HTMLPurifier_Config::createDefault();
+        $config->set('AutoFormat.AutoParagraph', false); // Desabilitar formatação automática de parágrafos
+        $config->set('AutoFormat.RemoveEmpty', true); // Remover tags vazias
+        $config->set('AutoFormat.AutoParagraph', false); // Desabilitar formatação automática de parágrafos
+
+        $purifier = new HTMLPurifier($config);
+        $fixedHtml = $purifier->purify($html);
+
+        return $fixedHtml;
+    }
 }

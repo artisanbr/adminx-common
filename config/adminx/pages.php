@@ -3,7 +3,7 @@
 return [
     'modules' => [
         'forms'   => 'Formulários',
-        'posts'   => 'Postagens',
+        'articles'   => 'Postagens',
         'widgets' => 'Elementos Personalizados (Widgets)',
         'data_source'    => 'Fonte de Dados',
         'advanced_html'    => 'HTML Avançado',

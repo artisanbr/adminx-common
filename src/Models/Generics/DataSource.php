@@ -8,14 +8,14 @@ use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\CustomListBase;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Post;
+use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Site;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * @property Page|Form|Post|CustomListBase|null $data
+ * @property Page|Form|Article|CustomListBase|null $data
  */
 class DataSource extends GenericModel
 {
@@ -44,7 +44,7 @@ class DataSource extends GenericModel
     protected $temporary = ['data', 'select_option_list'];
     protected $hidden = ['data'];
 
-    public static function getSourcesByType($source_type, Site $site = null): Collection
+    public static function getSourcesByType($source_type, ?Site $site = null): Collection
     {
         if (!$site) {
             $site = FrontendSite::current();
@@ -65,9 +65,9 @@ class DataSource extends GenericModel
                 $items = $site->forms;
                 $sources = $sources->merge($items);
                 break;
-            case 'posts':
+            case 'articles':
                 //Posts da Página
-                $items = $pages->where('using_posts', true);
+                $items = $pages->where('using_articles', true);
                 $sources = $sources->merge($items);
                 break;
             //Todo \/
@@ -80,7 +80,7 @@ class DataSource extends GenericModel
                 $items = $site->lists;
                 $sources = $sources->merge($items);
                 break;
-            case 'post':
+            case 'article':
             case 'address':
                 break;
 
@@ -88,7 +88,7 @@ class DataSource extends GenericModel
 
         //CustomLists Types
         foreach (CustomListType::array() as $value => $name) {
-            if ($source_type === "list.{$value}") {
+            if ($source_type === "list.{$value}" || $source_type === "list:{$value}") {
                 $items = $site->lists()->whereType($value)->get();
                 $sources = $sources->merge($items);
             }
@@ -119,7 +119,7 @@ class DataSource extends GenericModel
             switch ($this->type) {
                 //Todo:
                 case 'page':
-                case 'posts':
+                case 'articles':
                 case 'products':
                     //Página. Posts, Produtos (retornam a página)
                     $this->attributes['data'] = $site->pages()->where('id', $this->id)->first();
@@ -129,7 +129,7 @@ class DataSource extends GenericModel
                     $this->attributes['data'] = $site->forms()->where('id', $this->id)->first();
                     break;
                 //Todo \/
-                case 'post':
+                case 'article':
                 case 'address':
                 default:
                     break;

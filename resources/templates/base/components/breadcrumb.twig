@@ -1,0 +1,47 @@
+<div id="breadcrumb-area"
+     class="lazy breadcrumb-area breadcrumb-section breadcrumb-height site-breadcrumb-{{ site.public_id }} page-breadcumb-{{ page.public_id }}"
+     data-src="{{ breadcrumb.background_url ?? '' }}" style="{{ breadcrumb.style }} background-repeat: no-repeat; background-size: cover;">
+    <div class="container h-100">
+        <div class="row h-100">
+            <div class="col-lg-12 d-flex align-items-center">
+                <div class="breadcrumb-content breadcrumb-text d-flex align-items-start flex-column w-100">
+                    {% if breadcrumb.config.show_title %}
+                        <h1 id="breadcrumb-heading" class="breadcrumb-heading page-title">{{ breadcrumb.title }}</h1>
+                    {% endif %}
+                    {% if breadcrumb.config.show_navigation %}
+                        <nav id="breadcrumb" aria-label="breadcrumb"
+                             style="{{ breadcrumb.config.separator.css() ?? '' }}">
+                            <ol class="breadcrumb">
+                                {% for url, title in breadcrumb.items.toArray() %}
+                                    <li class="breadcrumb-item flex-row {{ loop.last ? 'active' : '' }}" {{ loop.last ? 'aria-current=page' : '' }}>
+                                        <a {% if url is defined and (url is not iterable or url[0] is not defined) %}href="{{ url }}"{% else %}role="button"{% endif %}>{{ title }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ol>
+                        </nav>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% set breadcrumbCss %}
+    <style>
+        {% if breadcrumb.config.height is defined %}
+        #breadcrumb-area.breadcrumb-area {
+            height: {{ breadcrumb.config.height }}px;
+        }
+
+        {% endif %}
+        {% if breadcrumb.background_url %}
+        #breadcrumb-area.breadcrumb-area {
+            background-image: url('{{ breadcrumb.background_url }}');
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        {% endif %}
+    </style>
+{% endset %}
+
+{% do assets.addInlineCss(breadcrumbCss) %}

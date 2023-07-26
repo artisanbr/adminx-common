@@ -2,6 +2,7 @@
 
 namespace Adminx\Common\Models;
 
+use Adminx\Common\Enums\MenuItemType;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\MenuItemConfig;
@@ -10,12 +11,14 @@ use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
 use Adminx\Common\Models\Traits\Relations\HasParent;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Spatie\Menu\Laravel\Link;
 use Spatie\Menu\Laravel\Menu as SpatieMenu;
+use Adminx\Common\Models\Pages\Page;
 
 class MenuItem extends EloquentModelBase
 {
@@ -27,6 +30,7 @@ class MenuItem extends EloquentModelBase
         'menuable_id',
         'menuable_type',
         'title',
+        'type',
         'external',
         'url',
         'position',
@@ -43,13 +47,18 @@ class MenuItem extends EloquentModelBase
         'external' => 'boolean',
         'position' => 'integer',
         'order'    => 'integer',
-        'config'    => MenuItemConfig::class,
+        'type'     => MenuItemType::class,
+        'config'   => MenuItemConfig::class,
     ];
 
     protected $appends = [
         'text',
         //'uri',
     ];
+
+    protected $touches = ['menu'];
+
+    //protected $with = ['children'];
 
     //region VALIDATIONS
     public static function createRules(FormRequest $request = null): array
@@ -61,12 +70,14 @@ class MenuItem extends EloquentModelBase
             'menuable_type_page_id'     => [
                 Rule::requiredIf(collect([
                                              'page',
-                                             'post',
+                                             'article',
                                              'category',
+                                             'page_model',
                                          ])->contains($request->menuable_type ?? '') !== false),
             ],
-            'menuable_type_post_id'     => [Rule::requiredIf(($request->menuable_type ?? '') === 'post')],
+            'menuable_type_article_id'  => [Rule::requiredIf(($request->menuable_type ?? '') === 'article')],
             'menuable_type_category_id' => [Rule::requiredIf(($request->menuable_type ?? '') === 'category')],
+            'menuable_type_page_model_id' => [Rule::requiredIf(($request->menuable_type ?? '') === 'page_model')],
             'url'                       => [Rule::requiredIf(($request->menuable_type ?? null) === 'link')],
         ];
     }
@@ -76,8 +87,9 @@ class MenuItem extends EloquentModelBase
         return [
             'menuable_type.required'             => 'Selecione o tipo de Item.',
             'menuable_type_page_id.required'     => 'Selecione uma página.',
-            'menuable_type_post_id.required'     => 'Selecione um Post.',
+            'menuable_type_article_id.required'  => 'Selecione um Post.',
             'menuable_type_category_id.required' => 'Selecione uma Categoria.',
+            'menuable_type_page_model_id.required' => 'Selecione uma Página Interna.',
             'url.required'                       => 'Insira um Link para seu Item.',
         ];
     }
@@ -94,13 +106,13 @@ class MenuItem extends EloquentModelBase
 
     public function hasMenuable(): bool
     {
-        return Str::contains($this->menuable_type, ['page', 'post', 'category']) && $this->menuable_id;
+        return Str::contains($this->menuable_type, ['page', 'article', 'category']) && $this->menuable_id;
     }
 
     public function jsonRelations(): static
     {
         if ($this->hasMenuable()) {
-            $this->load(['menuable', 'children', 'parent'/*, 'page', 'post', 'category'*/]);
+            $this->load(['menuable', 'children', 'parent'/*, 'page', 'article', 'category'*/]);
         }
 
         return $this;
@@ -108,11 +120,11 @@ class MenuItem extends EloquentModelBase
 
     public function mount(SpatieMenu $menuBuilder, Menu|null $menu = null): SpatieMenu
     {
-        if(!$menu){
+        if (!$menu) {
             $menu = $this->menu;
         }
 
-        if ($this->menuable_type === 'menu' || $this->children->count()) {
+        if ($this->type === MenuItemType::Submenu) {
 
             /*$subMenu = SpatieMenu::new()
                                  ->addClass($this->menu->config->submenu_class ?? '');*/
@@ -127,16 +139,25 @@ class MenuItem extends EloquentModelBase
 
                     $subMenu->addClass($menu->config->submenu_class ?? '');
 
-                    if($this->config->is_source_submenu && $this->config->submenu_source->data->id ?? false){
+                    if ($this->menuable_type === 'page_model' && $this->menuable && $this->menuable->model && method_exists($this->menuable->model, 'items')){
+
+                        //Debugbar::debug($this->menuable->model);
+
+                        foreach ($this->menuable->model->items as $modelItem) {
+                            $subMenu->add(Link::to($this->menuable->urlTo($modelItem->url), $modelItem->title)->addParentClass($menu->config->menu_item_class ?? ''));
+                        }
+
+                    }/*else if ($this->config->is_source_submenu && $this->config->submenu_source->data->id ?? false) {
                         //Subitens de uma fonte de dados
                         $sourceData = $this->config->submenu_source->data->mountModel();
 
 
-                        foreach($sourceData->items as $dataItem){
+                        foreach ($sourceData->items as $dataItem) {
                             $subMenu->add(Link::to($sourceData->itemUrl($dataItem), $dataItem->title)->addParentClass($menu->config->menu_item_class ?? ''));
                         }
 
-                    }else if($this->children->count()){
+                    }*/
+                    else if ($this->children->count()) {
                         //Subitens cadastrados
                         foreach ($this->children as $childMenuItem) {
                             $subMenu = $childMenuItem->mount($subMenu, $menu);
@@ -173,7 +194,7 @@ class MenuItem extends EloquentModelBase
     public function loadUrlFromMenuable(): static
     {
 
-        if ($this->menuable) {
+        if ($this->menuable_type && $this->menuable_id && $this->menuable) {
             $this->attributes['url'] = $this->menuable->url ?? null;
         }
 
@@ -202,7 +223,7 @@ class MenuItem extends EloquentModelBase
     //region GETS
     protected function getUrlAttribute()
     {
-        /*if (collect(['page', 'post', 'category'])->contains($this->menuable_type)) {
+        /*if (collect(['page', 'article', 'category'])->contains($this->menuable_type)) {
             if ($this->model && $this->model->url ?? false) {
                 return $this->model->url;
             }
@@ -214,6 +235,9 @@ class MenuItem extends EloquentModelBase
 
         return (Str::of($this->attributes['url'])->startsWith('/') ? '' : '/') . $this->attributes['url'];
     }
+    //endregion
+
+    //endregion
 
     //endregion OVERRIDES
     public function save(array $options = [])
@@ -243,9 +267,9 @@ class MenuItem extends EloquentModelBase
         return $this->morphedByMany(Page::class, 'menuable');
     }
 
-    public function post()
+    public function article()
     {
-        return $this->morphedByMany(Post::class, 'menuable');
+        return $this->morphedByMany(Article::class, 'menuable');
     }
 
     public function category()

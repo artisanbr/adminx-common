@@ -14,6 +14,7 @@ trait HasSelect2
     }
 
     protected function optionList(): Attribute {
+        $this->append(['text']);
         return Attribute::make(
             get: fn() => [
                 $this->id => $this->text

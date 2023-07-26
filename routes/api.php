@@ -17,7 +17,7 @@ Route::group([
             function () {
 
                 //render
-                Route::match(["get"], 'render/{public_Id}',
+                Route::match(["get"], 'render/{public_id}',
                              [
                                  "as"   => "render",
                                  "uses" => "WidgetController@render",

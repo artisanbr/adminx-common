@@ -43,6 +43,7 @@
         "butschster/meta-tags": "^2.2",
         "spatie/laravel-menu": "^4.1",
         "google/recaptcha": "^1.2",
+        "ezyang/htmlpurifier": "*",
         "twig/twig": "^3.5",
         "scssphp/scssphp": "^1.11",
         "prologue/alerts": "^1.0",
@@ -58,7 +59,8 @@
         "questocat/laravel-referral": "^1.0",
         "spatie/laravel-activitylog": "^4.5",
         "yadahan/laravel-authentication-log": "^1.4",
-        "laravelcollective/html": "*"
+        "laravelcollective/html": "*",
+        "anhskohbo/no-captcha": "*"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^2.0",

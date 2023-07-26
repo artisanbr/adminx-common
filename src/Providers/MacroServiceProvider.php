@@ -62,6 +62,15 @@ class MacroServiceProvider extends ServiceProvider
         //endregion
 
         //region Collection macros
+
+        Collection::macro('even', function () {
+            return $this->filter(static fn($item, $key) => $key % 2 === 0);
+        });
+
+        Collection::macro('odd', function () {
+            return $this->filter(static fn($item, $key) => $key % 2 !== 0);
+        });
+
         Collection::macro('mapRecursive', function (callable $callback) {
             $items = $this->toArray();
             array_walk_recursive($items, $callback,);

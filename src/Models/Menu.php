@@ -5,8 +5,15 @@ namespace Adminx\Common\Models;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\MenuConfig;
+use Adminx\Common\Models\Interfaces\OwneredModel;
+use Adminx\Common\Models\Scopes\WhereSiteScope;
+use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
+use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
+use Adminx\Common\Models\Traits\Relations\BelongsToSite;
+use Adminx\Common\Models\Traits\Relations\BelongsToUser;
+use Adminx\Common\Models\Users\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
@@ -15,9 +22,14 @@ use Illuminate\Validation\Rule;
 use Spatie\Menu\Laravel\Menu as SpatieMenu;
 use Spatie\Menu\Link;
 
-class Menu extends EloquentModelBase
+class Menu extends EloquentModelBase implements OwneredModel
 {
-    use HasUriAttributes, HasValidation;
+    use HasUriAttributes,
+        HasValidation,
+        BelongsToSite,
+        BelongsToUser,
+        BelongsToAccount,
+        HasOwners;
 
     protected $fillable = [
         'title',
@@ -26,6 +38,7 @@ class Menu extends EloquentModelBase
         'account_id',
         'user_id',
         'config',
+        'html',
     ];
 
     protected $casts = [
@@ -33,6 +46,8 @@ class Menu extends EloquentModelBase
         'slug'   => 'string',
         'config' => MenuConfig::class,
     ];
+
+    //protected $with = ['site'];
 
     //region VALIDATIONS
     public static function createRules(FormRequest $request = null): array
@@ -53,7 +68,7 @@ class Menu extends EloquentModelBase
         return [
             'title.required' => 'O título do menu é obrigatório',
             'slug.required'  => 'O apelido do menu é obrigatório',
-            'slug.unique'    => 'O apelído do menu deve ser único entre os menus do site.',
+            'slug.unique'    => 'O apelido do menu deve ser único entre os menus do site.',
         ];
     }
     //endregion
@@ -66,7 +81,7 @@ class Menu extends EloquentModelBase
 
         $menuParentItems = $this->parent_items;
 
-        foreach ($menuParentItems as $menuItem){
+        foreach ($menuParentItems as $menuItem) {
             $menuBuilder = $menuItem->mount($menuBuilder, $this);
         }
 
@@ -84,22 +99,32 @@ class Menu extends EloquentModelBase
     //endregion
 
     //region ATTRIBUTES
-    protected function html(): Attribute
+    public function mount_html()
     {
-        return Attribute::make(get: fn() => $this->mount()->render());
+        return $this->mount()->render();
     }
+
+    /*public function html(): Attribute
+    {
+        return Attribute::make(get: fn() => $this->mount_html());
+    }*/
 
     protected function slug(): Attribute
     {
         return Attribute::make(set: static fn($value) => Str::slug(Str::replaceNative([
-                                                                                    'menu-',
-                                                                                    'menu ',
-                                                                                    'menu',
-                                                                                ],    '', Str::lower($value))));
+                                                                                          'menu-',
+                                                                                          'menu ',
+                                                                                          'menu',
+                                                                                      ], '', Str::lower($value))));
     }
     //endregion
 
     //region OVERRIDES
+    protected static function booted()
+    {
+        static::addGlobalScope(new WhereSiteScope);
+    }
+
     public function save(array $options = [])
     {
         //Apelido

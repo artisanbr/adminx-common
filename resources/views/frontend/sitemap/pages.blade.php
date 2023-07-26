@@ -25,7 +25,7 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
         <url>
             <loc>{{ $page->uri }}</loc>
             <lastmod>{{ $page->updated_at->toIso8601String() }}</lastmod>
-            @if($page->using_posts && $page->posts()->count())
+            @if($page->using_articles && $page->articles()->count())
                 <changefreq>always</changefreq>
                 <priority>{{ $page->is_home ? '1.0' : '0.8' }}</priority>
             @elseif($page->data_sources->count())
@@ -57,7 +57,7 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
                         @if($dataSourceItem->data->image->file && $dataSourceItem->data->image_url)
                             <image:image>
                                 <image:loc>{{ FrontendUtils::url($dataSourceItem->data->image_url) }}</image:loc>
-                                {{--<image:title>{{ $post->seoTitle() }}</image:title>--}}
+                                {{--<image:title>{{ $article->seoTitle() }}</image:title>--}}
                             </image:image>
                         @endif
                     </url>

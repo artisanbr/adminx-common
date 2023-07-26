@@ -3,18 +3,24 @@
 namespace Adminx\Common\Providers\Frontend;
 
 use Adminx\Common\Facades\Frontend\FrontendPage;
+use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\FrontendEngine\FrontendPageEngine;
+use Adminx\Common\Models\Article;
+use Adminx\Common\Models\Bases\CustomListBase;
 use Adminx\Common\Models\Category;
-use Adminx\Common\Models\File;
+use Adminx\Common\Models\Pages\Modules\Manager\PageModuleManagerEngine;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Post;
+use Adminx\Common\Models\Pages\PageModel;
+use Adminx\Common\Models\Templates\Global\Manager\PageTemplateManagerEngine;
+use Adminx\Common\Models\Pages\Types\Manager\PageTypeManagerEngine;
 use Adminx\Common\Models\Site;
 use Adminx\Common\Models\Theme;
-use Butschster\Head\Facades\Meta;
-use Butschster\Head\Facades\PackageManager;
+use App\Http\Controllers\Frontend\Page\PageModelController;
+use Butschster\Head\Facades\Meta as MetaFacade;
+use Butschster\Head\MetaTags\Meta;
 use Butschster\Head\Packages\Entities\OpenGraphPackage;
 use Butschster\Head\Packages\Entities\TwitterCardPackage;
-use Butschster\Head\Packages\Package;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class FrontendPageServiceProvider extends ServiceProvider
@@ -25,20 +31,9 @@ class FrontendPageServiceProvider extends ServiceProvider
     public function register(): void
     {
 
+        $this->registerEngine();
+        $this->registerPageManagers();
 
-        //Singleton: FrontendPage
-        $this->app->singleton(FrontendPageEngine::class, function () {
-            return new FrontendPageEngine();
-        });
-        //Bind: FrontendPage
-        $this->app->bind('FrontendPageEngine', function () {
-            return app()->make(FrontendPageEngine::class);
-        });
-
-
-        $this->app->singleton('CurrentPage', function () {
-            return FrontendPage::getCurrentPage();
-        });
     }
 
     /**
@@ -47,8 +42,13 @@ class FrontendPageServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
+        $this->setupMetaMacros();
+    }
 
-        \Butschster\Head\MetaTags\Meta::macro('registerFromSite', function (Site $site) {
+
+    protected function setupMetaMacros()
+    {
+        Meta::macro('registerFromSite', function (Site $site) {
 
             $metaOg = new OpenGraphPackage('site_og');
             $metaTwitter = new TwitterCardPackage('site_tt');
@@ -72,40 +72,7 @@ class FrontendPageServiceProvider extends ServiceProvider
 
         });
 
-        \Butschster\Head\MetaTags\Meta::macro('registerFromSiteTheme', function (Theme $theme) {
-
-            /*PackageManager::create($theme->meta_pkg_name, function (Package $package) use ($theme) {
-
-
-                $packagesInclude = [];
-
-                //Frameworks
-                if ($theme) {
-
-                    if ($theme->config->jquery) {
-                        $packagesInclude[] = 'jquery';
-                    }
-
-                    if (!$theme->config->no_framework) {
-                        $packagesInclude[] = $theme->config->framework->value;
-                    }
-
-                    $packagesInclude = [...$packagesInclude, ...$theme->config->plugins->toArray() ?? []];
-                }
-
-                $packagesInclude[] = 'frontend.pre';
-
-                $package->requires($packagesInclude);
-                foreach ($theme->files()->themeBundleSortened()->values() as $file) {
-
-                    if ($file->extension === 'css') {
-                        $package->addStyle($file->name, $file->url);
-                    }
-                    if ($file->extension === 'js') {
-                        $package->addScript($file->name, $file->url, ['defer']);
-                    }
-                }
-            });*/
+        Meta::macro('registerFromSiteTheme', function (Theme $theme) {
 
             $theme->registerMetaPackage();
 
@@ -116,7 +83,7 @@ class FrontendPageServiceProvider extends ServiceProvider
 
         });
 
-        Meta::macro('registerSeoMetaTagsForPage', function (Page $page) {
+        Meta::macro('registerSeoForPage', function (Page $page) {
 
             if ($page->site->seo->config->show_parent_title) {
                 $this->prependTitle($page->site->getTitle());
@@ -127,53 +94,157 @@ class FrontendPageServiceProvider extends ServiceProvider
 
         });
 
-        Meta::macro('registerSeoMetaTagsForCategory', function (Page $page, Category $category) {
+        MetaFacade::macro('registerSeoMetaTagsForCategory', function (Page $page, Category $category) {
             $this->setTitle($page->seoTitle("Categoria {$category->title}"));
         });
 
-        Meta::macro('registerSeoMetaTagsForPost', function (Page $page, Post $post) {
+        Meta::macro('registerSeoForArticle', function (Article $article) {
 
-            $metaOg = new OpenGraphPackage('site_og');
-            $metaTwitter = new TwitterCardPackage('site_tt');
+            $metaOg = new OpenGraphPackage('site_og_article');
+            $metaTwitter = new TwitterCardPackage('site_tt_article');
 
-            $seoFullTitle = $post->site->seoTitle($post->getTitle());
+            $site = FrontendSite::current();
+            $page = FrontendPage::current();
+
+            $seoFullTitle = $site->seoTitle($page->seoTitle($article->getTitle()));
 
             $metaOg
                 ->setType('article')
                 ->setTitle($seoFullTitle)
-                ->setDescription($post->getDescription())
-                //->addOgMeta('article:author', $post->user->name)
-                ->addOgMeta('article:section', $post->page->title)
-                ->addOgMeta('article:tag', $post->getKeywords())
-                ->addOgMeta('article:published_time', $post->published_at->toIso8601String())
-                ->addOgMeta('article:modified_time', $post->updated_at->toIso8601String())
-                ->addOgMeta('og:updated_time', $post->updated_at->toIso8601String())
-                ->setUrl($post->uri);
+                ->setDescription($article->getDescription())
+                //->addOgMeta('article:author', $article->user->name)
+                ->addOgMeta('article:section', $page->title)
+                ->addOgMeta('article:tag', $article->getKeywords())
+                ->addOgMeta('article:published_time', $article->published_at->toIso8601String())
+                ->addOgMeta('article:modified_time', $article->updated_at->toIso8601String())
+                ->addOgMeta('og:updated_time', $article->updated_at->toIso8601String())
+                ->setUrl($article->uri);
 
             $metaTwitter
                 ->setTitle($seoFullTitle)
-                ->setDescription($post->getDescription());
+                ->setDescription($article->getDescription());
 
-            if ($post->seo_image) {
+            if ($article->seo_image) {
                 $metaTwitter
                     ->setType('summary_large_image')
-                    ->setImage($post->seo->image_uri)
-                    ->addMeta('image:alt', $post->getTitle());
+                    ->setImage($article->seo->image_uri)
+                    ->addMeta('image:alt', $article->getTitle());
 
-                $metaOg->addImage($post->seo->image_uri, [
-                    'type' => $post->seo_image->type,
-                    'alt'  => $post->getTitle(),
+                $metaOg->addImage($article->seo->image_uri, [
+                    'type' => $article->seo_image->type,
+                    'alt'  => $article->getTitle(),
                 ]);
             }
 
-            $comments = $post->comments()->paginate(5, ['*'], 'comments_page');
+            $comments = $article->comments()->paginate(5, ['*'], 'comments_page');
 
             $this
-                ->setMetaFrom($post)
+                ->setMetaFrom($article)
+                ->setTitle($seoFullTitle)
+                ->setDescription($article->getDescription())
                 ->registerPackage($metaOg)
-                ->registerPackage($metaTwitter)
-                ->setPaginationLinks($comments);
+                ->setPaginationLinks($comments)
+                ->registerPackage($metaTwitter);
         });
+
+        MetaFacade::macro('registerSeoForPageModel', function (PageModel $pageModel, $modelItem = null) {
+
+            $metaOg = new OpenGraphPackage('site_og_page_model');
+            $metaTwitter = new TwitterCardPackage('site_tt_page_model');
+
+
+            $seoFullTitle = $pageModel->page->site->seoTitle($pageModel->page->seoTitle($modelItem->title ?? null));
+
+            $metaOg
+                ->setType('article')
+                ->setTitle($seoFullTitle)
+                ->setDescription($pageModel->page->getDescription())
+                ->setUrl($pageModel->uriTo($modelItem->url));
+
+            $metaTwitter
+                ->setTitle($seoFullTitle)
+                ->setDescription($pageModel->page->getDescription());
+
+            if ($pageModel->breadcrumb_config->background_url) {
+                $metaTwitter
+                    ->setType('summary_large_image')
+                    ->setImage($pageModel->breadcrumb_config->background_url)
+                    ->addMeta('image:alt', $modelItem->title ?? $pageModel->page->title);
+
+                $metaOg->addImage($pageModel->breadcrumb_config->background_url, [
+                    'type' => $pageModel->breadcrumb_config->background->type,
+                    'alt'  => $modelItem->title ?? $pageModel->page->title,
+                ]);
+            }
+
+            $this
+                ->setTitle($seoFullTitle)
+                ->setDescription($pageModel->page->getDescription())
+                ->registerPackage($metaOg)
+                ->registerPackage($metaTwitter);
+        });
+    }
+
+
+    /**
+     * Registrar Facades e Singletons da Engine de Páginas
+     */
+    protected function registerEngine(): void
+    {
+        //Singleton: FrontendPage
+        $this->app->singleton(FrontendPageEngine::class, function () {
+            return new FrontendPageEngine();
+        });
+        //Bind: FrontendPage
+        $this->app->bind('FrontendPageEngine', function () {
+            return app()->make(FrontendPageEngine::class);
+        });
+
+        $this->app->singleton('CurrentPage', function () {
+            return FrontendPage::getCurrentPage();
+        });
+    }
+
+    /**
+     * Registrar Facades e Singletons do Managers das Páginas (tipos, modulos e templates)
+     */
+    protected function registerPageManagers(): void
+    {
+
+        //region PageType
+
+        //Singleton: PageTypeManagerEngine
+        $this->app->singleton(PageTypeManagerEngine::class, function () {
+            return new PageTypeManagerEngine();
+        });
+        $this->app->bind('PageTypeManagerEngine', function () {
+            return app()->make(PageTypeManagerEngine::class);
+        });
+
+        //endregion
+
+        //region PageTemplate
+
+        //Singleton: PageTypeManagerEngine
+        $this->app->singleton(PageTemplateManagerEngine::class, function () {
+            return new PageTemplateManagerEngine();
+        });
+        $this->app->bind('PageTemplateManagerEngine', function () {
+            return app()->make(PageTemplateManagerEngine::class);
+        });
+
+        //endregion
+
+        //Singleton: PageModuleManagerEngine
+        $this->app->singleton(PageModuleManagerEngine::class, function () {
+            return new PageModuleManagerEngine();
+        });
+        $this->app->bind('PageModuleManagerEngine', function () {
+            return app()->make(PageModuleManagerEngine::class);
+        });
+
+        //endregion
+
     }
 
 

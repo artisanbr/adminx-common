@@ -125,7 +125,7 @@
                                         <div class="text-center" style="" align="center">
                                             <a href="{{ $site->uri }}" target="_blank"
                                                style="color: #0d6efd;">
-                                                <img src="{{ $site->uri.$site->theme->media->logo->file->url }}" alt="" style="color: #0d6efd; width: 40%;"/>
+                                                <img src="{{ $site->uriTo($site->theme->media->logo->url) }}" alt="" style="color: #0d6efd; width: 40%;"/>
                                             </a>
                                         </div>
 

@@ -3,7 +3,7 @@
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Post;
+use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Widget;
 use Adminx\Common\Models\SiteWidget;
 use Adminx\Common\Repositories\Base\Repository;

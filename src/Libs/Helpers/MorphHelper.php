@@ -12,7 +12,7 @@ class MorphHelper
      * @return Collection
      */
     public static function morphMaps(): Collection{
-        return collect(config('adminx.defines.morphs.map'));
+        return collect(config('common.morphs.map'));
     }
 
     /**

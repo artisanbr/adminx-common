@@ -69,21 +69,27 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
         //Debugbar::debug($this->source->type);
 
         switch (true) {
+            case $this->source->type === 'articles':
             case $this->source->type === 'posts':
                 /**
                  * @var Page|null $page ;
                  */
 
+                if($this->source->type === 'posts'){
+                    $this->source->type = 'articles';
+                    $this->save();
+                }
+
                 $page = $this->source->data;
 
                 if ($page) {
 
-                    $postsQuery = $page->posts()->published();
+                    $articlesQuery = $page->articles()->published();
                     if ($this->config->sorting->enable || $this->widget->config->sorting->enable) {
-                        $postsQuery = $postsQuery->orderBy($this->config->sort_column, $this->config->sort_direction);
+                        $articlesQuery = $articlesQuery->orderBy($this->config->sort_column, $this->config->sort_direction);
                     }
                     $viewData['page'] = $page;
-                    $viewData['posts'] = $postsQuery->take(10)->get();
+                    $viewData['articles'] = $articlesQuery->take(10)->get();
                 }
                 break;
             case Str::contains($this->source->type, 'list'):
@@ -105,7 +111,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
             /*case 'page':
             case 'products':
             case 'form':
-            case 'post':
+            case 'article':
             case 'address':*/
 
         }
@@ -134,9 +140,9 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
                 $items = $site->forms;
                 $sources = $sources->merge($items);
                 break;
-            case 'page.posts':
+            case 'page.articles':
                 //Posts da Página
-                $items = $pages->where('using_posts', true);
+                $items = $pages->where('using_articles', true);
                 $sources = $sources->merge($items);
                 break;
             //Todo \/
@@ -149,7 +155,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
                 $items = $site->lists;
                 $sources = $sources->merge($items);
                 break;
-            case 'post':
+            case 'article':
             case 'address':
                 break;
 
@@ -177,6 +183,20 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
     //endregion
 
     //region  Attributes
+    protected function html(): Attribute
+    {
+        $renderView = $this->config->ajax_render ? 'adminx-common::Elements.Widgets.renders.ajax-render' : 'adminx-common::Elements.Widgets.renders.static-render';
+
+        $renderData = $this->config->ajax_render ? [
+            'siteWidget' => $this,
+        ] : $this->getBuildViewData();
+
+        $widgetView = View::make($renderView, $renderData);
+
+        return new Attribute(
+            get: static fn() => $widgetView->render(),
+        );
+    }
 
     //region Get's
 

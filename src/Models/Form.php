@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Adminx\Common\Models\Pages\Page;
 
 /**
  * @property Collection|FormElement[] $elements
@@ -108,9 +109,9 @@ class Form extends EloquentModelBase
     }
 
     //region Morphs
-    public function posts()
+    public function articles()
     {
-        return $this->morphedByMany(Post::class, 'formulable');
+        return $this->morphedByMany(Article::class, 'formulable');
     }
     public function pages()
     {

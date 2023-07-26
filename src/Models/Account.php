@@ -5,6 +5,7 @@ namespace Adminx\Common\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Ramsey\Uuid\Uuid;
+use Adminx\Common\Models\Users\User;
 
 class Account extends EloquentModelBase
 {

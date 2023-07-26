@@ -6,7 +6,6 @@ use Adminx\Common\Models\Account;
 use Adminx\Common\Models\AccountUser;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Comment;
-use Adminx\Common\Models\File;
 use Adminx\Common\Models\Generics\Configs\UserConfig;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
@@ -18,30 +17,27 @@ use Adminx\Common\Models\SiteWidget;
 use Adminx\Common\Models\Theme;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasValidation;
-use Adminx\Common\Models\Traits\Relations\HasPosts;
+use Adminx\Common\Models\Traits\Relations\HasArticles;
 use Cog\Laravel\Ban\Traits\Bannable;
 use EloquentFilter\Filterable;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Laravel\Fortify\TwoFactorAuthenticatable;
-use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Passport\HasApiTokens;
 use Questocat\Referral\Traits\UserReferral;
 use Spatie\Permission\Traits\HasRoles;
-
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Auth\MustVerifyEmail;
-use Illuminate\Auth\Passwords\CanResetPassword;
-use Illuminate\Foundation\Auth\Access\Authorizable;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Yadahan\AuthenticationLog\AuthenticationLogable;
 
 class User extends EloquentModelBase implements AuthenticatableContract,
@@ -57,7 +53,7 @@ class User extends EloquentModelBase implements AuthenticatableContract,
         HasApiTokens,
         Notifiable,
         HasValidation,
-        HasPosts,
+        HasArticles,
         HasPublicIdAttribute,
         HasRoles,
         Bannable,

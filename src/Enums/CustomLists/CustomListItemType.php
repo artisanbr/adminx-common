@@ -15,7 +15,7 @@ enum CustomListItemType: string
     case Image = 'image';
     case Video = 'video';
     case File = 'file';
-    case Post = 'post';
+    case Post = 'article';
     case HTML = 'html';
     case ImageSlide = 'slide.image';
     case Testimonial = 'testimonial';

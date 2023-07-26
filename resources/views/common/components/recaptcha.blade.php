@@ -1,8 +1,10 @@
 @props([
     'site' => new \Adminx\Common\Models\Site(),
     'noAjax' => false,
+    'id' => 'g-recaptcha-'.\Delight\Random\Random::alphaLowercaseHumanString(7),
+    'callback' => null,
 ])
-@once
+{{--@once
     @prepend('js')
         <script src="https://www.google.com/recaptcha/api.js?render={{ $site->config->recaptcha_site_key }}"></script>
         <script>
@@ -123,5 +125,20 @@
     @endprepend
 @endonce
 <input type="hidden" name="recaptcha_token" id="recaptcha-token">
-<input type="hidden" name="recaptcha_action" id="recaptcha-action">
+<input type="hidden" name="recaptcha_action" id="recaptcha-action">--}}
 
+<div id="{{ $id }}" class="g-recaptcha mb-3"></div>
+<script>
+    $(function () {
+        //recaptcha
+        grecaptcha.render(document.getElementById('{{ $id }}'), {
+            'sitekey': '{{ $site->config->recaptcha_site_key }}',
+
+            @if($callback)
+            'callback': {{ $callback }},
+            @endif
+
+        });
+    });
+</script>
+{{--{!! $captcha->display() !!} --}}

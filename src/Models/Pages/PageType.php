@@ -3,32 +3,36 @@
 namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Generics\Configs\PageConfig;
+use Adminx\Common\Models\Objects\Frontend\FrontendHtmlObject;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasValidation;
+use Adminx\Common\Models\Traits\Relations\BelongsToPage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class PageType extends EloquentModelBase
+class PageType extends Pivot
 {
-    use HasSelect2, HasValidation;
+    use HasSelect2, HasValidation, BelongsToPage;
+
+    public $incrementing = true;
+    public $timestamps   = true;
 
     protected $fillable = [
-        'title',
-        'description',
+        'page_id',
+        'model_type',
+        'model_id',
         'slug',
+        'content',
         'config',
     ];
 
     protected $casts = [
-        'config' => PageConfig::class,
-        'has_post' => 'bool'
+        //'config' => PageConfig::class,
+        'slug'     => 'string',
+        'content' => FrontendHtmlObject::class,
     ];
 
-    protected $appends = [
-        'can_use_forms',
-        'can_use_posts'
-    ];
+    protected $appends = [];
 
     public function __construct(array $attributes = [])
     {
@@ -41,7 +45,7 @@ class PageType extends EloquentModelBase
     protected function slug(): Attribute
     {
         return Attribute::make(
-            set: static fn ($value) => Str::contains($value, ' ') ? Str::slug(Str::ucfirst($value)) : Str::ucfirst($value),
+            set: static fn($value) => Str::contains($value, ' ') ? Str::slug(Str::ucfirst($value)) : Str::ucfirst($value),
         );
     }
 
@@ -53,46 +57,8 @@ class PageType extends EloquentModelBase
     protected function text(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->title ? "<h3>{$this->title}</h3>" . Str::limit($this->description, 150) : '',
+            get: fn() => ($this->model->title ?? false) ? "<h3>{$this->model->title}</h3>" : '',
         );
-    }
-    //endregion
-
-    //region MODULES
-    protected function canUsePosts(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->config->canUseModule('posts'));
-    }
-
-    protected function usingPosts(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->can_use_posts && $this->config->isUsingModule('posts'));
-    }
-
-    protected function canUseForms(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->config->canUseModule('forms'));
-    }
-
-    protected function usingForms(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->can_use_forms && $this->config->isUsingModule('forms'));
-    }
-
-    protected function canUseList(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->config->canUseModule('list'));
-    }
-
-    protected function usingList(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $this->can_use_list && $this->config->isUsingModule('list'));
     }
     //endregion
 
@@ -103,8 +69,8 @@ class PageType extends EloquentModelBase
     public function save(array $options = [])
     {
         //Gerar slug se estiver em branco
-        if(empty($this->slug)){
-            $this->slug = $this->title;
+        if (empty($this->slug) && ($this->model->title ?? false)) {
+            $this->slug = $this->model->title;
         }
 
         return parent::save($options);
@@ -114,12 +80,9 @@ class PageType extends EloquentModelBase
 
     //region RELATIONS
 
-    public function models(){
-        return $this->hasMany(PageModel::class, 'page_type_id', 'id');
-    }
-
-    public function pages(){
-        return $this->hasMany(Page::class, 'type_id', 'id');
+    public function model()
+    {
+        return $this->morphTo();
     }
 
     //endregion

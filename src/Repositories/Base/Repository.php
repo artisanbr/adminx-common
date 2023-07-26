@@ -103,7 +103,9 @@ abstract class Repository implements RepositoryInterface
 
         $this->data = array_merge_recursive($data, $mergeData);
 
-        $this->data[$this->idKey] = $mergeData[$this->idKey] ?? null;
+        if($mergeData[$this->idKey] ?? false){
+            $this->data[$this->idKey] = $mergeData[$this->idKey] ?? null;
+        }
 
         if($this->getDataId()){
             $this->setModel($this->getDataId());
@@ -120,7 +122,6 @@ abstract class Repository implements RepositoryInterface
      */
     public function save(array|Request $data): mixed
     {
-
         $this->traitData($data);
 
         return DB::transaction(fn() => $this->saveTransaction());

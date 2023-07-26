@@ -7,7 +7,7 @@ use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\File;
 use Adminx\Common\Models\Folder;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Post;
+use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Site;
 use Adminx\Common\Models\Theme;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Model;
 
 
 /**
- * @var Model|Site|Page|Theme|Post $this
- * @var Model|Site|Page|Theme|Post self
+ * @var Model|Site|Page|Theme|Article $this
+ * @var Model|Site|Page|Theme|Article self
  */
 trait HasFiles
 {

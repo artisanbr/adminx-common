@@ -1,37 +1,37 @@
 <?php
 /***
- * @var \Adminx\Common\Models\SiteWidget                                      $widgeteable
- * @var \Adminx\Common\Models\Pages\Page                                      $page
- * @var \Adminx\Common\Models\Post                                            $post
- * @var \Adminx\Common\Models\Post[]|\Illuminate\Database\Eloquent\Collection $posts
+ * @var \Adminx\Common\Models\SiteWidget                                         $widgeteable
+ * @var \Adminx\Common\Models\Pages\Page                                         $page
+ * @var \Adminx\Common\Models\Article                                            $article
+ * @var \Adminx\Common\Models\Article[]|\Illuminate\Database\Eloquent\Collection $articles
  */
 
-$postsQuery = $page->posts()->published();
+$articlesQuery = $page->articles()->published();
 ?>
 @extends('adminx-common::layouts.api.ajax-view')
 
-@if($posts->count())
-    <div class="row posts-mosaic posts-mosaic-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
+@if($articles->count())
+    <div class="row articles-mosaic articles-mosaic-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
         {{--Left--}}
-        {{--@foreach($page->posts()->published()->take(2)->get() as $post)--}}
-        @foreach($postsQuery->take(2)->get() as $post)
-            <div class="col-xl-4 col-lg-6 col-md-6 posts-mosaic-left">
-                <x-frontend::pages.Posts.post-miniature-1 :post="$post"
-                                                          class="posts-mosaic-item posts-mosaic-featured-item widget-post-featured-item mb-30"
-                                                          :show-read-more="false" :show-categories="false"
-                                                          bottom-meta show-comments/>
+        {{--@foreach($page->article()->published()->take(2)->get() as $article)--}}
+        @foreach($articlesQuery->take(2)->get() as $article)
+            <div class="col-xl-4 col-lg-6 col-md-6 articles-mosaic-left">
+                <x-frontend::pages.Articles.article-miniature-1 :article="$article"
+                                                             class="articles-mosaic-item articles-mosaic-featured-item widget-article-featured-item mb-30"
+                                                             :show-read-more="false" :show-categories="false"
+                                                             bottom-meta show-comments/>
             </div>
         @endforeach
 
         {{--Right--}}
-        <div class="col-xl-4 col-lg-12 col-md-12 posts-mosaic-right">
-            <div class="widget-post-list mb-30">
-                @foreach($postsQuery->skip(2)->take(3)->get() as $post)
-                    <x-frontend::pages.Posts.post-miniature-1 :post="$post"
-                                                              class="posts-mosaic-item posts-mosaic-list-item widget-post-list-item"
-                                                              :show-read-more="false" :show-categories="false"
-                                                              :show-description="false" :show-cover="false"
-                                                              bottom-meta/>
+        <div class="col-xl-4 col-lg-12 col-md-12 articles-mosaic-right">
+            <div class="widget-article-list mb-30">
+                @foreach($articlesQuery->skip(2)->take(3)->get() as $article)
+                    <x-frontend::pages.Articles.article-miniature-1 :article="$article"
+                                                                 class="articles-mosaic-item articles-mosaic-list-item widget-article-list-item"
+                                                                 :show-read-more="false" :show-categories="false"
+                                                                 :show-description="false" :show-cover="false"
+                                                                 bottom-meta/>
                 @endforeach
             </div>
         </div>

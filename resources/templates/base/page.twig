@@ -1,0 +1,13 @@
+{{ include(getTemplate('header')) }}
+<main class="main-content">
+    {% if breadcrumb and breadcrumb.enabled %}
+        {{ include('@base/components/breadcrumb.twig') }}
+    {% endif %}
+
+    {% if customPageTemplate %}
+        {{ include(customPageTemplate) }}
+    {% else %}
+        {{ include(getTemplate('content')) }}
+    {% endif %}
+</main>
+{{ include(getTemplate('footer')) }}

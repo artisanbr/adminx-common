@@ -10,6 +10,7 @@ use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Adminx\Common\Models\Pages\Page;
 
 class Widget extends EloquentModelBase
 {

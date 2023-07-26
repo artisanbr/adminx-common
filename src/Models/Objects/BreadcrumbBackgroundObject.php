@@ -12,18 +12,18 @@ class BreadcrumbBackgroundObject extends GenericModel
 {
 
     protected $fillable = [
-        'file_id',
+        //'file_id',
         'url',
         'type',
     ];
 
     protected $attributes = [
-        'file_id'         => null,
+        //'file_id'         => null,
         'type'            => 'image',
     ];
 
     protected $casts = [
-        'file_id'                => 'int',
+        //'file_id'                => 'int',
         'url'                   => 'string',
     ];
 
@@ -34,7 +34,7 @@ class BreadcrumbBackgroundObject extends GenericModel
 
 
     //region HELPERS
-    public function loadFile(){
+    /*public function loadFile(){
         if ($this->file_id ?? false) {
 
             if (!$this->attributes['file'] || (int)$this->attributes['file']->id !== (int)$this->file_id) {
@@ -46,7 +46,7 @@ class BreadcrumbBackgroundObject extends GenericModel
         }
 
         return $this->attributes['file'];
-    }
+    }*/
     //endregion
 
     //region ATTRIBUTES
@@ -55,10 +55,10 @@ class BreadcrumbBackgroundObject extends GenericModel
     //endregion
 
     //region GET
-    protected function getFileAttribute(): File|null
+    /*protected function getFileAttribute(): File|null
     {
         return $this->loadFile();
-    }
+    }*/
 
     /*protected function getNameAttribute()
     {

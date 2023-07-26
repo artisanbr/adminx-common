@@ -14,15 +14,23 @@
     <form id="form-{{$form->id}}" class="form w-100" action="{{ route('frontend.send-form', $form->id, false) }}"
           enctype="multipart/form-data" data-grecaptcha-action="{{$form->slug}}">
         @method('POST')
-        <x-common::recaptcha :site="$form->site"/>
 
-        <div class="row mb-2">
+
+        <div class="row">
             @foreach($form->elements as $element)
                 <x-frontend::forms.element :element="$element" :form="$form"/>
             @endforeach
         </div>
         <div class="row">
-            <div class="col-12 d-flex">
+            <div class="col-12 col-sm-8">
+                {{--<script>
+                    const verifyCallback_{{$form->id}} = function(response) {
+                        alert(response);
+                    };
+                </script>--}}
+                <x-common::recaptcha :site="$form->site" {{--:callback='"verifyCallback_{$form->id}"'--}}/>
+            </div>
+            <div class="col-12 col-sm d-flex justify-content-end align-items-end">
                 {{--<button type="submit"
                         class="primary_btn btn btn-primary btn-icon ml-0 ms-auto me-0">
                     <span><i class="fa-solid fa-paper-plane"></i></span> Enviar
@@ -116,75 +124,71 @@
                                 alertManager.info();
                                 $submitButton.prop('disabled', true);
 
-                                Recaptcha.form($form).complete(function (form) {
+                                // Simulate ajax request
+                                //axios.post(url_action, $form.serializeObject())
+                                let formData = new FormData($form[0]);
+                                /*$.ajax({
+                                    url: url_action,
+                                    type: 'POST',
+                                    data: formData,
+                                    cache: false,
+                                    processData: false,
+                                    contentType: false,
+                                    dataType: "json",
+                                    accepts: {
+                                        json: "application/json"
+                                    },
+                                }).done*/
+                                axios.post(url_action, formData).then(function (response) {
 
-                                    console.log(form);
+                                    console.log(response.data);
 
-                                    // Simulate ajax request
-                                    //axios.post(url_action, $form.serializeObject())
-                                    let formData = new FormData($form[0]);
-                                    /*$.ajax({
-                                        url: url_action,
-                                        type: 'POST',
-                                        data: formData,
-                                        cache: false,
-                                        processData: false,
-                                        contentType: false,
-                                        dataType: "json",
-                                        accepts: {
-                                            json: "application/json"
-                                        },
-                                    }).done*/
-                                    axios.post(url_action, formData).then(function (response) {
+                                    @if($form->config->on_success ?? false)
+                                            {{$form->config->on_success}}(response.data);
+                                    @endif
 
-                                        console.log(response.data);
+                                    if (response.data.result) {
+                                        $form.resetFormData();
+                                        //response.data.message
+                                        alertManager.success();
+                                    } else {
+                                        alertManager.error(response.data.message);
+                                    }
 
-                                        @if($form->config->on_success ?? false)
-                                                {{$form->config->on_success}}(response.data);
-                                        @endif
+                                }).catch(function (error) {
 
-                                        if (response.data.result) {
-                                            $form.resetFormData();
-                                            //response.data.message
-                                            alertManager.success();
-                                        } else {
-                                            alertManager.error(response.data.message);
+                                    console.log(error.response.data.message);
+
+                                    @if($form->config->on_fail ?? false)
+                                            {{$form->config->on_fail}}(error.response.data);
+                                    @endif
+
+
+                                    if (error.response) {
+                                        let dataMessage = 'Ops';//error.response.data.message;
+                                        let dataErrors = error.response.data.errors ?? false;
+
+                                        for (const errorsKey in dataErrors) {
+                                            if (!dataErrors.hasOwnProperty(errorsKey)) continue;
+                                            dataMessage += "\r\n" + dataErrors[errorsKey];
                                         }
 
-                                    }).catch(function (error) {
+                                        //alert dataMessage
+                                        alertManager.error(error.response.data.message);
+                                    }
 
-                                        console.log(error.response.data.message);
+                                })
+                                    .then(function () {
+                                        // always executed
+                                        setTimeout(function () {
+                                            alertManager.hide();
+                                            $submitButton.prop('disabled', false);
+                                        }, 8000);
 
-                                        @if($form->config->on_fail ?? false)
-                                                {{$form->config->on_fail}}(error.response.data);
-                                        @endif
+                                        //always js event config
+                                    });
 
 
-                                        if (error.response) {
-                                            let dataMessage = 'Ops';//error.response.data.message;
-                                            let dataErrors = error.response.data.errors ?? false;
-
-                                            for (const errorsKey in dataErrors) {
-                                                if (!dataErrors.hasOwnProperty(errorsKey)) continue;
-                                                dataMessage += "\r\n" + dataErrors[errorsKey];
-                                            }
-
-                                            //alert dataMessage
-                                            alertManager.error(error.response.data.message);
-                                        }
-
-                                    })
-                                        .then(function () {
-                                            // always executed
-                                            setTimeout(function () {
-                                                alertManager.hide();
-                                                $submitButton.prop('disabled', false);
-                                            }, 8000);
-
-                                            //always js event config
-                                        });
-
-                                });
                             } else {
                                 $alertMsg.text('Desculpe, parece que os dados preenchidos são inválidos.');
                                 $alert.removeClass('alert-primary').addClass('alert-warning show');

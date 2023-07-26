@@ -2,121 +2,168 @@
 
 namespace Adminx\Common\Models\Pages;
 
+use Adminx\Common\Enums\ContentEditorType;
 use Adminx\Common\Libs\Support\Str;
+use Adminx\Common\Models\Bases\CustomListBase;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Generics\Configs\PageConfig;
+use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
+use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Interfaces\UploadModel;
+use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
+use Adminx\Common\Models\Pages\Objects\PageBreadcrumb;
+use Adminx\Common\Models\Pages\Objects\PageConfig;
+use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
+use Adminx\Common\Models\Pages\Objects\PageModelConfig;
+use Adminx\Common\Models\Traits\HasBreadcrumbs;
 use Adminx\Common\Models\Traits\HasGenericConfig;
+use Adminx\Common\Models\Traits\HasPublicIdAttribute;
+use Adminx\Common\Models\Traits\HasPublicIdUriAttributes;
 use Adminx\Common\Models\Traits\HasSelect2;
+use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
+use Adminx\Common\Models\Traits\Relations\BelongsToPage;
+use Butschster\Head\Facades\Meta;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Foundation\Http\FormRequest;
 
-class PageModel extends EloquentModelBase
+/**
+ * @property EloquentModelBase|CustomListBase $model
+ */
+class PageModel extends EloquentModelBase implements PublicIdModel, UploadModel
+
 {
-    use HasSelect2, HasValidation, HasGenericConfig;
+    use HasSelect2,
+        HasValidation,
+        HasGenericConfig,
+        HasUriAttributes,
+        HasPublicIdAttribute,
+        HasPublicIdUriAttributes,
+        HasBreadcrumbs,
+        BelongsToPage;
 
     protected $fillable = [
-        'page_type_id',
-        'title',
-        'description',
+        'page_id',
+        'model_type',
+        'model_id',
         'slug',
+        'content',
         'config',
+        'assets',
     ];
 
     protected $casts = [
-        'config' => PageConfig::class
+        'content' => 'string',
+        'config'  => PageModelConfig::class,
+        'assets'  => FrontendAssetsBundle::class,
+    ];
+
+    protected $attributes = [
+        'slug'       => null,
+        'model_id'   => null,
+        'model_type' => 'list',
+        //'config'     => [],
     ];
 
     protected $appends = [
         //'can_use_forms',
-        //'can_use_posts',
+        //'can_use_articles',
     ];
 
-    //region SETS
+    //region VALIDATIONS
+    public static function createRules(?FormRequest $request = null): array
+    {
+        return [
+            //'slug' => ['required'],
+            'model_id' => ['required'],
+        ];
+    }
+
+    public static function createMessages(?FormRequest $request = null): array
+    {
+        return [
+            'slug.required' => 'A URL é obrigatória',
+        ];
+    }
+    //endregion
+
+    //region HELPERS
+
+    public function uploadPathTo(?string $path = null): string
+    {
+        $uploadPath = "models/{$this->public_id}";
+
+        return ($this->page ? $this->page->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
+    }
+
+    public function frontendBuild(): FrontendBuildObject
+    {
+        $frontendBuild = $this->page->frontendBuild();
+
+        //Antes inicio da tag head
+        //$frontendBuild->head->addBefore(Meta::toHtml());
+        $frontendBuild->head->css .= $this->assets->css_bundle_html;
+
+        //Fim d atag head
+        $frontendBuild->head->addAfter($this->assets->js->head_html ?? '');
+        $frontendBuild->head->addAfter($this->assets->head_script->html ?? '');
+
+        //Inicio do body
+        $frontendBuild->body->id = "article-{$this->public_id}";
+        $frontendBuild->body->class .= " article-{$this->public_id}";
+        $frontendBuild->body->addBefore($this->assets->js->before_body_html ?? '');
+
+        //Fim do body
+        $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
+
+        return $frontendBuild;
+    }
+
+    //endregion
+
+    //region ATTRIBUTES
 
     protected function slug(): Attribute
     {
         return Attribute::make(
-            set: static fn ($value) => Str::contains($value, ' ') ? Str::slug(Str::ucfirst($value)) : Str::ucfirst($value),
+            set: static fn($value) => Str::contains($value, ' ') ? Str::slug(Str::ucfirst($value)) : Str::ucfirst($value),
         );
     }
 
-    //endregion
+    protected function editorType(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->config->editor_type ?? auth()->user()->config->editor_type ?? ContentEditorType::from('tinymce')
+        );
+    }
 
-    //region GETS
-
-    //region SELECT2
     protected function text(): Attribute
     {
+        $title = $this->model->title ?? 'Sem Título';
+        $type = $this->model?->type?->title() ?? '';
         return Attribute::make(
-            get: fn() => $this->title ? "<h3>{$this->title}</h3>" . Str::limit($this->description, 150) : '',
+            get: fn() => "<h4>{$title}</h4> {$type}",
         );
     }
+
+    //region GETS
+    protected function getBreadcrumbConfigAttribute()
+    {
+        return $this->config->breadcrumb ?? $this->page->breadcrumb_config;
+    }
+    protected function getUrlAttribute(): string
+    {
+        return $this->page->urlTo($this->slug ? "{$this->slug}/" : '');
+    }
     //endregion
-
-    //region MODULES
-
-    protected function canUseForms(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->config->canUseModule('forms') ?: $this->type->can_use_forms ?: false);
-    }
-
-    protected function usingForms(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->can_use_forms && ($this->config->isUsingModule('forms') || ($this->type->using_forms ?? false)));
-    }
-
-    protected function canUsePosts(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->config->canUseModule('posts') ?: $this->type->can_use_posts ?: false);
-    }
-
-    protected function usingPosts(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->can_use_posts && ($this->config->isUsingModule('posts') || ($this->type->using_posts ?? false)));
-    }
-
-    protected function canUseList(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->config->canUseModule('list') ?: $this->type->can_use_list ?: false);
-    }
-
-    protected function usingList(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->can_use_list && ($this->config->isUsingModule('list') || ($this->type->using_list ?? false)));
-    }
-
-    //endregion
-
-    //endregion
-
-    //region OVERRIDES
-
-    public function save(array $options = [])
-    {
-        //Gerar slug se estiver em branco
-        if(empty($this->slug)){
-            $this->slug = $this->title;
-        }
-
-        return parent::save($options);
-    }
 
     //endregion
 
     //region RELATIONS
 
-    public function type(){
-        return $this->belongsTo(PageType::class, 'page_type_id', 'id');
-    }
-
-    public function pages(){
-        return $this->hasMany(Page::class, 'model_id', 'id');
+    public function model(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     //endregion
