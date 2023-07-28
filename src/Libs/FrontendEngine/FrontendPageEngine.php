@@ -131,7 +131,7 @@ class FrontendPageEngine extends FrontendEngineBase
      */
     public function getPageModelByUrl(string $url): ?PageModel
     {
-        return $this->currentPage?->pageModels()->where('slug', $url)->orWhere('public_id', $url)->first() ?? $this->currentPage?->pageModels()->whereNot('slug')->first();
+        return $this->currentPage?->page_models()->where('slug', $url)->orWhere('public_id', $url)->first() ?? $this->currentPage?->page_models()->whereNot('slug')->first();
     }
 
     public function getFirstInternalUrl($url): Article|PageModel|null
@@ -148,7 +148,7 @@ class FrontendPageEngine extends FrontendEngineBase
                 }
             }
 
-            if ($this->currentPage->pageModels()->count()) {
+            if ($this->currentPage->page_models()->count()) {
 
 
                 $pageModel = $this->getPageModelByUrl($url);
@@ -179,7 +179,7 @@ class FrontendPageEngine extends FrontendEngineBase
                 }
             }
 
-            if ($this->currentPage->pageModels()->count()) {
+            if ($this->currentPage->page_models()->count()) {
 
 
                 $pageModel = $this->getPageModelByUrl($url);

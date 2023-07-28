@@ -14,5 +14,4 @@ trait HasTemplates
         return $this->hasOne(Templatable::class, 'templatable_id', 'id')->where('templatable_type', MorphHelper::getMorphTypeTo(self::class));
     }
 
-
 }

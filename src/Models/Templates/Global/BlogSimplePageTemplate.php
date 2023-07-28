@@ -14,6 +14,9 @@ class BlogSimplePageTemplate extends AbstractPageTemplate
         'description' => 'Blog simples em duas colunas com gerenciamento de postagens, categorias, tags e comentários.',
         'morphs'      => ['page'],
         'path'      => 'pages',
+        'config' => [
+            'required_modules' => ['articles']
+        ],
     ];
 
 }

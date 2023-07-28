@@ -1,9 +1,9 @@
 <?php
 
 return [
-    'adminx_domain' => env('ADMINX_DOMAIN'),
+    'adminx_domain'   => env('ADMINX_DOMAIN'),
     'frontend_domain' => env('FRONTEND_DOMAIN'),
-    'cdn_domain' => env('CDN_HOST'),
+    'cdn_domain'      => env('CDN_HOST'),
 
 
     'info' => [
@@ -13,19 +13,19 @@ return [
         'keywords' =>
             'adminx, painel, criação de sites, cms, painel administrativo, gerenciador de conteúdo, content manager',
 
-        'version' => '0.5.1-beta',
+        'version' => '0.5.2-beta',
     ],
 
     'provider' => [
-        'name' => env('ADMINX_PROVIDER_NAME','Artisan Digital'),
-        'url' => env('ADMINX_PROVIDER_URL', 'https://artisan.dev.br'),
-        'logo' => env('ADMINX_PROVIDER_LOGO', 'media/images/providers/artisan/logo-micro.webp'),
-        'since' => env('ADMINX_PROVIDER_SINCE', 2022),
+        'name'      => env('ADMINX_PROVIDER_NAME', 'Artisan Digital'),
+        'url'       => env('ADMINX_PROVIDER_URL', 'https://artisan.dev.br'),
+        'logo'      => env('ADMINX_PROVIDER_LOGO', 'media/images/providers/artisan/logo-micro.webp'),
+        'since'     => env('ADMINX_PROVIDER_SINCE', 2022),
         'copyright' => env('ADMINX_PROVIDER_COPYRIGHT', "Desenvolvido com ❤️ com o apoio de"),
     ],
 
     'domains' => [
-        'adminx' => env('ADMINX_DOMAIN'),
-        'frontend' => env('FRONTEND_DOMAIN')
-    ]
+        'adminx'   => env('ADMINX_DOMAIN'),
+        'frontend' => env('FRONTEND_DOMAIN'),
+    ],
 ];

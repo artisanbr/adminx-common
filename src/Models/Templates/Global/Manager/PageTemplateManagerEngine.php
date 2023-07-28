@@ -5,6 +5,7 @@ namespace Adminx\Common\Models\Templates\Global\Manager;
 
 use Adminx\Common\Models\Pages\Modules\Abstract\AbstractPageModule;
 use Adminx\Common\Models\Pages\Types\Abstract\AbstractPageType;
+use Adminx\Common\Models\Templates\Global\Abstract\AbstractPageTemplate;
 use Illuminate\Support\Collection;
 
 class PageTemplateManagerEngine
@@ -38,7 +39,7 @@ class PageTemplateManagerEngine
     }
 
     /**
-     * @return AbstractPageModule[]|Collection
+     * @return AbstractPageTemplate[]|Collection
      */
     public function templates(): array|Collection
     {

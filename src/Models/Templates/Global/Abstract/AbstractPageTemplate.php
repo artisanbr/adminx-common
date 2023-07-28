@@ -10,6 +10,7 @@ use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Templates\Objects\TemplateConfig;
 use Adminx\Common\Models\Templates\Template;
 use Adminx\Common\Models\Theme;
 use Adminx\Common\Models\Traits\HasSelect2;
@@ -39,6 +40,7 @@ abstract class AbstractPageTemplate extends GenericModel
         'title'       => 'string',
         'path'  => 'string',
         'morphs' => 'array',
+        'config' => TemplateConfig::class,
     ];
 
     //protected $appends = ['views_path'];

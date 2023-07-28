@@ -4,15 +4,13 @@ namespace Adminx\Common\Models\Templates;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\PageTemplateManager;
+use Adminx\Common\Models\Templates\Objects\TemplateConfig;
 use Adminx\Common\Models\Traits\HasGenericConfig;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasValidation;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\View;
 
 class Template extends EloquentModelBase
 {
@@ -33,7 +31,7 @@ class Template extends EloquentModelBase
     ];
 
     protected $casts = [
-        //'config' => PageConfig::class
+        'config' => TemplateConfig::class,
         'public_id' => 'string',
         'title' => 'string',
         'description' => 'string',
@@ -47,12 +45,12 @@ class Template extends EloquentModelBase
     ];
 
     //region SELECT2
-    /*protected function text(): Attribute
+    protected function text(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->title ? "<h3>{$this->title}</h3>" . Str::limit($this->description, 150) : '',
+            get: fn() => $this->title ? "<h4>{$this->title}</h4>" . Str::limit($this->description, 150) : '',
         );
-    }*/
+    }
     //endregion
 
     public function getTemplateFile($file): string

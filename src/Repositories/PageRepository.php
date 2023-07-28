@@ -29,21 +29,13 @@ class PageRepository extends Repository
 
     protected string $modelClass = Page::class;
 
-    public function __construct(
-        protected Page|null $page = null,
-    ) {}
-
     /**
      * Salvar Tema
+     *
+     * @throws Exception
      */
     public function saveTransaction(): ?Page
     {
-
-        //$this->setModel(Page::findOrNew($this->data[$this->idKey] ?? null));
-
-        //$this->theme->header->is_html_advanced = $this->data['header']['is_html_advanced'];
-        //$this->theme->footer->is_html_advanced = $this->data['footer']['is_html_advanced'] ?? false;
-
 
         $this->model->fill($this->data);
 
@@ -55,11 +47,26 @@ class PageRepository extends Repository
 
         //region Defaults
 
-        //Generate breadcrumb
+        //region Template
+        //Se um template for selecionado, definir como o principal
+        if ($this->data['template_id'] ?? false) {
+            $pageTemplate = $this->model->page_template()->firstOrNew([
+                                                                          'templatable_type' => 'page',
+                                                                      ]);
 
+            $pageTemplate->template_id = $this->data['template_id'];
+            $pageTemplate->save();
+        }
+        else if ($this->model->page_template()->count()) {
+            $this->model->page_template()->delete();
+        }
+        //endregion
+
+        //region Generate breadcrumb
         $this->model->config->breadcrumb = $this->model->config->breadcrumb ?? $this->model->site->theme->config->breadcrumb ?? new BreadcrumbConfig();
 
         $this->model->config->breadcrumb->default_items = $this->data['config']['breadcrumb']['default_items'] ?? [];
+        //endregion
 
         //Modules
         $this->model->config->allowed_modules = $this->model->type->allowed_modules->toArray();

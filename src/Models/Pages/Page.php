@@ -178,23 +178,23 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     //protected $with = ['site'];
 
-    public array $buildSchema = [
-        /*'articles' => [
+    /*public array $buildSchema = [
+        'articles' => [
             'categories',
             'tags',
         ],
         'categories',
-        'tags',*/
-    ];
+        'tags',
+    ];*/
 
-    protected ViewContract|null $viewCache = null;
+    //protected ViewContract|null $viewCache = null;
 
     //region VALIDATIONS
-    public static function createRules(FormRequest $request = null): array
+    public static function createRules(?FormRequest $request = null): array
     {
         return [
-            'type_id'  => ['required'],
-            'model_id' => ['required'],
+            'type_name'  => ['required'],
+            //'model_id' => ['required'],
             'title'    => ['required'],
         ];
     }
@@ -632,7 +632,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         return $this->belongsTo(PageModel::class);
     }*/
 
-    public function pageModels()
+    public function page_models()
     {
         return $this->hasMany(PageModel::class);
     }
