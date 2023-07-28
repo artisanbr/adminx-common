@@ -72,7 +72,7 @@ trait HasUriAttributes
 
     public function uriTo($path)
     {
-        return $this->uri . $this->traitPath($path, 'uri'). '/';
+        return $this->uri . $this->traitPath($path, 'uri');
     }
 
     public function urlTo($path)
@@ -80,12 +80,16 @@ trait HasUriAttributes
         if(Str::startsWith($path, '/') && Str::endsWith($this->url, '/')){
             $path = Str::substr($path, 0, -1);
         }
-        return $this->url . $this->traitPath($path). '/';
+        return $this->url . $this->traitPath($path);
     }
 
     private function traitPath(string $path, $comparesWithAttr = 'url'): string
     {
-        return (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, -1) : $path;
+        $path = (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, -1) : $path;
+
+        //$path .= !Str::endsWith($this->{$comparesWithAttr}, '/') ? '/' : '';
+
+        return $path;
     }
     //endregion
 }
