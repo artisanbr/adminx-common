@@ -44,19 +44,19 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
             @endif
         </url>
 
-        @foreach($page->data_sources as $dataSource)
+        @foreach($page->page_models as $pageModel)
 
-            @if($dataSource->items ?? false)
-                @foreach($dataSource->items as $dataSourceItem)
+            @if($pageModel->model?->items ?? false)
+                @foreach($pageModel->model->mountModel()->items as $modelItem)
                     <url>
-                        <loc>{{ $dataSourceItem->uri }}</loc>
+                        <loc>{{ $page->uriTo($modelItem->url) }}</loc>
                         <changefreq>weekly</changefreq>
-                        <lastmod>{{ $dataSourceItem->updated_at->toIso8601String() }}</lastmod>
+                        <lastmod>{{ $modelItem->updated_at->toIso8601String() }}</lastmod>
                         <priority>0.5</priority>
 
-                        @if($dataSourceItem->data->image->file && $dataSourceItem->data->image_url)
+                        @if($modelItem->data->image->file && $modelItem->data->image_url)
                             <image:image>
-                                <image:loc>{{ FrontendUtils::url($dataSourceItem->data->image_url) }}</image:loc>
+                                <image:loc>{{ FrontendUtils::url($modelItem->data->image_url) }}</image:loc>
                                 {{--<image:title>{{ $article->seoTitle() }}</image:title>--}}
                             </image:image>
                         @endif
