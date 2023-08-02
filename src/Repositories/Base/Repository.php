@@ -21,6 +21,10 @@ abstract class Repository implements RepositoryInterface
 
     protected string $modelClass = EloquentModelBase::class;
 
+    public function __construct() {
+        $this->setModel(new $this->modelClass());
+    }
+
     protected function getDataId(){
         return $this->data[$this->idKey] ?? null;
     }
@@ -109,6 +113,8 @@ abstract class Repository implements RepositoryInterface
 
         if($this->getDataId()){
             $this->setModel($this->getDataId());
+        }else{
+            $this->setModel(new $this->modelClass());
         }
 
         return $this->data;
