@@ -1,28 +1,23 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Libs\FrontendEngine\Twig;
 
 use Adminx\Common\Exceptions\FrontendException;
-use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\FrontendEngine\FrontendEngineBase;
 use Adminx\Common\Libs\FrontendEngine\Twig\Extensions\FrontendTwigExtension;
 use Adminx\Common\Models\Article;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
-use Adminx\Common\Models\CustomLists\CustomList;
-use Adminx\Common\Models\Menu;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Widgets\SiteWidget;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\PageTemplateManager;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Themes\ThemeBuild;
 use Exception;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as SupportCollection;
-use Illuminate\Support\Facades\Blade;
-use JetBrains\PhpStorm\NoReturn;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -31,8 +26,6 @@ use Twig\Extension\DebugExtension;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
-use Twig\TwigFilter;
-use Twig\TwigFunction;
 use voku\helper\HtmlMin;
 
 class FrontendTwigEngine extends FrontendEngineBase
@@ -314,15 +307,18 @@ class FrontendTwigEngine extends FrontendEngineBase
         }
 
         $pageTemplate = $page->page_template;
+
+        $pageContent = $page->html;
+
         if ($pageTemplate) {
             //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
             $this->twigFileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
+            $pageContent .= "{{ include('@template/index.twig') }}";
         }
 
 
-        $pageContent = $page->page_template ? "{{ include('@template/index.twig') }}" : '';
+        //$pageContent = $page->page_template ? "{{ include('@template/index.twig') }}" : '';
 
-        $pageContent .= $page->html;
 
         $this->templates->put('page', $this->getPageBaseTemplate($pageContent));
 
@@ -366,5 +362,58 @@ class FrontendTwigEngine extends FrontendEngineBase
                 </html>
                 html;
 
+    }
+
+    /**
+     * @throws FrontendException
+     */
+    public function article(Article $article): string
+    {
+        $page = $article->page;
+        $this->templateNamePrefix = 'article-' . $article->public_id;
+
+        //$this->setCurrentSite($article->site, false);
+
+        //Meta::registerSeoForArticle($article);
+        $this->setViewData($article->getBuildViewData([
+                                                          'customPageTemplate' => $page->page_template ? '@template/article.twig' : false,
+                                                      ]));
+
+        //dd($this->themeBuild);
+
+        $this->setFrontendBuild($article->frontendBuild());
+
+        $this->frontendBuild->meta->registerSeoForArticle($article);
+
+        if ($page->site->theme) {
+            $this->applyTheme($page->site->theme);
+        }
+
+        $pageContent = '';
+        $pageTemplate = $page->page_template;
+
+        if ($pageTemplate) {
+            //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
+            $this->twigFileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
+            $pageContent .= "{{ include('@template/article.twig') }}";
+        }
+
+
+        //$pageContent = $page->page_template ? "{{ include('@template/index.twig') }}" : '';
+
+
+        $this->templates->put('article', $this->getPageBaseTemplate($pageContent));
+
+
+        $renderedTemplate = $this->renderTwig('article');
+
+
+        if ($page->site->config->enable_html_minify ?? false) {
+            $htmlMin = new HtmlMin();
+
+            $renderedTemplate = $htmlMin->minify($renderedTemplate);
+        }
+
+        return $renderedTemplate;
     }
 }

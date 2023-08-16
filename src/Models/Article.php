@@ -1,8 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models;
 
-use Adminx\Common\Facades\Frontend\FrontendHtml;
+use Adminx\Common\Facades\Frontend\FrontendTwig;
 use Adminx\Common\Libs\Support\HtmlString;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
@@ -29,13 +33,11 @@ use Adminx\Common\Models\Traits\Relations\HasComments;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
 use Adminx\Common\Rules\HtmlEmptyRule;
-use Butschster\Head\Facades\Meta;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
-use Adminx\Common\Models\Pages\Page;
 
 class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
@@ -287,7 +289,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     protected function buildedHtml(): Attribute
     {
         return Attribute::make(
-            get: fn() => FrontendHtml::article($this),
+            get: fn() => FrontendTwig::article($this),
         );
     }
 
