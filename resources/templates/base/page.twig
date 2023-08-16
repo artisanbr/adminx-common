@@ -1,3 +1,8 @@
+<html lang="pt-BR">
+<head>
+    {{ include(getTemplate('head')) }}
+</head>
+<body id="{{ frontendBuild.body.id }}" class="{{ frontendBuild.body.class }}">
 {{ include(getTemplate('header')) }}
 <main class="main-content">
     {% if breadcrumb and breadcrumb.enabled %}
@@ -9,5 +14,8 @@
     {% else %}
         {{ include(getTemplate('content')) }}
     {% endif %}
+
 </main>
 {{ include(getTemplate('footer')) }}
+</body>
+</html>

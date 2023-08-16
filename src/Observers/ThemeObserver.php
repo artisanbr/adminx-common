@@ -3,7 +3,7 @@
 namespace Adminx\Common\Observers;
 
 
-use Adminx\Common\Models\Theme;
+use Adminx\Common\Models\Themes\Theme;
 
 class ThemeObserver
 {

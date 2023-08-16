@@ -1,6 +1,6 @@
 <?php
 
-namespace Adminx\Common\Models\Generics\Configs;
+namespace Adminx\Common\Models\Widgets\Objects;
 
 use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigPaging;
@@ -10,22 +10,25 @@ use Adminx\Common\Models\Pages\Page;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
-/**
+/**s
  * @property Collection|WidgetConfigVariable[] $variables
  * @property string|null                       $sort_column
  * @property string                            $sort_direction
  *
  */
-class WidgetConfig extends GenericModel
+class WidgetConfigObject extends GenericModel
 {
 
     //protected static $nullable = true;
 
     protected $fillable = [
-        'variables',
-        'defines',
+        //'defines',
+
+        'update_template',
+
         'require_source',
 
+        'variables',
         'sorting',
         'paging',
 
@@ -53,11 +56,11 @@ class WidgetConfig extends GenericModel
         'paging'  => WidgetConfigPaging::class,
     ];
 
-    protected $temporary = ['reference_page'];
+    protected $temporary = ['sort_direction', 'sort_column'];
 
-    protected $hidden = [
+    /*protected $hidden = [
         'reference_page',
-    ];
+    ];*/
 
     //region HELPERS
     public function variable($slug, $attribute = null)
@@ -72,35 +75,21 @@ class WidgetConfig extends GenericModel
         return $this->variable($slug)->value ?? $defaultValue;
     }
 
-    public function loadReferencePage()
-    {
-        if ($this->reference_page_id ?? false) {
-
-            if (!$this->attributes['reference_page'] || (int)$this->attributes['reference_page']->id !== (int)$this->reference_page_id) {
-                $this->attributes['reference_page'] = Page::find($this->reference_page_id);
-            }
-        }
-        else {
-            $this->attributes['reference_page'] = null;
-        }
-
-        return $this->attributes['reference_page'];
-    }
-
-    //endregion
-
-    protected function getReferencePageAttribute()
-    {
-        return $this->loadReferencePage();
-    }
-
     protected function getSortColumnAttribute()
     {
-        return $this->sorting->columns->keys()[0] ?? false;
+        if (!($this->attributes['sort_column'] ?? false)) {
+            $this->attributes['sort_column'] = $this->sorting->columns->keys()[0] ?? false;
+        }
+
+        return $this->attributes['sort_column'];
     }
 
     protected function getSortDirectionAttribute()
     {
-        return $this->sorting->columns->values()[0] ?? 'desc';
+        if (!($this->attributes['sort_direction'] ?? false)) {
+            $this->attributes['sort_direction'] = $this->sorting->columns->values()[0] ?? 'desc';
+        }
+
+        return $this->attributes['sort_direction'];
     }
 }

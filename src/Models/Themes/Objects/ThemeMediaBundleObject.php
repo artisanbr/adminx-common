@@ -1,6 +1,6 @@
 <?php
 
-namespace Adminx\Common\Models\Objects\Themes;
+namespace Adminx\Common\Models\Themes\Objects;
 
 use Adminx\Common\Models\Generics\Files\GenericFile;
 use Adminx\Common\Models\Generics\Files\GenericImageFile;

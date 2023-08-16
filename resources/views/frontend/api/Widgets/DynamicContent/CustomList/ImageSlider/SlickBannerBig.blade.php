@@ -1,6 +1,6 @@
 <?php
 /***
- * @var \Adminx\Common\Models\SiteWidget                                                                                       $widgeteable
+ * @var \Adminx\Common\Models\Widgets\SiteWidget                                                                                       $widget
  * @var \Adminx\Common\Models\CustomLists\CustomListImageSlider                                                                $customList
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemImageSlider                                            $listItem
  * @var \Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas\Sliders\SliderDataButtons                                $button
@@ -10,13 +10,13 @@
 @extends('adminx-common::layouts.api.ajax-view')
 
 {{--@php
-    $customList = \Adminx\Common\Models\CustomLists\CustomList::findAndMount($widgeteable->source_ids->first());
+    $customList = \Adminx\Common\Models\CustomLists\CustomList::findAndMount($widget->source_ids->first());
 @endphp--}}
 @if($customListItems->count())
     <section
-            class="banner-section banner-section-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
+            class="banner-section banner-section-{{ $widget->public_id }} widget-module widget-module-{{ $widget->public_id }}">
         {{--Left--}}
-        <div class="banner-slider" id="bannerSlider-{{ $widgeteable->public_id }}">
+        <div class="banner-slider" id="bannerSlider-{{ $widget->public_id }}">
             @foreach($customListItems as $listItem)
                 @push('css')
                     <link rel="preload" as="image" href="{{ $listItem->data->image_url ?? '' }}"/>
@@ -50,25 +50,25 @@
 @endif
 @push('css')
     <style>
-        .banner-section.banner-section-{{ $widgeteable->public_id }} .single-banner {
+        .banner-section.banner-section-{{ $widget->public_id }} .single-banner {
             padding-bottom: 220px;
             padding-top: 365px;
         }
 
         @media (max-width: 767px) {
-            .banner-section.banner-section-{{ $widgeteable->public_id }} .single-banner {
+            .banner-section.banner-section-{{ $widget->public_id }} .single-banner {
                 padding-top: 220px;
                 padding-bottom: 150px;
             }
         }
 
-        .banner-section.banner-section-{{ $widgeteable->public_id }} .single-banner::before {
+        .banner-section.banner-section-{{ $widget->public_id }} .single-banner::before {
             background: radial-gradient(circle, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.9) 88%);
             background: -webkit-radial-gradient(circle, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0.9) 88%);
             opacity: 1;
         }
 
-        .banner-section.banner-section-{{ $widgeteable->public_id }} .single-banner::after {
+        .banner-section.banner-section-{{ $widget->public_id }} .single-banner::after {
             position: absolute;
             right: 0;
             bottom: 0;
@@ -81,24 +81,24 @@
         }
 
         @media (max-width: 575px) {
-            .banner-section.banner-section-{{ $widgeteable->public_id }} .single-banner::after {
+            .banner-section.banner-section-{{ $widget->public_id }} .single-banner::after {
                 background-size: 300px;
             }
         }
 
         @media (max-width: 991px) {
-            .banner-section.banner-section-{{ $widgeteable->public_id }} .single-banner p br {
+            .banner-section.banner-section-{{ $widget->public_id }} .single-banner p br {
                 display: none;
             }
         }
 
-        .banner-section.banner-section-{{ $widgeteable->public_id }} .slick-arrow {
+        .banner-section.banner-section-{{ $widget->public_id }} .slick-arrow {
             visibility: visible;
         }
     </style>
 @endpush
 @php
-    $jsModuleName = "widgetJsModule_{$widgeteable->public_id}";
+    $jsModuleName = "widgetJsModule_{$widget->public_id}";
 @endphp
 @push('js')
     <script>
@@ -108,7 +108,7 @@
 
                 const initBanner = function () {
 
-                    let banner = $('#bannerSlider-{{ $widgeteable->public_id }}');
+                    let banner = $('#bannerSlider-{{ $widget->public_id }}');
                     let bannerFirst = banner.find('.single-banner:first-child');
 
                     banner.on('init', function (e, slick) {

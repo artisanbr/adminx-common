@@ -2,21 +2,25 @@
 
 namespace Adminx\Common\Http\Controllers\API\Widgets;
 
+use Adminx\Common\Facades\Frontend\FrontendHtml;
 use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Facades\Frontend\FrontendSite;
+use Adminx\Common\Facades\Frontend\FrontendTwig;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\SiteWidget;
+use Adminx\Common\Models\Widgets\SiteWidget;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\View;
+use Symfony\Component\ErrorHandler\Debug;
 use voku\helper\HtmlMin;
 
 /**
+ * @middleware frontend
  * @prefix
  * @as
  */
@@ -24,7 +28,7 @@ class WidgetController extends Controller
 {
 
     public function __construct(
-        public Site|null $site = null,
+        public ?Site $site = null,
     ) {}
 
     /**
@@ -92,36 +96,66 @@ class WidgetController extends Controller
      */
     public function render(Request $request, $public_id)
     {
+        /**
+         * @var ?SiteWidget $siteWidget
+         */
+        Debugbar::startMeasure('get site');
         $this->site = FrontendSite::current();
+        Debugbar::stopMeasure('get site');
 
 
         if (!$this->site) {
             return Response::json('Unauthorized', 401);
         }
 
-        $widgeteable =  $this->site->widgets()->wherePublicId($public_id)->whereHas('widget')->first();
+        Debugbar::startMeasure('get widget');
+        $siteWidget = $this->site->widgets()->wherePublicId($public_id)->whereHas('widget')->first();
 
-        if (!$widgeteable) {
+        if (!$siteWidget) {
             return Response::json('Widget not found', 404);
         }
+        Debugbar::stopMeasure('get widget');
 
-        $widgetView = "adminx-frontend::api.Widgets.{$widgeteable->widget->type->slug}.{$widgeteable->widget->slug}";
+
+        //dd($siteWidget->toArray(), $viewData);
+
+        if(!empty($siteWidget->template_content)){
+            Debugbar::startMeasure('get build data');
+            $viewData = $siteWidget->getTwigRenderData();
+            Debugbar::stopMeasure('get build data');
+
+            Debugbar::startMeasure('render widget template');
+            $widgetRender = FrontendTwig::html($siteWidget->template_content, $viewData, 'widget-'.$siteWidget->public_id);
+            Debugbar::stopMeasure('render widget template');
+
+            return response($widgetRender);
+        }
+
+        Debugbar::startMeasure('get build data');
+        $viewData = $siteWidget->getViewRenderData();
+        Debugbar::stopMeasure('get build data');
 
 
+        $widgetView = "adminx-frontend::api.Widgets.{$siteWidget->widget->type->slug}.{$siteWidget->widget->slug}";
+
+
+        Debugbar::startMeasure('check view');
         if (!View::exists($widgetView)) {
             return Response::json('Widget View not Found', 501);
         }
+        Debugbar::stopMeasure('check view');
 
-        $viewData = $widgeteable->getBuildViewData();
 
-        $htmlMin = new HtmlMin();
+        //$htmlMin = new HtmlMin();
 
-        $viewRender = View::make($widgetView, $viewData)->render();
+        Debugbar::startMeasure('render view');
+        $viewRender = view($widgetView, $viewData);
+        Debugbar::stopMeasure('render view');
 
-        /*return $viewRender;*/
+        return $viewRender;
 
-        return Cache::remember("widget-view-{$this->site->public_id}-{$public_id}", 60 * 24 * 7, function() use($htmlMin, $viewRender){
+        /*return Cache::remember("widget-view-{$this->site->public_id}-{$public_id}", 60 * 24 * 7, function() use($htmlMin, $viewRender){
             return $htmlMin->minify($viewRender);
-        });
+        });*/
     }
 }

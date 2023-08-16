@@ -10,7 +10,7 @@ use Adminx\Common\Models\Pages\Modules\Traits\HasPageModulesManager;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
-class PageModelConfig extends GenericModel
+class PageInternalConfig extends GenericModel
 {
 
     protected $fillable = [

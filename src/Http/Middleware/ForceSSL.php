@@ -20,7 +20,7 @@ class ForceSSL
 
         if (!Str::contains(config('app.url'), ['.local', 'localhost'])) {
             //Redirect if using http
-            if (!FrontendSite::isForwarderd() && !$request->secure()) {
+            if (!FrontendSite::isForwarded() && !$request->secure()) {
                 return redirect()->secure($request->getRequestUri());
             }
 

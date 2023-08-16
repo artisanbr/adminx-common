@@ -85,7 +85,9 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     protected $touches = ['page'];
 
-    protected $with = ['page'];
+    protected $with = ['page','site'];
+
+    protected $hidden = ['account_id','site_id','user_id','page_id'];
 
 
     //region VALIDATION
@@ -381,6 +383,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     //endregion
 
     //region OVERRIDES
+
     protected static function booted()
     {
         static::addGlobalScope(new WhereSiteScope);

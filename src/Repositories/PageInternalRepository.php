@@ -4,26 +4,26 @@ namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Facades\FileManager\FileUpload;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Pages\PageModel;
+use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Repositories\Base\Repository;
 use Adminx\Common\Repositories\Traits\SeoModelRepository;
 use Exception;
 use Illuminate\Http\UploadedFile;
 
 /**
- * @property ?PageModel $model
+ * @property ?PageInternal $model
  */
-class PageModelRepository extends Repository
+class PageInternalRepository extends Repository
 {
     use SeoModelRepository;
 
-    protected string $modelClass = PageModel::class;
+    protected string $modelClass = PageInternal::class;
 
 
     public function __construct(
         protected ?Page $page = null
     ) {
-
+        parent::__construct();
     }
 
     public function page(Page $page): static
@@ -37,7 +37,7 @@ class PageModelRepository extends Repository
     /**
      * @throws Exception
      */
-    public function saveTransaction(): ?PageModel
+    public function saveTransaction(): ?PageInternal
     {
 
         $this->model->fill($this->data);

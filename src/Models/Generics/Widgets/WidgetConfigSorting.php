@@ -2,6 +2,7 @@
 namespace Adminx\Common\Models\Generics\Widgets;
 
 use ArtisanLabs\GModel\GenericModel;
+use Illuminate\Contracts\Database\Query\Builder;
 
 class WidgetConfigSorting extends GenericModel
 {
@@ -24,7 +25,7 @@ class WidgetConfigSorting extends GenericModel
         'columns' => 'collection'
     ];
 
-    protected $temporary = ['sort_column', 'sort_direction'];
+    protected $appends = ['sort_column', 'sort_direction'];
 
     //region Attributes
 
@@ -51,4 +52,12 @@ class WidgetConfigSorting extends GenericModel
     //endregion
 
     //endregion
+
+    public function applySort(Builder $query){
+        if($this->enable && $this->columns){
+
+        }
+
+        return $query;
+    }
 }

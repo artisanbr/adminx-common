@@ -1,7 +1,8 @@
 <?php
 
-namespace Adminx\Common\Models\Bases;
+namespace Adminx\Common\Models\CustomLists\Abstract;
 
+use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Observers\OwneredModelObserver;
 use Adminx\Common\Observers\PublicIdModelObserver;
@@ -65,7 +66,7 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
         'created_at' => 'datetime:d/m/Y H:i:s',
     ];
 
-    //protected $with = ['list'];
+    protected $with = ['list'];
 
     public function __construct(array $attributes = [])
     {
@@ -108,7 +109,7 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
 
         $mountClass = $listType ? CustomListItemType::from($listType)->mountClass() : CustomListItem::class;
 
-        return $mountClass::find($id);
+        return ($mountClass)::find($id);
 
     }
 
@@ -121,7 +122,7 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
     //region ATTRIBUTES
     protected function getUrlAttribute()
     {
-        return $this->slug ?? $this->public_id;
+        return ($this->list->url ?? '') . ($this->slug ?? $this->public_id);
     }
     //endregion
 

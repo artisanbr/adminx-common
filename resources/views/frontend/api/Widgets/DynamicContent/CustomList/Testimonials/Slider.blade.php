@@ -1,6 +1,6 @@
 <?php
 /***
- * @var \Adminx\Common\Models\SiteWidget                                                                                        $widgeteable
+ * @var \Adminx\Common\Models\Widgets\SiteWidget                                                                                        $widget
  * @var \Adminx\Common\Models\CustomLists\CustomListTestimonials                                                                $customList
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemTestimonials                                            $listItem
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemTestimonials[]|\Illuminate\Database\Eloquent\Collection $customListItems
@@ -9,7 +9,7 @@
 @extends('adminx-common::layouts.api.ajax-view')
 
 @if($customListItems->count())
-    <div class="testimonials-slide testimonials-slide-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
+    <div class="testimonials-slide testimonials-slide-{{ $widget->public_id }} widget-module widget-module-{{ $widget->public_id }}">
         {{--Left--}}
         @foreach($customListItems as $listItem)
             <div class="testimonials-item" data-thumb="{{ $listItem->data->image_url }}">
@@ -35,75 +35,75 @@
 
     </div>
 
-    <div class="testimonials-dots testimonials-dots-{{ $widgeteable->public_id }}"></div>
+    <div class="testimonials-dots testimonials-dots-{{ $widget->public_id }}"></div>
 
 @endif
 @push('css')
     <style>
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item {
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item {
             font-size: 24px;
             line-height: 1.583;
             text-align: center;
         }
 
         @media (max-width: 991px) {
-            .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item {
+            .testimonials-slide-{{ $widget->public_id }} .testimonials-item {
                 font-size: 20px;
             }
         }
 
         @media (max-width: 575px) {
-            .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item {
+            .testimonials-slide-{{ $widget->public_id }} .testimonials-item {
                 font-size: 18px;
             }
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item .quote-top,
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item .quote-bottom {
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item .quote-top,
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item .quote-bottom {
             color: #333;
             font-size: 16px;
             position: relative;
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item .quote-top {
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item .quote-top {
             margin-right: 10px;
             top: -5px;
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item .quote-bottom {
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item .quote-bottom {
             margin-left: 10px;
             bottom: -5px;
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item .author-img {
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item .author-img {
             margin-bottom: 50px;
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item .author-img img {
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item .author-img img {
             border-radius: 15px;
             height: 100px;
             width: 100px;
             box-shadow: 0px 10px 30px 0px rgba(20, 33, 43, 0.32);
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item .author-name {
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item .author-name {
             margin-top: 40px;
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item .author-name h4 {
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item .author-name h4 {
             font-size: 22px;
             font-weight: 600;
             letter-spacing: -1px;
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .testimonials-item .author-name span {
+        .testimonials-slide-{{ $widget->public_id }} .testimonials-item .author-name span {
             font-weight: 600;
             color: #333;
             font-size: 16px;
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .slick-arrow {
+        .testimonials-slide-{{ $widget->public_id }} .slick-arrow {
             position: absolute;
             left: -18%;
             top: 50%;
@@ -121,59 +121,59 @@
         }
 
         @media (max-width: 1599px) {
-            .testimonials-slide-{{ $widgeteable->public_id }} .slick-arrow {
+            .testimonials-slide-{{ $widget->public_id }} .slick-arrow {
                 left: -15%;
             }
         }
 
         @media (max-width: 991px) {
-            .testimonials-slide-{{ $widgeteable->public_id }} .slick-arrow {
+            .testimonials-slide-{{ $widget->public_id }} .slick-arrow {
                 left: -8%;
                 font-size: 35px;
             }
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .slick-arrow.next-arrow {
+        .testimonials-slide-{{ $widget->public_id }} .slick-arrow.next-arrow {
             left: auto;
             right: -18%;
         }
 
         @media (max-width: 1599px) {
-            .testimonials-slide-{{ $widgeteable->public_id }} .slick-arrow.next-arrow {
+            .testimonials-slide-{{ $widget->public_id }} .slick-arrow.next-arrow {
                 right: -15%;
             }
         }
 
         @media (max-width: 991px) {
-            .testimonials-slide-{{ $widgeteable->public_id }} .slick-arrow.next-arrow {
+            .testimonials-slide-{{ $widget->public_id }} .slick-arrow.next-arrow {
                 right: -8%;
             }
         }
 
-        .testimonials-slide-{{ $widgeteable->public_id }} .slick-arrow:hover {
+        .testimonials-slide-{{ $widget->public_id }} .slick-arrow:hover {
             opacity: 1;
             color: #333;
         }
 
-        .widget-{{ $widgeteable->public_id }} .testimonials-dots {
+        .widget-{{ $widget->public_id }} .testimonials-dots {
             text-align: center;
             margin-top: 55px;
         }
 
         @media (max-width: 575px) {
-            .widget-{{ $widgeteable->public_id }} .testimonials-dots {
+            .widget-{{ $widget->public_id }} .testimonials-dots {
                 display: none;
             }
         }
 
-        .widget-{{ $widgeteable->public_id }} .testimonials-dots li {
+        .widget-{{ $widget->public_id }} .testimonials-dots li {
             display: inline-block;
             margin: 0 10px;
             width: 60px;
             height: 60px;
         }
 
-        .widget-{{ $widgeteable->public_id }} .testimonials-dots li img {
+        .widget-{{ $widget->public_id }} .testimonials-dots li img {
             cursor: pointer;
             width: 60px;
             height: 60px;
@@ -184,7 +184,7 @@
 @push('js')
     <script>
         $(function () {
-            $('.widget-module-{{ $widgeteable->public_id }}').slick({
+            $('.widget-module-{{ $widget->public_id }}').slick({
                 infinite: true,
                 slidesToShow: 1,
                 slidesToScroll: 1,
@@ -197,7 +197,7 @@
                 swipe: true,
                 nextArrow: '<button class="slick-arrow next-arrow"><i class="fa-solid fa-long-arrow-right"></i></button>',
                 prevArrow: '<button class="slick-arrow prev-arrow"><i class="fa-solid fa-long-arrow-left"></i></button>',
-                appendDots: $('.testimonials-dots-{{ $widgeteable->public_id }}'),
+                appendDots: $('.testimonials-dots-{{ $widget->public_id }}'),
                 responsive: [
                     {
                         breakpoint: 991,

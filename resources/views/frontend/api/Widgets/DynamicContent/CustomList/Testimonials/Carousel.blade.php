@@ -1,6 +1,6 @@
 <?php
 /***
- * @var \Adminx\Common\Models\SiteWidget                                                                                        $widgeteable
+ * @var \Adminx\Common\Models\Widgets\SiteWidget                                                                                        $widget
  * @var \Adminx\Common\Models\CustomLists\CustomListTestimonials                                                                $customList
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemTestimonials                                            $listItem
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemTestimonials[]|\Illuminate\Database\Eloquent\Collection $customListItems
@@ -9,7 +9,7 @@
 @extends('adminx-common::layouts.api.ajax-view')
 
 @if($customListItems->count())
-    <div class="testimonials-carousel testimonials-carousel-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
+    <div class="testimonials-carousel testimonials-carousel-{{ $widget->public_id }} widget-module widget-module-{{ $widget->public_id }}">
         {{--Left--}}
         @foreach($customListItems as $listItem)
             <div class="col-xl-12 testimonials-item">
@@ -49,7 +49,7 @@
     <script>
         $(function () {
 
-            $('.widget-module-{{ $widgeteable->public_id }}').slick({
+            $('.widget-module-{{ $widget->public_id }}').slick({
                 dots: false,
                 arrows: false,
                 infinite: false,

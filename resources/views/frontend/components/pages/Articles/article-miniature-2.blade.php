@@ -20,7 +20,7 @@
     @endif
     <div class="article-desc">
         <h3 class="title">
-            <a href="{{ $article->dynamic_uri }}" class="limit-lines" style="-webkit-line-clamp: {{ $titleLines }};">
+            <a href="{{ $article->url }}" class="limit-lines" style="-webkit-line-clamp: {{ $titleLines }};">
                 {{ $article->title }}
             </a>
         </h3>
@@ -31,7 +31,7 @@
 
         <div class="d-flex align-items-center justify-content-between">
             @if($showReadMore)
-                <a href="{{ $article->dynamic_uri }}" class="article-link">
+                <a href="{{ $article->url }}" class="article-link">
                     {!! $readMoreText !!} <i class="fa-solid fa-long-arrow-right"></i>
                 </a>
             @endif

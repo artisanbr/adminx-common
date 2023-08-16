@@ -1,6 +1,6 @@
 <?php
 /***
- * @var \Adminx\Common\Models\SiteWidget $siteWidget
+ * @var \Adminx\Common\Models\Widgets\SiteWidget $siteWidget
  */
 ?>
 <div class="row">

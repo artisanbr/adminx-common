@@ -2,9 +2,8 @@
 
 namespace Adminx\Common\Providers\Frontend;
 
-use Adminx\Common\Facades\Frontend\FrontendHtml;
 use Adminx\Common\Libs\FrontendEngine\FrontendHtmlEngine;
-use Adminx\Common\Libs\FrontendEngine\FrontendSiteEngine;
+use Adminx\Common\Libs\FrontendEngine\Twig\FrontendTwigEngine;
 use Illuminate\Support\ServiceProvider;
 
 class FrontendHtmlServiceProvider extends ServiceProvider
@@ -27,6 +26,20 @@ class FrontendHtmlServiceProvider extends ServiceProvider
 
         $this->app->singleton('FrontendHtml', function () {
             return app('FrontendHtmlEngine');
+        });
+
+
+        //Singleton: FrontendSite
+        $this->app->singleton(FrontendTwigEngine::class, function () {
+            return new FrontendTwigEngine();
+        });
+        //Bind: FrontendSite
+        $this->app->bind('FrontendTwigEngine', function () {
+            return app()->make(FrontendTwigEngine::class);
+        });
+
+        $this->app->singleton('FrontendTwig', function () {
+            return app('FrontendTwigEngine');
         });
     }
 

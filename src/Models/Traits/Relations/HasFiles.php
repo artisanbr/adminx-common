@@ -9,7 +9,7 @@ use Adminx\Common\Models\Folder;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Theme;
+use Adminx\Common\Models\Themes\Theme;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 

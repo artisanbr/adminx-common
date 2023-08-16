@@ -4,7 +4,11 @@
  * @var string[]                                    breadcrumbs
  */
 ?> #}
-{% extends "@base/content.twig" %}
+{% extends "@base/page.twig" %}
 {% block content %}
-    {{ page.html }}
+    {% if customPageTemplate %}
+        {{ include(customPageTemplate) }}
+    {% else %}
+        {{ include(getTemplate('content')) }}
+    {% endif %}
 {% endblock %}

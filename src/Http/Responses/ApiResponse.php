@@ -23,17 +23,17 @@ class ApiResponse
 
     }
 
-    public static function success($data = [], $message = [], $status = 200): ApiResponse
+    public static function success($data = [], $message = [], $status = 200): self
     {
         return (new static(true, $data, $message, $status));
     }
 
-    public static function error($data = [], $message = '', $errors = [], $status = 500): ApiResponse
+    public static function error($data = [], $message = '', $errors = [], $status = 500): self
     {
         return (new static(false, $data, $message, $status))->errors($errors);
     }
 
-    public static function from($data, $message = []): ApiResponse
+    public static function from($data, $message = []): self
     {
         return (new static(true, $data, $message));
     }

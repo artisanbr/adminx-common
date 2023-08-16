@@ -1,13 +1,13 @@
 <?php
 /***
- * @var \Adminx\Common\Models\SiteWidget $widgeteable
+ * @var \Adminx\Common\Models\Widgets\SiteWidget $widget
  * @var \Adminx\Common\Models\Form       $form
  */
 ?>
 @extends('adminx-common::layouts.api.ajax-view')
 
 {{--@php
-    $form = $widgeteable->sources->first();
+    $form = $widget->sources->first();
 @endphp--}}
 
 @if($form->id ?? false)

@@ -9,7 +9,7 @@ use Adminx\Common\Libs\Helpers\HtmlHelper;
 use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Theme;
+use Adminx\Common\Models\Themes\Theme;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 

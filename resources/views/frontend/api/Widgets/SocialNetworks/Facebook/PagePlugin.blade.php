@@ -1,10 +1,10 @@
 <?php
 /***
- * @var \Adminx\Common\Models\SiteWidget $widgeteable
+ * @var \Adminx\Common\Models\Widgets\SiteWidget $widget
  */
 ?>
 
-@if(($widgeteable->config->variables ?? false) && $widgeteable->config->variableValue('facebook_url'))
+@if(($widget->config->variables ?? false) && $widget->config->variableValue('facebook_url'))
 
     @once
         @push('body-js')
@@ -15,15 +15,15 @@
         @endpush
     @endonce
 
-    <div class="fb-page" data-href="{{ $widgeteable->config->variableValue('facebook_url') }}"
-         data-tabs="{{ $widgeteable->config->variableValue('tabs') }}"
-         data-width="{{ $widgeteable->config->variableValue('width') }}"
-         data-height="{{ $widgeteable->config->variableValue('height') }}"
-         data-small-header="{{ $widgeteable->config->variableValue('small_header', false) }}"
-         data-adapt-container-width="true" data-hide-cover="{{ $widgeteable->config->variableValue('hide_cover') }}"
+    <div class="fb-page" data-href="{{ $widget->config->variableValue('facebook_url') }}"
+         data-tabs="{{ $widget->config->variableValue('tabs') }}"
+         data-width="{{ $widget->config->variableValue('width') }}"
+         data-height="{{ $widget->config->variableValue('height') }}"
+         data-small-header="{{ $widget->config->variableValue('small_header', false) }}"
+         data-adapt-container-width="true" data-hide-cover="{{ $widget->config->variableValue('hide_cover') }}"
          data-show-facepile="true">
-        <blockquote cite="{{ $widgeteable->config->variableValue('facebook_url') }}" class="fb-xfbml-parse-ignore">
-            <a href="{{ $widgeteable->config->variableValue('facebook_url') }}">{{ $widgeteable->site->title }}</a>
+        <blockquote cite="{{ $widget->config->variableValue('facebook_url') }}" class="fb-xfbml-parse-ignore">
+            <a href="{{ $widget->config->variableValue('facebook_url') }}">{{ $widget->site->title }}</a>
         </blockquote>
     </div>
 @endif

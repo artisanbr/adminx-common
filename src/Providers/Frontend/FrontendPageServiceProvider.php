@@ -6,21 +6,18 @@ use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\FrontendEngine\FrontendPageEngine;
 use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Bases\CustomListBase;
 use Adminx\Common\Models\Category;
 use Adminx\Common\Models\Pages\Modules\Manager\PageModuleManagerEngine;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Pages\PageModel;
-use Adminx\Common\Models\Templates\Global\Manager\PageTemplateManagerEngine;
+use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Pages\Types\Manager\PageTypeManagerEngine;
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Theme;
-use App\Http\Controllers\Frontend\Page\PageModelController;
+use Adminx\Common\Models\Templates\Global\Manager\PageTemplateManagerEngine;
+use Adminx\Common\Models\Themes\Theme;
 use Butschster\Head\Facades\Meta as MetaFacade;
 use Butschster\Head\MetaTags\Meta;
 use Butschster\Head\Packages\Entities\OpenGraphPackage;
 use Butschster\Head\Packages\Entities\TwitterCardPackage;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class FrontendPageServiceProvider extends ServiceProvider
@@ -100,6 +97,7 @@ class FrontendPageServiceProvider extends ServiceProvider
 
         Meta::macro('registerSeoForArticle', function (Article $article) {
 
+            //$article->load(['site','page']);
             $metaOg = new OpenGraphPackage('site_og_article');
             $metaTwitter = new TwitterCardPackage('site_tt_article');
 
@@ -112,13 +110,13 @@ class FrontendPageServiceProvider extends ServiceProvider
                 ->setType('article')
                 ->setTitle($seoFullTitle)
                 ->setDescription($article->getDescription())
+                //->setUrl($article->uri)
                 //->addOgMeta('article:author', $article->user->name)
                 ->addOgMeta('article:section', $page->title)
                 ->addOgMeta('article:tag', $article->getKeywords())
                 ->addOgMeta('article:published_time', $article->published_at->toIso8601String())
                 ->addOgMeta('article:modified_time', $article->updated_at->toIso8601String())
-                ->addOgMeta('og:updated_time', $article->updated_at->toIso8601String())
-                ->setUrl($article->uri);
+                ->addOgMeta('og:updated_time', $article->updated_at->toIso8601String());
 
             $metaTwitter
                 ->setTitle($seoFullTitle)
@@ -144,42 +142,43 @@ class FrontendPageServiceProvider extends ServiceProvider
                 ->setDescription($article->getDescription())
                 ->registerPackage($metaOg)
                 ->setPaginationLinks($comments)
+                //->setCanonical($article->uri)
                 ->registerPackage($metaTwitter);
         });
 
-        MetaFacade::macro('registerSeoForPageModel', function (PageModel $pageModel, $modelItem = null) {
+        MetaFacade::macro('registerSeoForPageInternal', function (PageInternal $pageInternal, $modelItem = null) {
 
-            $metaOg = new OpenGraphPackage('site_og_page_model');
-            $metaTwitter = new TwitterCardPackage('site_tt_page_model');
+            $metaOg = new OpenGraphPackage('site_og_page_internal');
+            $metaTwitter = new TwitterCardPackage('site_tt_page_internal');
 
 
-            $seoFullTitle = $pageModel->page->site->seoTitle($pageModel->page->seoTitle($modelItem->title ?? null));
+            $seoFullTitle = $pageInternal->page->site->seoTitle($pageInternal->page->seoTitle($modelItem->title ?? null));
 
             $metaOg
                 ->setType('article')
                 ->setTitle($seoFullTitle)
-                ->setDescription($pageModel->page->getDescription())
-                ->setUrl($pageModel->uriTo($modelItem->url));
+                ->setDescription($pageInternal->page->getDescription())
+                ->setUrl($pageInternal->uriTo($modelItem->url));
 
             $metaTwitter
                 ->setTitle($seoFullTitle)
-                ->setDescription($pageModel->page->getDescription());
+                ->setDescription($pageInternal->page->getDescription());
 
-            if ($pageModel->breadcrumb_config->background_url) {
+            if ($pageInternal->breadcrumb_config->background_url) {
                 $metaTwitter
                     ->setType('summary_large_image')
-                    ->setImage($pageModel->breadcrumb_config->background_url)
-                    ->addMeta('image:alt', $modelItem->title ?? $pageModel->page->title);
+                    ->setImage($pageInternal->breadcrumb_config->background_url)
+                    ->addMeta('image:alt', $modelItem->title ?? $pageInternal->page->title);
 
-                $metaOg->addImage($pageModel->breadcrumb_config->background_url, [
-                    'type' => $pageModel->breadcrumb_config->background->type,
-                    'alt'  => $modelItem->title ?? $pageModel->page->title,
+                $metaOg->addImage($pageInternal->breadcrumb_config->background_url, [
+                    'type' => $pageInternal->breadcrumb_config->background->type,
+                    'alt'  => $modelItem->title ?? $pageInternal->page->title,
                 ]);
             }
 
             $this
                 ->setTitle($seoFullTitle)
-                ->setDescription($pageModel->page->getDescription())
+                ->setDescription($pageInternal->page->getDescription())
                 ->registerPackage($metaOg)
                 ->registerPackage($metaTwitter);
         });

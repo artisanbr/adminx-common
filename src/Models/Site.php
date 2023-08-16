@@ -14,6 +14,7 @@ use Adminx\Common\Models\Objects\Seo\SiteSeo;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
+use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasRelatedCache;
@@ -23,6 +24,7 @@ use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasArticles;
+use Adminx\Common\Models\Widgets\SiteWidget;
 use Adminx\Common\Rules\DomainRule;
 use Adminx\Common\Models\Pages\Page;
 use Illuminate\Database\Eloquent\Builder;
@@ -100,12 +102,12 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
     public static function getFromPreviousDomain($public_id): EloquentModelBase|Builder|Site|null
     {
-        $site = self::where('public_id', $public_id)->with(['pages'])->first();
+        $site = self::where('public_id', $public_id)->first();
 
         if (!$public_id || $site) {
             $previousDomain = Url::previousDomain();
 
-            $site = self::whereUrl($previousDomain)->with(['pages'])->first();
+            $site = self::whereUrl($previousDomain)->first();
         }
 
         return $site;

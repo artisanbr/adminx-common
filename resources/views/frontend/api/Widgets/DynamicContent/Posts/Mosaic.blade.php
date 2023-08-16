@@ -1,6 +1,6 @@
 <?php
 /***
- * @var \Adminx\Common\Models\SiteWidget                                         $widgeteable
+ * @var \Adminx\Common\Models\Widgets\SiteWidget                                         $widget
  * @var \Adminx\Common\Models\Pages\Page                                         $page
  * @var \Adminx\Common\Models\Article                                            $article
  * @var \Adminx\Common\Models\Article[]|\Illuminate\Database\Eloquent\Collection $articles
@@ -11,7 +11,7 @@ $articlesQuery = $page->articles()->published();
 @extends('adminx-common::layouts.api.ajax-view')
 
 @if($articles->count())
-    <div class="row articles-mosaic articles-mosaic-{{ $widgeteable->public_id }} widget-module widget-module-{{ $widgeteable->public_id }}">
+    <div class="row articles-mosaic articles-mosaic-{{ $widget->public_id }} widget-module widget-module-{{ $widget->public_id }}">
         {{--Left--}}
         {{--@foreach($page->article()->published()->take(2)->get() as $article)--}}
         @foreach($articlesQuery->take(2)->get() as $article)

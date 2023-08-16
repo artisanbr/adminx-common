@@ -1,0 +1,14 @@
+{% set recaptchaId = 'g-recaptcha-'.time() %}
+<script src="https://www.google.com/recaptcha/api.js?render={{ site.config.recaptcha_site_key }}"></script>
+<input type="hidden" name="recaptcha_token" id="recaptcha-token">
+<input type="hidden" name="recaptcha_action" id="recaptcha-action">--}}
+<div id="{{ recaptchaId }}" class="g-recaptcha mb-3"></div>
+<script>
+    $(function () {
+        //recaptcha
+        grecaptcha.render(document.getElementById('{{ recaptchaId }}'), {
+            'sitekey': '{{ site.config.recaptcha_site_key }}',
+
+        });
+    });
+</script>

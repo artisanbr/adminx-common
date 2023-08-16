@@ -4,21 +4,22 @@ namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\Frontend\FrontendPage;
+use Adminx\Common\Facades\Frontend\FrontendSite;
+use Adminx\Common\Libs\FrontendEngine\Twig\Extensions\FrontendTwigExtension;
 use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Bases\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Menu;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\SiteWidget;
+use Adminx\Common\Models\Widgets\SiteWidget;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\PageTemplateManager;
-use Adminx\Common\Models\Theme;
-use Adminx\Common\Models\ThemeBuild;
-use Butschster\Head\Contracts\Packages\ManagerInterface;
-use Butschster\Head\MetaTags\Meta;
+use Adminx\Common\Models\Themes\Theme;
+use Adminx\Common\Models\Themes\ThemeBuild;
+use Barryvdh\Debugbar\Facades\Debugbar;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Blade;
-use PragmaRX\Support\Exceptions\Exception;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -37,6 +38,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
      * @var Collection|mixed|SiteWidget[]
      */
     protected mixed $widgets;
+    protected mixed $widgetsTemplates;
     /**
      * @var Collection|mixed|Menu[]
      */
@@ -55,6 +57,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
     public function __construct(
         public ?Page                   $currentPage = null,
         public ?ThemeBuild             $themeBuild = null,
+        public string                  $headHtml = '',
         public string                  $headerHtml = '',
         public string                  $contentHtml = '',
         public string                  $footerHtml = '',
@@ -63,6 +66,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
     )
     {
         $this->widgets = collect();
+        $this->widgetsTemplates = collect();
         $this->menus = collect();
         $this->customLists = collect();
 
@@ -75,9 +79,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
         $this->menus = collect();
         $this->customLists = collect();
 
-        if (!$this->viewTemporaryName) {
-            $this->setViewName("page-{$page->public_id}");
-        }
+        $this->setViewName("page-{$page->public_id}");
 
         /*if ($this->currentPage->site->theme) {
             $this->theme($this->currentPage->site->theme, $this->currentPage->frontendBuild());
@@ -94,11 +96,14 @@ class FrontendHtmlEngine extends FrontendEngineBase
 
         //$frontendBuild->meta->reset();
 
+        //Montar Head
+        $this->headHtml = $this->themeBuild->head;//renderHead($this->frontendBuild);
+
         //Montar Header
-        $this->headerHtml = $this->themeBuild->renderHeader($this->frontendBuild);
+        $this->headerHtml = $this->themeBuild->header;//renderHeader($this->frontendBuild);
 
         //Montar footer
-        $this->footerHtml = $this->themeBuild->renderFooter($this->frontendBuild);
+        $this->footerHtml = $this->themeBuild->footer;//renderFooter($this->frontendBuild);
 
         return $this;
     }
@@ -127,6 +132,32 @@ class FrontendHtmlEngine extends FrontendEngineBase
         return ($this->currentPage ? "{$this->currentPage->public_id}-" : "") . $this->viewTemporaryName;
     }
 
+    public function getPageBaseTemplate(string|bool $customPageTemplate = false): string
+    {
+
+        $customTemplateHtml = $this->currentPage->page_template ? "{{ include('@template/index.twig') }}" : '';
+
+        return <<<blade
+<html lang="pt-BR">
+<head>
+    {$this->headHtml}
+</head>
+<body id="{{ frontendBuild.body.id }}" class="{{ frontendBuild.body.class }}">
+{$this->headerHtml}
+<main class="main-content">
+    {% if breadcrumb and breadcrumb.enabled %}
+        {{ include('@base/components/breadcrumb.twig') }}
+    {% endif %}
+    {$this->contentHtml}
+    {$customTemplateHtml}
+</main>
+{$this->footerHtml}
+</body>
+</html>
+blade;
+
+    }
+
     public function setViewData(array $viewData = []): static
     {
         $this->viewData = $viewData;
@@ -146,26 +177,64 @@ class FrontendHtmlEngine extends FrontendEngineBase
         return $this;
     }
 
+    public function getRenderViewData(): array
+    {
+        return [...$this->viewData, 'frontendBuild' => $this->frontendBuild, 'header' => $this->headerHtml];
+    }
+
     /**
      * Prepare Twig Filters and Functions
+     *
+     * @throws LoaderError
+     * @throws LoaderError
      */
-    protected function startTwig(): static
+    protected function startTwig($mainViewName = 'page_base'): static
     {
 
-        $arrayLoader = new ArrayLoader([
-                                           $this->getTwigTemplateName('header')  => $this->headerHtml,
-                                           $this->getTwigTemplateName('content') => $this->contentHtml,
-                                           $this->getTwigTemplateName('footer')  => $this->footerHtml,
-                                       ]);
+        $arrayTemplates = [
+            //$this->getTwigTemplateName('head')    => $this->headHtml,
+            //$this->getTwigTemplateName('header')  => $this->headerHtml,
+            //$this->getTwigTemplateName('content') => $this->contentHtml,
+            //$this->getTwigTemplateName('footer')  => $this->footerHtml,
+        ];
 
         $fileLoader = new FilesystemLoader();
         $fileLoader->addPath(PageTemplateManager::globalTemplatesPath('base'), 'base');
+        $fileLoader->addPath(PageTemplateManager::globalTemplatesPath('pages'), 'pages');
 
-        if ($this->currentPage->page_template) {
-            $fileLoader->addPath($this->currentPage->page_template->path, 'template');
+        if ($this->currentPage) {
+            $arrayTemplates[$this->getTwigTemplateName($mainViewName)] = $this->getPageBaseTemplate();
+
+            //$fileLoader->addPath(PageTemplateManager::globalTemplatesPath('widgets'), 'widgets');
+
+            $pageTemplate = $this->currentPage->page_template;
+            if ($pageTemplate) {
+                //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
+                $fileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
+            }
+
+        }
+        else {
+            $arrayTemplates[$this->getTwigTemplateName($mainViewName)] = $this->contentHtml;
         }
 
+        /* $staticSiteWidgets = $this->currentPage->site->widgets()->where('config->ajax_render', false);
 
+         if ($staticSiteWidgets->count()) {
+             foreach ($staticSiteWidgets->get() as $siteWidget) {
+
+                 $siteWidget->save(); //todo: remove
+
+                 //$fileLoader->addPath($siteWidget->widget->template->template->global_path, "widget-{$siteWidget->public_id}");
+
+                 //Debugbar::debug("widget-{$siteWidget->public_id}");
+
+                 $arrayTemplates["widget-{$siteWidget->public_id}"] = $siteWidget->content->html;
+
+             }
+         }*/
+
+        $arrayLoader = new ArrayLoader($arrayTemplates);
         $this->twigLoader = new ChainLoader([$arrayLoader, $fileLoader]);
 
         $this->twig = new Environment($this->twigLoader, [
@@ -191,6 +260,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
         }));
 
         //Widget
+        //$this->twig->addExtension(new WidgetTwigExtension($this->currentPage->site->widgets()));
         $this->twig->addFilter(new TwigFilter('widget', function (string $public_id) {
             return $this->widget($public_id);
         }));
@@ -207,12 +277,72 @@ class FrontendHtmlEngine extends FrontendEngineBase
         return $this;
     }
 
+    /**
+     * @throws RuntimeError
+     * @throws SyntaxError
+     * @throws LoaderError
+     */
+    public function renderTwig(string $template): string
+    {
+        $this->startTwig($template);
+
+        if (!$this->twig) {
+            throw new Exception('Twig Não Iniciado');
+        }
+
+        try {
+            return $this->twig->render($template, $this->getRenderViewData());
+        } catch (Exception $e) {
+            //dump($this->getViewName(), $this->viewData, $this->contentHtml);
+            throw $e;
+        }
+    }
+
+
+    /**
+     * @throws FrontendException
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function content($rawHtml = null, $viewData = null, ?Theme $theme = null): string
+    {
+        if ($viewData) {
+            $this->addViewData($viewData);
+        }
+
+        if ($theme ?? FrontendPage::current()) {
+            $this->setCurrentPage(FrontendPage::current());
+            $this->theme($theme ?? FrontendPage::current()->site->theme);
+
+        }
+
+        return $this->html($rawHtml, $viewData, 'content-' . time());
+    }
+
+    /**
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function renderPageTwig(): string
+    {
+        return $this->renderTwig($this->getTwigTemplateName('page_base'));
+        //return $this->renderTwigFile('@base/page.twig');
+    }
+
+    /**
+     * @throws FrontendException
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
     public function page(Page $page): string
     {
         $this->setCurrentPage($page);
-        $this->setViewData($this->currentPage->getBuildViewData([
+        $this->setViewData($this->currentPage->getBuildViewData(/*[
                                                                     'customPageTemplate' => $this->currentPage->page_template ? '@template/index.twig' : false,
-                                                                ]));
+                                                                ]*/));
 
         $this->setFrontendBuild($this->currentPage->frontendBuild());
 
@@ -222,12 +352,12 @@ class FrontendHtmlEngine extends FrontendEngineBase
             $this->theme($this->currentPage->site->theme);
         }
 
-        $this->startTwig();
-
-        $rawBlade = $this->renderTwig();
+        //$rawBlade = $this->renderPageTwig();
         //dd($rawBlade);
 
-        $renderedBlade = Blade::render($rawBlade, $this->viewData);
+
+        $renderedBlade = $this->renderPageTwig();
+        //$renderedBlade = Blade::render($rawBlade, $this->viewData);
 
         if ($this->currentPage->site->config->enable_html_minify) {
             $htmlMin = new HtmlMin();
@@ -263,7 +393,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
 
         $this->startTwig();
 
-        $rawBlade = $this->renderTwig();
+        $rawBlade = $this->renderPageTwig();
 
         $renderedBlade = Blade::render($rawBlade, $this->viewData);
 
@@ -302,63 +432,27 @@ class FrontendHtmlEngine extends FrontendEngineBase
 
     public function html($rawHtml = null, $viewData = null, $viewName = null): string
     {
+        $viewName = $viewName ?? 'temp-html-' . time();
+
         if ($viewData) {
             $this->addViewData($viewData);
         }
 
         $this->contentHtml = $rawHtml;
 
-        $this->setViewName($viewName ?? 'temp-html-' . time());
+        $this->setViewName($viewName);
 
         $this->startTwig();
 
-        return $this->renderTwig();
+        return $this->renderPageTwig();
     }
 
-    /**
-     * @throws FrontendException
-     * @throws SyntaxError
-     * @throws RuntimeError
-     * @throws LoaderError
-     */
-    public function content($rawHtml = null, $viewData = null, ?Theme $theme = null): string
-    {
-        if ($viewData) {
-            $this->addViewData($viewData);
-        }
-
-        if ($theme ?? FrontendPage::current()) {
-            $this->setCurrentPage(FrontendPage::current());
-            $this->theme($theme ?? FrontendPage::current()->site->theme);
-
-        }
-
-        return $this->html($rawHtml, $viewData, 'content-' . time());
-    }
 
     /**
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function renderTwig(): string
-    {
-        if (!$this->twig) {
-            throw new Exception('HTML não definido');
-        }
-
-        try {
-
-            //dd($this->viewData['breadcrumb']);
-
-            return $this->twig->render('@base/page.twig', $this->viewData);
-
-        } catch (\Exception $e) {
-            //dump($this->getViewName(), $this->viewData, $this->contentHtml);
-            throw $e;
-        }
-    }
-
     public function widget($widget_public_id): string
     {
 
@@ -367,37 +461,31 @@ class FrontendHtmlEngine extends FrontendEngineBase
 
         //Não encontrou, buscar no banco
         if (!$siteWidget) {
-            $siteWidget = $this->currentPage->site->widgets()->where('public_id', $widget_public_id)->first();
+            $siteWidget = FrontendSite::current()->widgets()->where('public_id', $widget_public_id)->first();
 
             if ($siteWidget) {
                 $this->widgets->add($siteWidget);
             }
         }
 
-
-        //$siteWidget = $this->widgets->firstWhere('public_id', $widget_public_id);
-
-
+        //Se não encontrar parar aqui.
         if (!$siteWidget) {
             return "Widget {$widget_public_id} não encontrado";
         }
 
+        //Se estiver sem content, compilar
         if (empty($siteWidget->content->html)) {
             $siteWidget->save();
         }
 
-        //return $siteWidget->html;
+        if (!$siteWidget->config->ajax_render) {
+
+            $template = $this->twig->createTemplate($siteWidget->content->html, "widget-{$siteWidget->public_id}");
+
+            return $template->render($siteWidget->getBuildViewData());
+        }
+
         return $siteWidget->content->html;
-
-        //Widget View
-        //Debugbar::debug($widget->public_id, $widget->config->ajax_render);
-
-        /* $renderView = $siteWidget->config->ajax_render ? 'adminx-common::Elements.Widgets.renders.ajax-render' : 'adminx-common::Elements.Widgets.renders.static-render';
-         $renderData = $siteWidget->config->ajax_render ? compact('siteWidget') : $siteWidget->getBuildViewData();
-
-         $widgetView = View::make($renderView, [...$renderData, 'page' => $this->currentPage]);
-
-         return $widgetView->render();*/
 
     }
 

@@ -25,10 +25,10 @@ class FileHelper
 
         $fileModel->site_id = $site->id;
 
-        return self::saveRequest($requestFile, $uploadPath, $fileName, $fileModel, $site->config->enable_image_optimize);
+        return self::saveRequest($requestFile, $uploadPath, $fileName, $fileModel, (bool) $site->config->performance->enable_image_optimize);
     }
 
-    public static function saveRequest(UploadedFile $requestFile, $path = '', $fileName = '', File|null $fileModel = null, bool $imagesToWebp = true): ?File
+    public static function saveRequest(UploadedFile $requestFile, $path = '', $fileName = '', ?File $fileModel = null, bool $imagesToWebp = true): ?File
     {
         if (!$fileModel) {
             $fileModel = new File();

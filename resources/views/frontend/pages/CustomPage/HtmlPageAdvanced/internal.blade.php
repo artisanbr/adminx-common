@@ -2,7 +2,7 @@
 /***
  * @var \Adminx\Common\Models\Site                                                                                                        $site
  * @var \Adminx\Common\Models\Pages\Page                                                                                                        $page
- * @var \Adminx\Common\Models\Bases\CustomListItemBase|\Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml $currentItem
+ * @var \Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase|\Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml $currentItem
  */
 ?>
 @extends('adminx-frontend::layout.partials.content', compact('page'))

@@ -6,12 +6,12 @@ use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Pages\Objects\PageBreadcrumb;
 use Adminx\Common\Models\Pages\Objects\PageConfig;
-use Adminx\Common\Models\Pages\Objects\PageModelConfig;
+use Adminx\Common\Models\Pages\Objects\PageInternalConfig;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**
- * @var EloquentModelBase               $this
- * @property PageConfig|PageModelConfig $config
+ * @var EloquentModelBase                  $this
+ * @property PageConfig|PageInternalConfig $config
  */
 trait HasBreadcrumbs
 {

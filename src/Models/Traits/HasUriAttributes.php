@@ -3,6 +3,7 @@
 namespace Adminx\Common\Models\Traits;
 
 use Adminx\Common\Libs\Support\Str;
+use Adminx\Common\Models\Site;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Database\Eloquent\Model;
 
@@ -35,7 +36,11 @@ trait HasUriAttributes
             return  $this->url;
         }
 
-        return ($this->site ?? false) ? ("{$this->site->dynamic_uri}{$this->url}") : '//'.$this->url;
+        if(get_class($this) === Site::class){
+            return '//'.$this->url;
+        }
+
+        return (($this->attributes['site_id'] ?? false) && $this->site ? $this->site->dynamic_uri : '').$this->url;
     }
 
     protected function getUrlAttribute()

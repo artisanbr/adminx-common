@@ -4,6 +4,7 @@ namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Enums\ContentEditorType;
 use Adminx\Common\Facades\Frontend\FrontendHtml;
+use Adminx\Common\Facades\Frontend\FrontendTwig;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
@@ -166,7 +167,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         //'content',
         //'assets',
         //'html',
-        'url',
+        'url'
 
     ];
 
@@ -175,6 +176,8 @@ class Page extends EloquentModelBase implements BuildableModel,
         //'content' => [],
         //'assets' => [],
     ];
+
+    protected $hidden = ['account_id','site_id','user_id','parent_id'];
 
     //protected $with = ['site'];
 
@@ -340,14 +343,14 @@ class Page extends EloquentModelBase implements BuildableModel,
         return [...$viewData, ...$merge_data];
     }
 
-    public function frontendBuild(\Butschster\Head\MetaTags\Meta|null $meta = null): FrontendBuildObject
+    public function frontendBuild(?\Butschster\Head\MetaTags\Meta $meta = null): FrontendBuildObject
     {
 
 
         $frontendBuild = $this->site->frontendBuild();
 
         $frontendBuild->head->gtag_script = $this->getGTagScript();
-        $frontendBuild->head->addBefore($meta ? $meta->toHtml() : Meta::toHtml());
+        //$frontendBuild->head->addBefore($meta ? $meta->toHtml() : Meta::toHtml());
         $frontendBuild->head->css = $this->assets->css_bundle_html;
         $frontendBuild->head->addAfter($this->assets->js->head->html ?? '');
         $frontendBuild->head->addAfter($this->assets->head_script->html ?? '');
@@ -479,7 +482,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         $page = $this;
 
         return Attribute::make(
-            get: fn() => FrontendHtml::page($page),
+            get: static fn() => FrontendTwig::page($page),
         );
     }
 
@@ -575,7 +578,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     public function custom_lists()
     {
-        return $this->morphToMany(CustomList::class, 'model', 'page_models');
+        return $this->morphToMany(CustomList::class, 'model', 'page_internals');
     }
 
     //region Articles
@@ -629,12 +632,12 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     public function model()
     {
-        return $this->belongsTo(PageModel::class);
+        return $this->belongsTo(PageInternal::class);
     }*/
 
-    public function page_models()
+    public function page_internals()
     {
-        return $this->hasMany(PageModel::class);
+        return $this->hasMany(PageInternal::class);
     }
 
     //endregion

@@ -9,7 +9,7 @@ use Adminx\Common\Models\MenuItem;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Theme;
+use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Report;
 use Adminx\Common\Models\FormAnswer;
 

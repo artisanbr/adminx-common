@@ -66,18 +66,18 @@ class MenuItem extends EloquentModelBase
         return [
             'title'                     => ['required'],
             'external'                  => ['boolean', 'nullable'],
-            'menuable_type'             => ['required'],
+            'menuable_type'             => ['nullable'],
             'menuable_type_page_id'     => [
-                Rule::requiredIf(collect([
+                Rule::requiredIf($request->type !== 'link' && collect([
                                              'page',
                                              'article',
                                              'category',
-                                             'page_model',
+                                             'page_internal',
                                          ])->contains($request->menuable_type ?? '') !== false),
             ],
             'menuable_type_article_id'  => [Rule::requiredIf(($request->menuable_type ?? '') === 'article')],
             'menuable_type_category_id' => [Rule::requiredIf(($request->menuable_type ?? '') === 'category')],
-            'menuable_type_page_model_id' => [Rule::requiredIf(($request->menuable_type ?? '') === 'page_model')],
+            'menuable_type_page_internal_id' => [Rule::requiredIf(($request->menuable_type ?? '') === 'page_internal')],
             'url'                       => [Rule::requiredIf(($request->menuable_type ?? null) === 'link')],
         ];
     }
@@ -89,7 +89,7 @@ class MenuItem extends EloquentModelBase
             'menuable_type_page_id.required'     => 'Selecione uma página.',
             'menuable_type_article_id.required'  => 'Selecione um Post.',
             'menuable_type_category_id.required' => 'Selecione uma Categoria.',
-            'menuable_type_page_model_id.required' => 'Selecione uma Página Interna.',
+            'menuable_type_page_internal_id.required' => 'Selecione uma Página Interna.',
             'url.required'                       => 'Insira um Link para seu Item.',
         ];
     }
@@ -139,7 +139,7 @@ class MenuItem extends EloquentModelBase
 
                     $subMenu->addClass($menu->config->submenu_class ?? '');
 
-                    if ($this->menuable_type === 'page_model' && $this->menuable && $this->menuable->model && method_exists($this->menuable->model, 'items')){
+                    if ($this->menuable_type === 'page_internal' && $this->menuable && $this->menuable->model && method_exists($this->menuable->model, 'items')){
 
                         //Debugbar::debug($this->menuable->model);
 

@@ -3,7 +3,7 @@
 namespace Adminx\Common\Libs\AdvancedHtml;
 
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\SiteWidget;
+use Adminx\Common\Models\Widgets\SiteWidget;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Blade;
 
@@ -95,7 +95,7 @@ class AdvancedTagsHelper
                 'id'       => "menu('{$menu->slug}')",
                 'text'     => "<h4 class='text-gray-800'>{$menu->title}</h4><code class='small'>{{ menu('{$menu->slug}') }}</code>",
                 'category' => 'menu',
-                'icon'     =>  $getIcon('menu'),
+                'icon'     => $getIcon('menu'),
             ])->values();
 
             $siteTags = $siteTags->merge([
@@ -103,6 +103,23 @@ class AdvancedTagsHelper
                                          ])
                                  ->values()
                                  ->merge($menus);
+        }
+
+
+        //CustomLists
+        if ($site->lists()->count()) {
+            $customLists = $site->lists->map(fn($customList) => [
+                'id'       => "custom_list('{$customList->public_id}')",
+                'text'     => "<h4 class='text-gray-800'>{$customList->title}</h4><code class='small'>{{ custom_list('{$customList->public_id}') }}</code>",
+                'category' => 'custom_list',
+                'icon'     => $getIcon('list'),
+            ])->values();
+
+            $siteTags = $siteTags->merge([
+                                             ['title' => 'Listas Personalizadas', 'category' => 'custom_list'],
+                                         ])
+                                 ->values()
+                                 ->merge($customLists);
         }
 
         return $siteTags->values();

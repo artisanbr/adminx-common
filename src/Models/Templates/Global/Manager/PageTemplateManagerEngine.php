@@ -14,6 +14,10 @@ class PageTemplateManagerEngine
      * @var Collection|AbstractPageModule[]
      */
     protected Collection|array $items;
+    /**
+     * @var Collection|string[]
+     */
+    protected Collection|array $classMap;
     protected string           $configName = 'common.models.page.templates';
 
     public function __construct()
@@ -46,7 +50,8 @@ class PageTemplateManagerEngine
         return $this->items;
     }
 
-    public function globalTemplatesPath($path = ''){
+    public function globalTemplatesPath($path = '')
+    {
         return base_path("vendor/artisanbr/adminx-common/resources/templates/{$path}");
     }
 }

@@ -25,7 +25,7 @@ class WidgetType extends EloquentModelBase
     protected function text(): Attribute
     {
         return Attribute::make(
-            get: fn() => "<h2>{$this->title}</h2>{$this->description}",
+            get: fn() => "<h4>{$this->title}</h4>{$this->description}",
         );
     }
     //endregion

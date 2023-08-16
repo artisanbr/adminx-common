@@ -1,6 +1,6 @@
 <?php
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Themes;
 
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Interfaces\OwneredModel;
@@ -30,11 +30,13 @@ class ThemeBuild extends EloquentModelBase implements PublicIdModel, OwneredMode
         'account_id',
         'theme_id',
 
+        'head',
         'header',
         'footer',
     ];
 
     protected $casts = [
+        'head'        => 'string',
         'header'        => 'string',
         'footer'        => 'string',
     ];
@@ -58,6 +60,11 @@ class ThemeBuild extends EloquentModelBase implements PublicIdModel, OwneredMode
         }
 
         return '';
+    }
+
+    public function renderHead(FrontendBuildObject $frontendBuild): string
+    {
+        return $this->render($frontendBuild, 'head');
     }
 
     public function renderHeader(FrontendBuildObject $frontendBuild): string

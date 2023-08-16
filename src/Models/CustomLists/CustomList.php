@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Models\CustomLists;
 
-use Adminx\Common\Models\Bases\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CustomList extends CustomListBase

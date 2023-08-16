@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \Adminx\Common\Models\SiteWidget $widgeteable
+ * @var \Adminx\Common\Models\Widgets\SiteWidget $widgeteable
  * @var \Adminx\Common\Models\Site       $site
  * @var \Adminx\Common\Models\Pages\Page $page
  */

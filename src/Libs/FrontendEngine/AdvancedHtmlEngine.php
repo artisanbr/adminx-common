@@ -5,7 +5,7 @@ namespace Adminx\Common\Libs\FrontendEngine;
 use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Site;
-use Adminx\Common\Models\SiteWidget;
+use Adminx\Common\Models\Widgets\SiteWidget;
 use Illuminate\Support\Facades\View;
 use PragmaRX\Support\Exceptions\Exception;
 use Twig\Environment;

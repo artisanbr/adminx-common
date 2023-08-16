@@ -25,12 +25,12 @@ class FrontendSiteEngine extends FrontendEngineBase
         $this->cacheName = Str::of($this->currentDomain)->replace('.', '_');
     }
 
-    public function loadCurrent($modelCache = true): Site|null
+    public function loadCurrent(): Site|null
     {
 
-        /*if (Auth::check() && Auth::user()->site_id) {
+        if (app('auth') && Auth::check() && (Auth::user()->site_id ?? false)) {
             return Auth::user()->site;
-        }*/
+        }
 
         //Pegar dominio atual e remover o WWW
         //header("Host: {$this->currentDomain}");
@@ -40,32 +40,35 @@ class FrontendSiteEngine extends FrontendEngineBase
         //Se o site ainda não foi carregado, ou estiver com outro endereço, carregar o atual via cache.
         if (!$this->currentSite || $this->currentSite->url !== $this->currentDomain) {
 
-            $this->currentSite = $this->getCachedSiteByDomain($modelCache);
+            $this->currentSite = $this->getCachedSiteByDomain();
         }
 
 
-        $this->refreshCache();
+        //$this->refreshCache();
 
         return $this->currentSite;
     }
 
-    public function getCachedSiteByDomain($modelCache)
+    public function getCachedSiteByDomain()
     {
+        $cachedSite = Cache::get($this->cacheName);
 
-        return Cache::remember($this->cacheName, $this->cacheMinutes, function () use ($modelCache) {
-            return $this->getSiteByDomain($modelCache);
-        });
-    }
-
-    public function getSiteByDomain($modelCache = true)
-    {
-        $siteQuery = Site::where('url', $this->currentDomain);
-
-        if (!$modelCache) {
-            $siteQuery = $siteQuery->disableCache();
+        if(!$cachedSite || get_class($cachedSite) !== Site::class || $cachedSite->url !== $this->currentDomain){
+            $cachedSite = Cache::remember($this->cacheName, $this->cacheMinutes, function () {
+                return $this->getSiteByDomain();
+            });
         }
 
-        return $siteQuery->first();
+        return $cachedSite;
+    }
+
+    public function getSiteByDomain(): ?Site
+    {
+        /*if (!$modelCache) {
+            $siteQuery = $siteQuery->disableCache();
+        }*/
+
+        return Site::where('url', $this->currentDomain)->first();
     }
 
     public function current()

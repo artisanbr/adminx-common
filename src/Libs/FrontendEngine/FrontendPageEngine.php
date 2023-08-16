@@ -5,18 +5,12 @@ namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\Frontend\FrontendSite;
-use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Pages\PageModel;
+use Adminx\Common\Models\Pages\Page;
+use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Pages\Types\Manager\Facade\PageTypeManager;
-use Adminx\Common\Models\Site;
-use App\Http\Controllers\Frontend\Page\ArticlesController;
-use App\Http\Controllers\Frontend\Page\PageModelController;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Session;
 
 class FrontendPageEngine extends FrontendEngineBase
 {
@@ -127,14 +121,14 @@ class FrontendPageEngine extends FrontendEngineBase
     }
 
     /***
-     * Encontrar PageModel da Página através da URL (slug ou public_id)
+     * Encontrar PageInternal da Página através da URL (slug ou public_id)
      */
-    public function getPageModelByUrl(string $url): ?PageModel
+    public function getPageInternalByUrl(string $url): ?PageInternal
     {
-        return $this->currentPage?->page_models()->where('slug', $url)->orWhere('public_id', $url)->first() ?? $this->currentPage?->page_models()->whereNot('slug')->first();
+        return $this->currentPage?->page_internals()->where('slug', $url)->orWhere('public_id', $url)->first() ?? $this->currentPage?->page_internals()->whereNot('slug')->first();
     }
 
-    public function getFirstInternalUrl($url): Article|PageModel|null
+    public function getFirstInternalUrl($url): Article|PageInternal|null
     {
 
         //Validar pelo tipo da página
@@ -148,12 +142,12 @@ class FrontendPageEngine extends FrontendEngineBase
                 }
             }
 
-            if ($this->currentPage->page_models()->count()) {
+            if ($this->currentPage->page_internals()->count()) {
 
 
-                $pageModel = $this->getPageModelByUrl($url);
-                if ($pageModel) {
-                    return $pageModel;
+                $pageInternal = $this->getPageInternalByUrl($url);
+                if ($pageInternal) {
+                    return $pageInternal;
                 }
 
 
@@ -179,12 +173,12 @@ class FrontendPageEngine extends FrontendEngineBase
                 }
             }
 
-            if ($this->currentPage->page_models()->count()) {
+            if ($this->currentPage->page_internals()->count()) {
 
 
-                $pageModel = $this->getPageModelByUrl($url);
-                if ($pageModel) {
-                    return $pageModel;
+                $pageInternal = $this->getPageInternalByUrl($url);
+                if ($pageInternal) {
+                    return $pageInternal;
                 }
 
 
@@ -198,8 +192,8 @@ class FrontendPageEngine extends FrontendEngineBase
     public function getModelController($model): string
     {
         return match (get_class($model)){
-            Article::class => ArticlesController::class,
-            PageModel::class => PageModelController::class,
+            Article::class => 'App\Http\Controllers\Frontend\Page\ArticlesController',
+            PageInternal::class => 'App\Http\Controllers\Frontend\Page\PageInternalController'
         };
     }
 

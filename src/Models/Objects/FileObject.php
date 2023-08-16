@@ -49,6 +49,11 @@ class FileObject extends GenericModel
 
     ];
 
+    protected $appends = [
+        'url',
+        'location',
+    ];
+
 
     //region Attributes
     //region Gets
@@ -108,6 +113,11 @@ class FileObject extends GenericModel
     protected function getUrlAttribute(): string|null
     {
         return "/storage/{$this->path}";
+    }
+
+    protected function getLocationAttribute(): string|null
+    {
+        return $this->url;
     }
 
     protected function getHtmlAttribute(): string

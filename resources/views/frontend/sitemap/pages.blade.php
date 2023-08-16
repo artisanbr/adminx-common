@@ -44,10 +44,10 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
             @endif
         </url>
 
-        @foreach($page->page_models as $pageModel)
+        @foreach($page->page_internals as $pageInternal)
 
-            @if($pageModel->model?->items ?? false)
-                @foreach($pageModel->model->mountModel()->items as $modelItem)
+            @if($pageInternal->model?->items ?? false)
+                @foreach($pageInternal->model->mountModel()->items as $modelItem)
                     <url>
                         <loc>{{ $page->uriTo($modelItem->url) }}</loc>
                         <changefreq>weekly</changefreq>

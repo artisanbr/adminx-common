@@ -5,17 +5,19 @@ namespace Adminx\Common\Models\Generics;
 use Adminx\Common\Enums\CustomLists\CustomListType;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Bases\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Site;
 use ArtisanLabs\GModel\GenericModel;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 /**
  * @property Page|Form|Article|CustomListBase|null $data
+ * @property Page|null                             $page
  */
 class DataSource extends GenericModel
 {
@@ -41,8 +43,9 @@ class DataSource extends GenericModel
     ];
 
 
-    protected $temporary = ['data', 'select_option_list'];
-    protected $hidden = ['data'];
+    protected $temporary = ['data', 'select_option_list', 'page'];
+
+    //protected $hidden = ['data'];
 
     public static function getSourcesByType($source_type, ?Site $site = null): Collection
     {
@@ -105,59 +108,114 @@ class DataSource extends GenericModel
         return $config ? config("{$sourceTypeConfig}.{$config}", $defaultValue) : config($sourceTypeConfig, $defaultValue);
     }
 
-
     //region Attributes
+
+    public function dataQuery(?Site $site = null): ?Builder
+    {
+        if (!$site) {
+            $site = FrontendSite::current();
+        }
+
+        return match ($this->type) {
+            'posts', 'articles' => $site->articles()->where('page_id', $this->id),
+            'page' => $site->pages()->where('id', $this->id),
+            'form' => $site->forms()->where('id', $this->id),
+            default => null,
+        };
+    }
+
+    protected function getSiteAttribute()
+    {
+        return FrontendSite::current();
+    }
+
+    protected function getBelongsToPageAttribute(): bool
+    {
+        return match ($this->type) {
+            'articles',
+            'products' => true,
+            default => false,
+        };
+    }
+
+    protected function getPageAttribute(): ?Page
+    {
+        if ($this->belongs_to_page) {
+            if (!($this->attributes['page'] ?? false)) {
+                $site = (Auth::check() && Auth::user()->site) ? Auth::user()->site : FrontendSite::current();
+                $this->attributes['page'] = $site->pages()->where('id', $this->id)->first();
+            }
+
+            return $this->attributes['page'];
+        }
+
+        return null;
+    }
+
     protected function getDataAttribute()
     {
 
-        if (!isset($this->attributes['data']) || (empty($this->attributes['data']) || $this->attributes['data']->id !== $this->id)) {
+        if ($this->id && $this->type) {
+            if (!isset($this->attributes['data']) || empty($this->attributes['data'])) {
 
-            $this->attributes['data'] = null;
+                $this->attributes['data'] = null;
 
-            $site = (Auth::check() && Auth::user()->site) ? Auth::user()->site : FrontendSite::current();
+                $site = $this->site;
 
-            switch ($this->type) {
-                //Todo:
-                case 'page':
-                case 'articles':
-                case 'products':
-                    //Página. Posts, Produtos (retornam a página)
-                    $this->attributes['data'] = $site->pages()->where('id', $this->id)->first();
-                    break;
-                case 'form':
-                    //Formulário
-                    $this->attributes['data'] = $site->forms()->where('id', $this->id)->first();
-                    break;
-                //Todo \/
-                case 'article':
-                case 'address':
-                default:
-                    break;
+                switch ($this->type) {
+                    //Todo:
+                    case 'page':
+                        $this->attributes['data'] = $this->dataQuery()->first();
+                        break;
+                    case 'articles':
+                        /**
+                         * @var ?Page $page
+                         */
+                        //Página. Posts, Produtos (retornam um array de items)
+                        //$page = $site->pages()->find($this->id);
+                        $this->attributes['data'] = $this->dataQuery()->get();
+                        break;
+                    case 'form':
+                        //Formulário
+                        $this->attributes['data'] = $this->dataQuery()->first();
+                        break;
+                    //Todo \/
+                    case 'article':
+                    case 'address':
+                    case 'products':
+                    default:
+                        break;
 
-            }
-
-            if(empty($this->attributes['data']) && ($this->type === 'list' || Str::contains($this->type, 'list.'))){
-                //Listas Customizadas
-                /**
-                 * @var CustomListBase $customList
-                 */
-                $customList = $site->lists()->where('id', $this->id)->first();
-
-                if ($customList) {
-                    $this->attributes['data'] = $customList->mountModel();
                 }
+
+                if (empty($this->attributes['data']) && ($this->type === 'list' || Str::contains($this->type, 'list.'))) {
+                    //Listas Customizadas
+                    /**
+                     * @var CustomListBase $customList
+                     */
+                    $customList = $site->lists()->where('id', $this->id)->first();
+
+                    if ($customList) {
+                        $this->attributes['data'] = $customList->mountModel();
+                    }
+                }
+
+
+                //$this->attributes['data'] = self::getSourcesByType($this->type)->firstWhere('id', $this->id);
             }
-
-
-            //$this->attributes['data'] = self::getSourcesByType($this->type)->firstWhere('id', $this->id);
         }
+        else {
+            $this->attributes['data'] = null;
+        }
+
 
         return $this->attributes['data'];
     }
 
-    protected function getSelectOptionListAttribute()
+    protected function getSelectOptionListAttribute(): array
     {
-        return $this->data ?? false ? [$this->data->id => $this->data->text ?? $this->data->title] : [];
+
+        return $this->belongs_to_page ? $this->page?->select_option_list : ($this->data ? [$this->data->id => $this->data->text ?? $this->data->title] : []);
     }
     //endregion
 

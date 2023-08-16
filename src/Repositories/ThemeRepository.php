@@ -10,7 +10,7 @@ use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Generics\Elements\Themes\ThemeMediaElement;
 use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Theme;
+use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Repositories\Base\Repository;
 use Exception;
 use Illuminate\Http\Request;

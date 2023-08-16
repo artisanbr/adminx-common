@@ -12,7 +12,7 @@ use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Site;
 use Adminx\Common\Models\Templates\Objects\TemplateConfig;
 use Adminx\Common\Models\Templates\Template;
-use Adminx\Common\Models\Theme;
+use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Traits\HasSelect2;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Database\Eloquent\Casts\Attribute;

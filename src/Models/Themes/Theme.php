@@ -1,6 +1,6 @@
 <?php
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Themes;
 
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
@@ -10,9 +10,10 @@ use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
-use Adminx\Common\Models\Objects\Themes\ThemeFooterObject;
-use Adminx\Common\Models\Objects\Themes\ThemeHeaderObject;
-use Adminx\Common\Models\Objects\Themes\ThemeMediaBundleObject;
+use Adminx\Common\Models\Themes\Objects\ThemeCopyrightObject;
+use Adminx\Common\Models\Themes\Objects\ThemeFooterObject;
+use Adminx\Common\Models\Themes\Objects\ThemeHeaderObject;
+use Adminx\Common\Models\Themes\Objects\ThemeMediaBundleObject;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasSelect2;
@@ -55,6 +56,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
         'header',
         //'header_old',
         'footer',
+        'copyright',
         //'footer_old',
     ];
 
@@ -66,10 +68,9 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
         'css'         => GenericAssetElementCSS::class,
         'js'          => GenericAssetElementJS::class,
         'header'      => ThemeHeaderObject::class,
-        //'header_old'  => ThemeHeaderElement::class,
         'header_html' => 'string',
         'footer'      => ThemeFooterObject::class,
-        //'footer_old'  => ThemeFooterElement::class,
+        'copyright'   => ThemeCopyrightObject::class,
         'footer_html' => 'string',
         'created_at'  => 'datetime:d/m/Y H:i:s',
     ];
@@ -95,24 +96,8 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
     public function uploadPathTo(?string $path = null): string
     {
         $uploadPath = "themes/{$this->public_id}";
-        return ($this->page ? $this->page->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
-    }
 
-    public function prepareHtml()
-    {
-        $this->append(['logo', 'logo_secondary', 'favicon']);
-
-        /*$this->media->logo->append('file');
-        $this->media->logo_secondary->append('file');
-        $this->media->favicon->append('file');*/
-
-        if ($this->menu && $this->menu->id) {
-            $this->menu->append('html');
-        }
-
-        if ($this->menu_footer && $this->menu_footer->id) {
-            $this->menu_footer->append('html');
-        }
+        return ($this->site ? $this->site->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
     }
 
     public function compile()
@@ -168,19 +153,26 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
                                                      'account_id' => $this->account_id,
                                                  ]);
 
+        $headHtml = View::make('adminx-frontend::layout.partials.head', [
+            'site'      => $this->site,
+            'theme'     => $this,
+            'themeMeta' => $themeMeta,
+        ])->render();
+
         $headerHtml = View::make('adminx-frontend::layout.partials.header', [
-            'site'  => $this->site,
-            'theme' => $this,
+            'site'      => $this->site,
+            'theme'     => $this,
             'themeMeta' => $themeMeta,
         ])->render();
 
         $footerHtml = View::make('adminx-frontend::layout.partials.footer', [
-            'site'  => $this->site,
-            'theme' => $this,
+            'site'      => $this->site,
+            'theme'     => $this,
             'themeMeta' => $themeMeta,
         ])->render();
 
         $themeBuild->fill([
+                              'head'   => $this->site->config->enable_html_minify ? $htmlMin->minify($headHtml) : $headHtml,
                               'header' => $this->site->config->enable_html_minify ? $htmlMin->minify($headerHtml) : $headerHtml,
                               'footer' => $this->site->config->enable_html_minify ? $htmlMin->minify($footerHtml) : $footerHtml,
                           ]);

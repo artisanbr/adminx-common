@@ -3,7 +3,7 @@
 namespace Adminx\Common\Models\Pages\Modules;
 
 use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Bases\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Pages\Modules\Abstract\AbstractPageModule;

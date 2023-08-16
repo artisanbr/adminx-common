@@ -2,7 +2,7 @@
 
 namespace Adminx\Common\Models\CustomLists\CustomListItems;
 
-use Adminx\Common\Models\Bases\CustomListItemBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
 use Adminx\Common\Models\CustomLists\CustomListTestimonials;
 use Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas\CustomListItemTestimonialsData;
 

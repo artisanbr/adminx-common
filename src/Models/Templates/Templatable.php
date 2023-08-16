@@ -27,6 +27,7 @@ class Templatable extends Pivot
         'templatable_id',
         'templatable_type',
         'config',
+        'content',
     ];
 
     protected $casts = [
@@ -60,12 +61,19 @@ class Templatable extends Pivot
     {
         return Attribute::make(get: fn() => $this->template->full_path);
     }
+
     //region GET's
-    //protected function getAttribute(){}
+    protected function getContentAttribute()
+    {
+        return $this->template->content;
+    }
     //endregion
 
     //region SET's
-    //protected function setAttribute(){}
+    protected function setContentAttribute($value): void
+    {
+        $this->template->content = $value;
+    }
 
     //endregion
     //endregion

@@ -4,7 +4,7 @@ namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Enums\ContentEditorType;
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Bases\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
@@ -13,7 +13,7 @@ use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Objects\PageBreadcrumb;
 use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
-use Adminx\Common\Models\Pages\Objects\PageModelConfig;
+use Adminx\Common\Models\Pages\Objects\PageInternalConfig;
 use Adminx\Common\Models\Traits\HasBreadcrumbs;
 use Adminx\Common\Models\Traits\HasGenericConfig;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
@@ -30,7 +30,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @property EloquentModelBase|CustomListBase $model
  */
-class PageModel extends EloquentModelBase implements PublicIdModel, UploadModel
+class PageInternal extends EloquentModelBase implements PublicIdModel, UploadModel
 
 {
     use HasSelect2,
@@ -46,6 +46,7 @@ class PageModel extends EloquentModelBase implements PublicIdModel, UploadModel
         'page_id',
         'model_type',
         'model_id',
+        'title',
         'slug',
         'content',
         'config',
@@ -53,8 +54,9 @@ class PageModel extends EloquentModelBase implements PublicIdModel, UploadModel
     ];
 
     protected $casts = [
+        'title' => 'string',
         'content' => 'string',
-        'config'  => PageModelConfig::class,
+        'config'  => PageInternalConfig::class,
         'assets'  => FrontendAssetsBundle::class,
     ];
 
@@ -91,7 +93,7 @@ class PageModel extends EloquentModelBase implements PublicIdModel, UploadModel
 
     public function uploadPathTo(?string $path = null): string
     {
-        $uploadPath = "models/{$this->public_id}";
+        $uploadPath = "internals/{$this->public_id}";
 
         return ($this->page ? $this->page->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
     }
@@ -109,8 +111,8 @@ class PageModel extends EloquentModelBase implements PublicIdModel, UploadModel
         $frontendBuild->head->addAfter($this->assets->head_script->html ?? '');
 
         //Inicio do body
-        $frontendBuild->body->id = "article-{$this->public_id}";
-        $frontendBuild->body->class .= " article-{$this->public_id}";
+        $frontendBuild->body->id = "internal-{$this->public_id}";
+        $frontendBuild->body->class .= " internal-{$this->public_id}";
         $frontendBuild->body->addBefore($this->assets->js->before_body_html ?? '');
 
         //Fim do body

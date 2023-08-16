@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \Adminx\Common\Models\Site                                        $site
- * @var \Adminx\Common\Models\Theme                                       $theme
+ * @var \Adminx\Common\Models\Themes\Theme                                       $theme
  * @var \Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject $frontendBuild
  * @var \Butschster\Head\MetaTags\Meta                                    $themeMeta
  */
@@ -12,8 +12,9 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
 
 
 {{--Footer--}}
-{!! $theme->footer->twig_html ?? '' !!}
+{!! $theme->footer->html ?? '' !!}
 
+@if(empty($theme->copyright->html))
 <footer id="footer-copyright" class="footer-bottom py-2">
     <div class="container">
         <div class="row">
@@ -34,6 +35,9 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
         </div>
     </div>
 </footer>
+@else
+    {!! $theme->copyright->html !!}
+@endif
 
 {{--</div>--}}
 
@@ -43,11 +47,10 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
 @endif
 
 {{--<script src="https://www.google.com/recaptcha/api.js?render=explicit"></script>--}}
-@@stack('js-includes')
+{{--@@stack('js-includes')--}}
 
 <script>
     moment.locale("pt-br");
-
     // Ajax calls should always have the CSRF token attached to them, otherwise they won't work
     $.ajaxSetup({
         // force ajax call on all browsers
@@ -62,7 +65,6 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
             xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         }
     });
-
     //recaptcha
     /*window.onload = function() {
         const recaptchaDivs = document.getElementsByClassName('g-recaptcha');
@@ -74,15 +76,14 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
             });
         });
     };*/
-
 </script>
 {!! $captcha->renderJs() !!}
 
 @include('adminx-frontend::layout.inc.alerts')
 
-@@stack('footer-includes')
-@@stack('js')
+{{--@@stack('footer-includes')
+@@stack('js')--}}
 {!! $theme->assets->js->after_body->html ?? '' !!}
-@{!! $frontendBuild->body->after !!}
+@{{ frontendBuild.body.after }}
 
 {!! '</body></html>' !!}
