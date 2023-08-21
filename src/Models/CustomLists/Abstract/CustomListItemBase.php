@@ -1,16 +1,18 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\CustomLists\Abstract;
 
-use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Interfaces\UploadModel;
-use Adminx\Common\Observers\OwneredModelObserver;
-use Adminx\Common\Observers\PublicIdModelObserver;
 use Adminx\Common\Enums\CustomLists\CustomListItemType;
+use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasPublicIdUriAttributes;
@@ -23,6 +25,8 @@ use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
 use Adminx\Common\Models\Traits\Relations\HasParent;
+use Adminx\Common\Observers\OwneredModelObserver;
+use Adminx\Common\Observers\PublicIdModelObserver;
 use Illuminate\Support\Facades\DB;
 
 abstract class CustomListItemBase extends EloquentModelBase implements OwneredModel, PublicIdModel, UploadModel
@@ -113,7 +117,8 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
 
     }
 
-    public function mountModel(){
+    public function mountModel(): CustomListItemBase
+    {
         return self::findAndMount($this->id, $this->type->value);
     }
 

@@ -1,30 +1,31 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Facades\FileManager\FileUpload;
-use Adminx\Common\Models\Article;
-use App\Repositories\Exception;
-use Adminx\Common\Enums\FileType;
-use Adminx\Common\Libs\Helpers\FileHelper;
-use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
 use Adminx\Common\Repositories\Base\Repository;
-use Illuminate\Support\Facades\DB;
+use Exception;
+
 /**
  * @property ?CustomListItemBase $model
  */
 class CustomListItemRepository extends Repository
 {
-    public int|null $list_id;
+    public ?int           $list_id;
     public CustomListBase $customList;
+    protected string $modelClass = CustomListItem::class;
 
-    public function __construct(
+    /*public function __construct(
         protected CustomListItemBase|null $listItem = null,
-    ) {}
+    ) {}*/
 
     public function customList($list_id): static
     {
@@ -43,7 +44,7 @@ class CustomListItemRepository extends Repository
         $this->model->fill($this->data);
         $this->model->list_id = $this->list_id;
 
-        if(!$this->model->id){
+        if (!$this->model->id) {
             $this->model->newPosition();
         }
 
@@ -74,13 +75,13 @@ class CustomListItemRepository extends Repository
         $this->uploadPathBase = $this->model->uploadPathTo();
 
         //Media
-        if($this->data['data']['image']['file_upload'] ?? false){
+        if ($this->data['data']['image']['file_upload'] ?? false) {
 
             //$mediaFile = FileHelper::saveRequestToSite($this->model->site, $this->data['data']['image']['file_upload'], $this->uploadPathBase, $this->model->public_id, $this->model->data->image->file ?? null);
 
             $mediaFile = FileUpload::upload($this->data['data']['image']['file_upload'], $this->uploadPathBase, $this->model->public_id);
 
-            if(!$mediaFile){
+            if (!$mediaFile) {
                 abort(500);
             }
 
@@ -96,20 +97,22 @@ class CustomListItemRepository extends Repository
      *
      * @return bool
      */
-    public function updateList(array $items): bool{
+    public function updateList(array $items): bool
+    {
         $retorno = true;
-        foreach ($items as $i => $item){
+        foreach ($items as $i => $item) {
             $listItem = CustomListItem::findAndMount($item);
 
-            if($listItem) {
+            if ($listItem) {
                 $listItem->position = $i;
 
                 $retorno = $listItem->save();
-            }else{
+            }
+            else {
                 $retorno = false;
             }
 
-            if(!$retorno){
+            if (!$retorno) {
                 return $retorno;
                 break;
             }

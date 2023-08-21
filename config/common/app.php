@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 return [
     'adminx_domain'   => env('ADMINX_DOMAIN'),
@@ -13,7 +17,7 @@ return [
         'keywords' =>
             'adminx, painel, criação de sites, cms, painel administrativo, gerenciador de conteúdo, content manager',
 
-        'version' => '0.6-alpha-r2',
+        'version' => '0.6.1-alpha',
     ],
 
     'provider' => [
