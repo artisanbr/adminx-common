@@ -40,6 +40,10 @@ class CustomListItemHtmlData extends GenericModel
 
         return !empty($this->attributes["description"] ?? null) ? $this->attributes["description"] : Str::limit(Str::removeHTML($this->content), 150);
     }
+
+    protected function getHtmlAttribute(){
+        return $this->content;
+    }
     //endregion
 
     //region SET's
