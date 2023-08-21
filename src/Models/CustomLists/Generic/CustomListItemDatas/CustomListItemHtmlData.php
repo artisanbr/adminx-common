@@ -32,6 +32,7 @@ class CustomListItemHtmlData extends GenericModel
     ];*/
 
     protected $appends = [
+        'html'
     ];
 
     //region Attributes
