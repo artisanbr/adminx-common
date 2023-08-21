@@ -17,7 +17,7 @@ class CustomListItemHtmlData extends GenericModel
         'image_url',
         'image',
         'description',
-        'content',
+        //'content',
         'content_string',
         //'raw_html',
         'seo'
