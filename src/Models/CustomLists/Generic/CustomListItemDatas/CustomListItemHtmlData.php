@@ -6,7 +6,6 @@
 
 namespace Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas;
 
-use Adminx\Common\Models\Generics\Elements\HtmlElement;
 use Adminx\Common\Models\Generics\Files\GenericImageFile;
 use Adminx\Common\Models\Objects\Seo\Seo;
 use ArtisanLabs\GModel\GenericModel;
@@ -28,23 +27,22 @@ class CustomListItemHtmlData extends GenericModel
         'image_url' => 'string',
         'image' => GenericImageFile::class, //todo: remove
         'description' => 'string',
-        'content' => HtmlElement::class,
+        'content' => 'string',
         'content_string' => 'string',
         'seo' => Seo::class,
     ];
 
-    protected $attributes = [
-        'content' => [],
-    ];
+    /*protected $attributes = [
+    ];*/
 
     protected $appends = [
-        'html'
+        //'html'
     ];
 
     protected $temporary = ['raw_html'];
 
-    public function getHtmlAttribute() {
+    /*public function getHtmlAttribute() {
         return $this->content->raw;
-    }
+    }*/
 
 }
