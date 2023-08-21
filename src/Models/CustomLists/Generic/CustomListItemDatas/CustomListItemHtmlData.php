@@ -6,6 +6,7 @@
 
 namespace Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas;
 
+use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Objects\Seo\Seo;
 use ArtisanLabs\GModel\GenericModel;
 
@@ -17,16 +18,13 @@ class CustomListItemHtmlData extends GenericModel
         //'image',
         'description',
         'content',
-        'content_string',
         'seo'
     ];
 
     protected $casts = [
         'image_url' => 'string',
-        //'image' => GenericImageFile::class, //todo: remove
         'description' => 'string',
         'content' => 'string',
-        'content_string' => 'string',
         'seo' => Seo::class,
     ];
 
@@ -34,13 +32,25 @@ class CustomListItemHtmlData extends GenericModel
     ];*/
 
     protected $appends = [
-        //'html'
     ];
 
-    //protected $temporary = ['raw_html'];
+    //region Attributes
+    //region GET's
+    protected function getDescriptionAttribute(){
 
-    /*public function getHtmlAttribute() {
-        return $this->content->raw;
-    }*/
+        return !empty($this->attributes["description"] ?? null) ? $this->attributes["description"] : Str::limit(Str::removeHTML($this->content), 150);
+    }
+    //endregion
+
+    //region SET's
+    protected function setDescriptionAttribute($value){
+        if((string) $value !== Str::limit(Str::removeHTML($this->content), 150)){
+            $this->attributes["description"] = $value;
+        }else{
+            $this->attributes["description"] = null;
+        }
+    }
+    //endregion
+    //endregion
 
 }
