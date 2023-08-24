@@ -1,9 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Traits;
 
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Database\Eloquent\Model;
 
@@ -92,7 +96,7 @@ trait HasUriAttributes
     {
         $path = (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, -1) : $path;
 
-        //$path .= !Str::endsWith($this->{$comparesWithAttr}, '/') ? '/' : '';
+        $path .= !Str::endsWith($this->{$comparesWithAttr}, '/') ? '/' : '';
 
         return $path;
     }

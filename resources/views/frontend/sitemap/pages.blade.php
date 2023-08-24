@@ -48,7 +48,7 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
             @if($pageInternal->model?->items ?? false)
                 @foreach($pageInternal->model->mountModel()->items as $modelItem)
                     <url>
-                        <loc>{{ $page->uriTo($modelItem->url) }}</loc>
+                        <loc>{{ $site->uriTo($modelItem->url) }}</loc>
                         <changefreq>weekly</changefreq>
                         <lastmod>{{ $modelItem->updated_at->toIso8601String() }}</lastmod>
                         <priority>0.5</priority>
