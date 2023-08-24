@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \Adminx\Common\Models\Site $site
+ * @var \Adminx\Common\Models\Sites\Site $site
  */
 ?>
 <?php print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>

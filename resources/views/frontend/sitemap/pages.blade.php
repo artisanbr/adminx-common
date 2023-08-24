@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \Adminx\Common\Models\Site $site
+ * @var \Adminx\Common\Models\Sites\Site $site
  */
 ?>
 <?php
@@ -8,7 +8,6 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
 <urlset
         xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
         xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
@@ -54,7 +53,7 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
                         <lastmod>{{ $modelItem->updated_at->toIso8601String() }}</lastmod>
                         <priority>0.5</priority>
 
-                        @if($modelItem->data->image->file && $modelItem->data->image_url)
+                        @if($modelItem->data->image_url)
                             <image:image>
                                 <image:loc>{{ FrontendUtils::url($modelItem->data->image_url) }}</image:loc>
                                 {{--<image:title>{{ $article->seoTitle() }}</image:title>--}}
