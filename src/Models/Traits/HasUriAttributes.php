@@ -79,24 +79,26 @@ trait HasUriAttributes
         return ($dynamic ? '' : "{$this->http_protocol}:") . '//' . $this->urlFrom($model);
     }
 
-    public function uriTo($path)
+    public function uriTo($path, $endWithDash = true)
     {
-        return $this->uri . $this->traitPath($path, 'uri');
+        return $this->uri . $this->traitPath($path, $endWithDash, 'uri');
     }
 
-    public function urlTo($path)
+    public function urlTo($path, $endWithDash = true)
     {
         if(Str::startsWith($path, '/') && Str::endsWith($this->url, '/')){
             $path = Str::substr($path, 0, -1);
         }
-        return $this->url . $this->traitPath($path);
+        return $this->url . $this->traitPath($path, $endWithDash);
     }
 
-    private function traitPath(string $path, $comparesWithAttr = 'url'): string
+    private function traitPath(string $path, $endWithDash = true, $comparesWithAttr = 'url'): string
     {
         $path = (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, -1) : $path;
 
-        $path .= !Str::endsWith($this->{$comparesWithAttr}, '/') ? '/' : '';
+        if($endWithDash){
+            $path .= !Str::endsWith($this->{$comparesWithAttr}, '/') ? '/' : '';
+        }
 
         return $path;
     }
