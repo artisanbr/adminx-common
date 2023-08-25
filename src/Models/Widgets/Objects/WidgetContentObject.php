@@ -1,12 +1,14 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Widgets\Objects;
 
 
-use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
-use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Objects\Abstract\AbstractHtmlObject;
-use Adminx\Common\Models\Site;
-use ArtisanLabs\GModel\GenericModel;
+use Adminx\Common\Models\Sites\Site;
 
 class WidgetContentObject extends AbstractHtmlObject
 {

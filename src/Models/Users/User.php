@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Users;
 
@@ -10,14 +14,14 @@ use Adminx\Common\Models\Generics\Configs\UserConfig;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Site;
 use Adminx\Common\Models\SiteAccessLog;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\SiteUser;
-use Adminx\Common\Models\Widgets\SiteWidget;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\HasArticles;
+use Adminx\Common\Models\Widgets\SiteWidget;
 use Cog\Laravel\Ban\Traits\Bannable;
 use EloquentFilter\Filterable;
 use Illuminate\Auth\Authenticatable;

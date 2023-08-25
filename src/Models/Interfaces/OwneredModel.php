@@ -1,10 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Interfaces;
 
-use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Traits\HasPublicIdAttribute;
-use Delight\Random\Random;
+use Adminx\Common\Models\Sites\Site;
 
 /**
  * @property int $site_id

@@ -1,6 +1,6 @@
 <?php
 /**
- * @var \Adminx\Common\Models\Site                                        $site
+ * @var \Adminx\Common\Models\Sites\Site                                        $site
  * @var \Adminx\Common\Models\Themes\Theme                                       $theme
  * @var \Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject $frontendBuild
  * @var \Butschster\Head\MetaTags\Meta                                    $themeMeta

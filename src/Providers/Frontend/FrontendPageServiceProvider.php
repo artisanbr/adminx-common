@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Providers\Frontend;
 
@@ -11,7 +15,7 @@ use Adminx\Common\Models\Pages\Modules\Manager\PageModuleManagerEngine;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Pages\Types\Manager\PageTypeManagerEngine;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Templates\Global\Manager\PageTemplateManagerEngine;
 use Adminx\Common\Models\Themes\Theme;
 use Butschster\Head\Facades\Meta as MetaFacade;

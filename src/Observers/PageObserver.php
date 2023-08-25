@@ -1,13 +1,15 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Observers;
 
 
-use Adminx\Common\Models\Interfaces\OwneredModel;
+use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Pages\Page;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 
 class PageObserver
 {
@@ -19,17 +21,31 @@ class PageObserver
         }
 
         //Gerar config caso esteja em branco
-        if(!$model->has_config){
-            $model->config = $model->type->config;
+        if (!$model->has_config) {
+            $model->config = $model->type?->config ?? new PageConfig();
         }
 
         if ($model->id) {
 
             //Comprimir CSS e JS personalizado da Página
             $model->assets->minify();
+
+            //region Seo
+            /*if (empty($model->seo->keywords)) {
+                $model->seo->keywords = $model->content->keywords;
+            }
+
+            if (empty($model->seo->description)) {
+                $model->seo->description = $model->content->description;
+            }
+
+            if (empty($model->seo->title)) {
+                $model->seo->title = $model->title;
+            }*/
+            //endregion
         }
 
-        if(empty($model->published_at)){
+        if (empty($model->published_at)) {
             $model->published_at = $model->created_at ?? Carbon::now();
         }
     }

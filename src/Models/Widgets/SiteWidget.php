@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Widgets;
 
@@ -10,7 +14,7 @@ use Adminx\Common\Models\Generics\DataSource;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasTemplates;
@@ -23,7 +27,6 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
-use ReflectionClass;
 
 class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredModel
 {

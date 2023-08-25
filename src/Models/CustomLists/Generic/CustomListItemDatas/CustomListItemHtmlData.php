@@ -18,7 +18,7 @@ class CustomListItemHtmlData extends GenericModel
         //'image',
         'description',
         'content',
-        'content_string',
+        //'content_string',
         'seo'
     ];
 
@@ -26,7 +26,7 @@ class CustomListItemHtmlData extends GenericModel
         'image_url' => 'string',
         'description' => 'string',
         'content' => 'string',
-        'content_string' => 'string',
+        //'content_string' => 'string',
         'seo' => Seo::class,
     ];
 

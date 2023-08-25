@@ -1,6 +1,6 @@
 <?php
 /***
- * @var \Adminx\Common\Models\Site                                                                                                        $site
+ * @var \Adminx\Common\Models\Sites\Site                                                                                                        $site
  * @var \Adminx\Common\Models\Pages\Page                                                                                                        $page
  * @var \Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase|\Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml $currentItem
  */

@@ -1,23 +1,22 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Http\Controllers\API\Widgets;
 
-use Adminx\Common\Facades\Frontend\FrontendHtml;
-use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Facades\Frontend\FrontendTwig;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Widgets\SiteWidget;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Controllers\Controller;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\View;
-use Symfony\Component\ErrorHandler\Debug;
-use voku\helper\HtmlMin;
 
 /**
  * @middleware frontend

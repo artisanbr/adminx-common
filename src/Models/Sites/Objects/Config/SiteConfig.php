@@ -1,6 +1,12 @@
 <?php
-namespace Adminx\Common\Models\Generics\Configs\Site;
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
+namespace Adminx\Common\Models\Sites\Objects\Config;
+
+use Adminx\Common\Models\Sites\Objects\Config\Import\SiteImportConfig;
 use ArtisanLabs\GModel\GenericModel;
 
 class SiteConfig extends GenericModel
@@ -8,6 +14,7 @@ class SiteConfig extends GenericModel
 
     protected $fillable = [
         'performance',
+        'import',
         'mail',
         'is_https',
         'ssl',
@@ -21,41 +28,47 @@ class SiteConfig extends GenericModel
 
     protected $attributes = [
         'maintenance' => false,
-        'debug' => false,
-        'ssl' => false,
+        'debug'       => false,
+        'ssl'         => false,
         'performance' => [],
     ];
 
     protected $casts = [
         'performance' => SitePerformanceConfig::class,
-        'mail' => MailServerConfig::class,
-        'is_https' => 'bool',
-        'ssl' => 'bool',
-        'debug' => 'bool',
+        'import'      => SiteImportConfig::class,
+        'mail'        => MailServerConfig::class,
+        'is_https'    => 'bool',
+        'ssl'         => 'bool',
+        'debug'       => 'bool',
         'maintenance' => 'bool',
     ];
 
 
-
     //region ATTRIBUTES
 
-    protected function setIsHttpsAttribute($value){
+    protected function setIsHttpsAttribute($value)
+    {
         return $this->attributes['ssl'] = $value;
     }
 
-    protected function getIsHttpsAttribute(){
+    protected function getIsHttpsAttribute()
+    {
         return $this->ssl;
     }
 
-    protected function getSslAttribute(){
+    protected function getSslAttribute()
+    {
         return $this->attributes['ssl'] ?? $this->attributes['is_https'] ?? false;
     }
 
     //region GETS
-    protected function getRecaptchaSiteKeyAttribute($value){
+    protected function getRecaptchaSiteKeyAttribute($value)
+    {
         return $value ?? config("services.recaptcha.site_key");
     }
-    protected function getRecaptchaPrivateKeyAttribute($value){
+
+    protected function getRecaptchaPrivateKeyAttribute($value)
+    {
         return $value ?? config("services.recaptcha.private_key");
     }
     //endregion

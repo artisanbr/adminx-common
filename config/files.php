@@ -1,17 +1,10 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-use Adminx\Common\Models\Category;
-use Adminx\Common\Models\CustomLists\CustomList;
-use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
-use Adminx\Common\Models\Form;
-use Adminx\Common\Models\Menu;
-use Adminx\Common\Models\MenuItem;
-use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Themes\Theme;
-use Adminx\Common\Models\Report;
-use Adminx\Common\Models\FormAnswer;
+use Adminx\Common\Models\Sites\Site;
 
 return [
     'mime_types' => [

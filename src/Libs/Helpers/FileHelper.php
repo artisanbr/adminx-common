@@ -1,10 +1,14 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Libs\Helpers;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\File;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use Buglinjo\LaravelWebp\Webp;
 use Delight\Random\Random;
 use Illuminate\Http\UploadedFile;

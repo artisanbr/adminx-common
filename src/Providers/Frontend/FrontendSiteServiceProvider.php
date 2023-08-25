@@ -1,10 +1,14 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Providers\Frontend;
 
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\FrontendEngine\FrontendSiteEngine;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use Illuminate\Support\ServiceProvider;
 
 class FrontendSiteServiceProvider extends ServiceProvider

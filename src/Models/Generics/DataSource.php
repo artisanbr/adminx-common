@@ -1,15 +1,19 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Generics;
 
 use Adminx\Common\Enums\CustomLists\CustomListType;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
+use Adminx\Common\Models\Article;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Collection;

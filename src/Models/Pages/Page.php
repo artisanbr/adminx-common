@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Pages;
 
@@ -28,6 +32,7 @@ use Adminx\Common\Models\Pages\Objects\PageContent;
 use Adminx\Common\Models\Pages\Types\Abstract\AbstractPageType;
 use Adminx\Common\Models\Pages\Types\Manager\Facade\PageTypeManager;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
+use Adminx\Common\Models\Sites\SiteRoute;
 use Adminx\Common\Models\Templates\Global\Abstract\AbstractPageTemplate;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\PageTemplateManager;
 use Adminx\Common\Models\Traits\HasAdvancedHtml;
@@ -40,6 +45,7 @@ use Adminx\Common\Models\Traits\HasPublishTimestamps;
 use Adminx\Common\Models\Traits\HasRelatedCache;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasSEO;
+use Adminx\Common\Models\Traits\HasSiteRoutes;
 use Adminx\Common\Models\Traits\HasSlugAttribute;
 use Adminx\Common\Models\Traits\HasTemplates;
 use Adminx\Common\Models\Traits\HasUriAttributes;
@@ -55,9 +61,9 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use Butschster\Head\Contracts\MetaTags\RobotsTagsInterface;
 use Butschster\Head\Contracts\MetaTags\SeoMetaTagsInterface;
 use Butschster\Head\Facades\Meta;
-use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
@@ -99,6 +105,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         HasTemplates,
         HasUriAttributes,
         HasVisitCounter,
+        HasSiteRoutes,
         SoftDeletes;
 
     protected $connection = 'mysql';
@@ -167,7 +174,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         //'content',
         //'assets',
         //'html',
-        'url'
+        'url',
 
     ];
 
@@ -177,7 +184,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         //'assets' => [],
     ];
 
-    protected $hidden = ['account_id','site_id','user_id','parent_id'];
+    protected $hidden = ['account_id', 'site_id', 'user_id', 'parent_id'];
 
     //protected $with = ['site'];
 
@@ -196,9 +203,9 @@ class Page extends EloquentModelBase implements BuildableModel,
     public static function createRules(?FormRequest $request = null): array
     {
         return [
-            'type_name'  => ['required'],
+            'type_name' => ['required'],
             //'model_id' => ['required'],
-            'title'    => ['required'],
+            'title'     => ['required'],
         ];
     }
 
@@ -386,7 +393,6 @@ class Page extends EloquentModelBase implements BuildableModel,
         return $this->config->breadcrumb ?? $this->site->theme->config->breadcrumb ?? new BreadcrumbConfig();
     }
 
-
     protected function type(): Attribute
     {
         return Attribute::make(
@@ -458,7 +464,7 @@ class Page extends EloquentModelBase implements BuildableModel,
     protected function text(): Attribute
     {
         return Attribute::make(
-            get: fn() => "<h4>{$this->title}</h4>{$this->type->title}",
+            get: fn() => "<h4>" . ($this->title ?? 'Página sem Título') . "</h4><div class=\"d-flex align-items-center\"><small class=\"ms-0 me-2 w-100\">{$this->type?->title}</small><small class=\"ms-auto me-0\">{$this->created_at?->shortRelativeToNowDiffForHumans()}</small></div>",
         );
     }
 
@@ -511,7 +517,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     protected function getHtmlAttribute()
     {
-        return $this->content->main->html ?? '';
+        return $this->content->html ?? '';
     }
 
     protected function getUrlAttribute()
@@ -531,13 +537,13 @@ class Page extends EloquentModelBase implements BuildableModel,
     //region SETS
     protected function setHtmlAttribute($value): void
     {
-        $this->content->main->html = $value;
+        $this->content->html = $value;
     }
 
-    protected function setInternalHtmlAttribute($value): void
+    /*protected function setInternalHtmlAttribute($value): void
     {
         $this->content->internal->html = $value;
-    }
+    }*/
 
     //endregion
 
@@ -593,11 +599,14 @@ class Page extends EloquentModelBase implements BuildableModel,
     }
     //endregion
 
-
-    /*public function custom_lists()
+    /**
+     * Rotas vinculadas á página ou a seus objetos
+     */
+    public function related_routes(): HasMany
     {
-        return $this->hasMany(CustomList::class, 'page_id', 'id');
-    }*/
+        return $this->hasMany(SiteRoute::class);
+    }
+
 
     public function menu_items()
     {
@@ -635,7 +644,10 @@ class Page extends EloquentModelBase implements BuildableModel,
         return $this->belongsTo(PageInternal::class);
     }*/
 
-    public function page_internals()
+    /**
+     * Páginas Internas
+     */
+    public function page_internals(): HasMany
     {
         return $this->hasMany(PageInternal::class);
     }

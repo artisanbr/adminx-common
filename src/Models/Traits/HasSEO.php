@@ -1,11 +1,15 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Traits;
 
+use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Http\FormRequest;
 

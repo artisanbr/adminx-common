@@ -1,20 +1,16 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Pages\Types\Abstract;
 
-use Adminx\Common\Facades\Frontend\FrontendHtml;
-use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
-use Adminx\Common\Libs\FrontendEngine\FrontendHtmlEngine;
-use Adminx\Common\Libs\Helpers\HtmlHelper;
-use Adminx\Common\Models\Pages\Objects\PageConfig;
-use Adminx\Common\Models\Interfaces\HtmlModel;
-use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Modules\Traits\HasPageModulesManager;
-use Adminx\Common\Models\Site;
-use Adminx\Common\Models\Themes\Theme;
+use Adminx\Common\Models\Pages\Objects\PageConfig;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Traits\HasSelect2;
 use ArtisanLabs\GModel\GenericModel;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Collection;
 
 /**

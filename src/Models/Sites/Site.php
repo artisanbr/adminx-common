@@ -1,19 +1,31 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Sites;
 
 use Adminx\Common\Libs\Helpers\HtmlHelper;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Libs\Support\Url;
+use Adminx\Common\Models\Account;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Category;
+use Adminx\Common\Models\Comment;
 use Adminx\Common\Models\CustomLists\CustomList;
-use Adminx\Common\Models\Generics\Configs\Site\SiteConfig;
+use Adminx\Common\Models\File;
+use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Generics\Contact\Contact;
-use Adminx\Common\Models\Interfaces\UploadModel;
-use Adminx\Common\Models\Objects\Seo\SiteSeo;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
+use Adminx\Common\Models\Interfaces\UploadModel;
+use Adminx\Common\Models\Menu;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
+use Adminx\Common\Models\Objects\Seo\SiteSeo;
+use Adminx\Common\Models\Pages\Page;
+use Adminx\Common\Models\Sites\Objects\Config\SiteConfig;
+use Adminx\Common\Models\Tag;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
@@ -22,15 +34,14 @@ use Adminx\Common\Models\Traits\HasSEO;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
-use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasArticles;
+use Adminx\Common\Models\Traits\Relations\HasFiles;
+use Adminx\Common\Models\Users\User;
 use Adminx\Common\Models\Widgets\SiteWidget;
 use Adminx\Common\Rules\DomainRule;
-use Adminx\Common\Models\Pages\Page;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
-use Adminx\Common\Models\Users\User;
 
 class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
@@ -263,6 +274,11 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     public function themes()
     {
         return $this->hasMany(Theme::class);
+    }
+
+    public function routes()
+    {
+        return $this->hasMany(SiteRoute::class);
     }
 
     public function theme()

@@ -23,6 +23,7 @@ use Adminx\Common\Models\Traits\HasPublicIdUriAttributes;
 use Adminx\Common\Models\Traits\HasPublishTimestamps;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasSEO;
+use Adminx\Common\Models\Traits\HasSiteRoutes;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToPage;
@@ -41,7 +42,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
-    use HasUriAttributes, HasSelect2, HasPublishTimestamps, SoftDeletes, HasValidation, HasSEO, HasFiles, BelongsToPage, BelongsToUser, BelongsToSite, HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes, HasPublicIdAttribute;
+    use HasUriAttributes, HasSelect2, HasPublishTimestamps, SoftDeletes, HasValidation, HasSEO, HasFiles, BelongsToPage, BelongsToUser, BelongsToSite, HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes,
+        HasSiteRoutes, HasPublicIdAttribute;
 
     protected $table = 'articles';
 
@@ -87,9 +89,9 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     protected $touches = ['page'];
 
-    protected $with = ['page','site'];
+    protected $with = ['page', 'site'];
 
-    protected $hidden = ['account_id','site_id','user_id','page_id'];
+    protected $hidden = ['account_id', 'site_id', 'user_id', 'page_id'];
 
 
     //region VALIDATION

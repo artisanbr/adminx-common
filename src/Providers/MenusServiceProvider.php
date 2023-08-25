@@ -1,10 +1,14 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Providers;
 
-use App\View\Components\Icon;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Pages\Page;
+use App\View\Components\Icon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\ServiceProvider;
@@ -45,6 +49,7 @@ class MenusServiceProvider extends ServiceProvider
         Html::macro('kicon', function ($icon = null, $class = '', $paths = 2) {
 
             $size = 2;
+            $kicon = true;
 
             if(is_array($icon)){
 
@@ -54,13 +59,25 @@ class MenusServiceProvider extends ServiceProvider
                 $paths = $iconArray['paths'] ?? $paths ?? 2;
                 $size = $iconArray['size'] ?? $size;
                 $icon = $iconArray['icon'] ?? $icon;
+                $kicon = $iconArray['type'] ?? $iconArray['kicon'] ?? true;
             }
 
             if (!is_null($icon)) {
-                $html = "<span class='menu-icon'>" .
-                    Blade::render(<<<blade
-<x-kicon i="$icon" class="$class" paths="$paths" size="$size" />
-blade, compact('icon', 'class', 'paths', 'size')) . "</span>";
+                $html = "<span class='menu-icon'>";
+
+                if($kicon){
+                    $html .= Blade::render(<<<blade
+<x-kicon i="{$icon}" class="{$class}" paths="{$paths}" size="{$size}" />
+blade, compact('icon', 'class', 'paths', 'size'));
+                }else{
+                    $html .= <<<html
+<i class="{$icon} {$class}"></i>
+html;
+
+                }
+
+                $html .= "</span>";
+
 
             }
             else {

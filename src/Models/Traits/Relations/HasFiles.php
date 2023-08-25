@@ -1,14 +1,18 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Traits\Relations;
 
 use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Libs\Support\Str;
+use Adminx\Common\Models\Article;
 use Adminx\Common\Models\File;
 use Adminx\Common\Models\Folder;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Themes\Theme;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;

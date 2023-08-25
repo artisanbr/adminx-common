@@ -1,9 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 
 abstract class FrontendEngineBase
 {

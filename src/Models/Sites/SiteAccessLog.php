@@ -1,15 +1,14 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Sites;
 
-use Adminx\Common\Exceptions\FrontendException;
-use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Casts\AsFormElementCollection;
-use Adminx\Common\Models\Generics\Configs\FormConfig;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class SiteAccessLog extends Pivot

@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 /**
  * Created by PhpStorm.
  * User: renalcio
@@ -9,11 +14,9 @@
 namespace Adminx\Common\Libs\Helpers;
 
 
-use Adminx\Common\Libs\Support\HtmlString;
-use Collective\Html\HtmlFacade;
-use DOMDocument;
 use HTMLPurifier;
 use HTMLPurifier_Config;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ScssPhp\ScssPhp\Compiler;
 use ScssPhp\ScssPhp\Exception\SassException;
@@ -21,6 +24,28 @@ use ScssPhp\ScssPhp\OutputStyle;
 
 class HtmlHelper
 {
+
+    public static function getMediaUrls($html): array
+    {
+        $urls = [];
+
+        // Use regex para encontrar todos os URLs de imagens e PDF.
+        preg_match_all('/<(img|iframe|a)[^>]+?(?:src|href)="([^"]+(?:pdf|jpg|jpeg|png|gif))"/i', $html, $matches);
+
+        // Itere pelos resultados e adicione os URLs aos URLs.
+        foreach ($matches[2] as $url) {
+            $urls[] = $url;
+        }
+
+        // Retorne os URLs.
+        return $urls;
+    }
+
+    public static function getMediaUrlsCollection($html): Collection
+    {
+        return collect(self::getMediaUrls($html));
+    }
+
 
     public static function isHTML($string)
     {
@@ -39,8 +64,12 @@ class HtmlHelper
         return self::hasTags($string, $tags, true);
     }
 
-    public static function removeTags(string $string, array|string $tags): string
+    public static function removeTags(string $string, array|string|null $tags = null): string
     {
+        if (!$tags) {
+            return self::removeAllTags($string);
+        }
+
         if (is_string($tags)) {
             $tags = explode(',', $tags);
         }
@@ -53,6 +82,18 @@ class HtmlHelper
         }
 
         return $string;
+
+    }
+
+    public static function removeAllTags(string $string): string
+    {
+        $stripedString = strip_tags($string);
+
+        // Substituir as quebras de linha por espaços
+        $singleSpacedString = str_replace(["\r\n", "\n", "\r"], ' ', $stripedString);
+
+        // Remover espaços consecutivos extras
+        return preg_replace('/\s+/', ' ', $stripedString);
 
     }
 
@@ -209,7 +250,8 @@ class HtmlHelper
         return $compiler->compileString($sass)->getCss();
     }
 
-    public static function ldJsonScript($schema): string{
+    public static function ldJsonScript($schema): string
+    {
 
         if ($schema) {
             return '<script type="application/ld+json">' . json_encode($schema) . '</script>';
@@ -219,7 +261,8 @@ class HtmlHelper
     }
 
 
-    public static function fixTags(string $html): string {
+    public static function fixTags(string $html): string
+    {
         $config = HTMLPurifier_Config::createDefault();
         $config->set('AutoFormat.AutoParagraph', false); // Desabilitar formatação automática de parágrafos
         $config->set('AutoFormat.RemoveEmpty', true); // Remover tags vazias

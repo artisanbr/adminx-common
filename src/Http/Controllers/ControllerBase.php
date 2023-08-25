@@ -1,11 +1,15 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Http\Controllers;
 
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Users\User;
-use ArtisanLabs\Breadcrumbs\Providers\Breadcrumbs;
 use App\Http\Controllers\Controller;
+use ArtisanLabs\Breadcrumbs\Providers\Breadcrumbs;
 use Illuminate\Support\Facades\Auth;
 
 abstract class ControllerBase extends Controller

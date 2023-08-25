@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Libs\Support;
 
@@ -19,23 +23,29 @@ class Str extends CoreStr
         return ucwords($string, $separators);
     }
 
-    public static function removeHTML($text, $allowed_tags = null): string
+    public static function removeHTML(string $text, $allowed_tags = null): string
     {
+        //dd($text,html_entity_decode($text));
         return strip_tags($text, $allowed_tags);
     }
 
-    public static function mostFrequentWords(string|array $content): array
+    public static function mostFrequentWords(string|array $string, $limitWords = 40, $minWordChars = 3): array
     {
-        if(is_string($content)){
-            //Remove HTML
-            $content = self::removeHTML($content);
 
-            $content = explode(" ", $content);
-        }
+        // Converte a string em um array de palavras
+        $words = self::of(self::removeHTML($string))->explode(' ')->toArray();
 
-        $counts = array_count_values(str_word_count(implode(" ",$content),1));
-        arsort($counts);
-        return $counts;
+        // Cria um array associativo com as palavras como chaves e o número de repetições como valores
+        $word_counts = array_count_values($words);
+
+        // Ordena o array decrescentemente por número de repetições
+        arsort($word_counts);
+
+        // Limita o array às 20 palavras mais repetidas
+        $word_counts = array_slice($word_counts, 0, $limitWords);
+
+        // Retorna o array
+        return collect($word_counts)->filter(static fn($count, $word) => Str::length($word) > $minWordChars)->toArray();
     }
 
     public static function removeBlankLines($text): string{

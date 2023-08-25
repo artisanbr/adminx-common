@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Libs\FrontendEngine\Twig\Extensions;
 
@@ -6,14 +10,12 @@ use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Menu;
-use Adminx\Common\Models\Site;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Widgets\SiteWidget;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Twig\Environment;
 use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;

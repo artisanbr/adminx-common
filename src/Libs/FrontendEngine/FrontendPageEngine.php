@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Libs\FrontendEngine;
 
@@ -23,7 +27,7 @@ class FrontendPageEngine extends FrontendEngineBase
         }
     }
 
-    public function getHomePage(): Page
+    public function getHomePage(): ?Page
     {
 
         if (!$this->currentPage || !$this->currentPage->is_home) {
@@ -37,7 +41,7 @@ class FrontendPageEngine extends FrontendEngineBase
         return $this->currentPage;
     }
 
-    public function getCurrentPage(): Page
+    public function getCurrentPage(): ?Page
     {
         return $this->currentPage;
     }

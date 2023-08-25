@@ -1,5 +1,10 @@
 <?php
-namespace Adminx\Common\Models\Generics\Configs\Site;
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
+namespace Adminx\Common\Models\Sites\Objects\Config;
 
 use ArtisanLabs\GModel\GenericModel;
 
