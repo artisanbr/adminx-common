@@ -115,7 +115,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         'user_id',
         'account_id',
         'parent_id',
-        'type_id',
+        //'type_id',
         'type_name',
         'model_id',
         'template_name',
@@ -634,11 +634,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         return $this->morphMany(FormAnswer::class, 'formulable');
     }*/
 
-    /*public function type()
-    {
-        return $this->belongsTo(PageType::class);
-    }
-
+    /*
     public function model()
     {
         return $this->belongsTo(PageInternal::class);

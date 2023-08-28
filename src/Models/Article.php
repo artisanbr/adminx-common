@@ -98,7 +98,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     protected $with = ['page', 'site'];
 
-    protected $hidden = ['account_id', 'site_id', 'user_id', 'page_id'];
+    protected $hidden = ['account_id', 'site_id', 'user_id'];
 
 
     //region VALIDATION

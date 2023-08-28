@@ -335,13 +335,19 @@ class WordpressImportTools
                 if ($result) {
                     //Vincular Categorias
                     $wpPostCategories = $importPost->taxonomies()->category()->get();
+
+                    $localCategoriesIds = collect();
                     foreach ($wpPostCategories as $wpPostCategory) {
                         $localCategory = $this->getLocalCategoryFrom($wpPostCategory);
 
                         if ($localCategory) {
-                            $localArticle->categories()->attach([$localCategory->id]);
+                            $localCategoriesIds->add($localCategory->id);
                         }
                     }
+
+                    $localArticle->categories()->detach();
+
+                    $localArticle->categories()->sync($localCategoriesIds->toArray());
 
                     //Rotas alternativas
                     if ($importPost->url !== $localArticle->uri) {
