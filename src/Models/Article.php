@@ -41,6 +41,10 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
 
+/**
+ * @property Seo                  $seo
+ * @property FrontendAssetsBundle $assets
+ */
 class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
     use HasUriAttributes, HasSelect2, HasPublishTimestamps, SoftDeletes, HasValidation, HasSEO, HasFiles, BelongsToPage, BelongsToUser, BelongsToSite, HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes,
@@ -72,8 +76,8 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     ];
 
     protected $casts = [
-        'seo'            => Seo::class,
-        'assets'         => FrontendAssetsBundle::class,
+        /*'seo'            => Seo::class,
+        'assets'         => FrontendAssetsBundle::class,*/
         'meta'           => ArticleMetaObject::class,
         'published_at'   => 'datetime:d/m/Y H:i:s',
         'unpublished_at' => 'datetime:d/m/Y H:i:s',
@@ -210,6 +214,28 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     }
 
     //region ATTRIBUTES
+    protected function getSeoAttribute(): Seo
+    {
+        return $this->meta->seo;
+    }
+    protected function setSeoAttribute($value): static
+    {
+        $this->meta->seo->fill($value);
+
+        return $this;
+    }
+
+    protected function getAssetsAttribute(): FrontendAssetsBundle
+    {
+        return $this->meta->assets;
+    }
+    protected function setAssetsAttribute($value): static
+    {
+        $this->meta->assets->fill($value);
+
+        return $this;
+    }
+
     protected function ldJsonScript(): Attribute
     {
         return Attribute::make(
