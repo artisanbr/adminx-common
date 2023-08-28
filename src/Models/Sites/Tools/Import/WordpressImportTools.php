@@ -125,7 +125,7 @@ class WordpressImportTools
 
     public function wpPageQuery(): PostBuilder
     {
-        return WpPage::published()->type('post');
+        return WpPage::published();
     }
 
     public function wpCategoryQuery(): TaxonomyBuilder
