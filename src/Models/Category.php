@@ -1,14 +1,23 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Interfaces\OwneredModel;
+use Adminx\Common\Models\Pages\Page;
+use Adminx\Common\Models\Scopes\WhereSiteScope;
+use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
+use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\ScopeOrganize;
@@ -17,13 +26,15 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
-use Adminx\Common\Models\Pages\Page;
 
-class Category extends EloquentModelBase
+class Category extends EloquentModelBase implements OwneredModel
 {
-    use HasSelect2, HasUriAttributes, ScopeOrganize, HasUriAttributes, HasMorphAssigns, HasValidation, BelongsToSite, BelongsToAccount, HasParent;
+    use HasSelect2, HasUriAttributes, ScopeOrganize, HasUriAttributes, HasMorphAssigns, HasValidation, BelongsToSite, BelongsToAccount, HasParent, BelongsToUser, HasOwners;
 
     protected $fillable = [
+        'site_id',
+        'account_id',
+        'user_id',
         'title',
         'slug',
         'description',
@@ -101,6 +112,11 @@ class Category extends EloquentModelBase
     //endregion
 
     //region OVERRIDES
+    protected static function booted()
+    {
+        static::addGlobalScope(new WhereSiteScope);
+    }
+
     public function save(array $options = []): bool
     {
         //Gerar slug se estiver em branco

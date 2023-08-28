@@ -13,6 +13,7 @@ use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
+use Adminx\Common\Models\Objects\ArticleMetaObject;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
@@ -60,6 +61,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         'cover_id',
         'assets',
         'seo',
+        'meta',
         'published_at',
         'unpublished_at',
         'unpublish',
@@ -72,6 +74,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     protected $casts = [
         'seo'            => Seo::class,
         'assets'         => FrontendAssetsBundle::class,
+        'meta'           => ArticleMetaObject::class,
         'published_at'   => 'datetime:d/m/Y H:i:s',
         'unpublished_at' => 'datetime:d/m/Y H:i:s',
         'created_at'     => 'datetime:d/m/Y H:i:s',
