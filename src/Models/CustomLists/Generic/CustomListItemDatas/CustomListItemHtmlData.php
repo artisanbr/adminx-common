@@ -41,7 +41,7 @@ class CustomListItemHtmlData extends GenericModel
     //region GET's
     protected function getDescriptionAttribute(){
 
-        return !empty($this->attributes["description"] ?? null) ? $this->attributes["description"] : Str::limit(Str::removeHTML($this->content), 150);
+        return !empty($this->attributes["description"] ?? null) ? $this->attributes["description"] : Str::limit(Str::removeHTML($this->content ?? ''), 150);
     }
 
     protected function getHtmlAttribute(){
@@ -51,7 +51,7 @@ class CustomListItemHtmlData extends GenericModel
 
     //region SET's
     protected function setDescriptionAttribute($value){
-        if((string) $value !== Str::limit(Str::removeHTML($this->content), 150)){
+        if((string) $value !== Str::limit(Str::removeHTML($this->content ?? ''), 150)){
             $this->attributes["description"] = $value;
         }else{
             $this->attributes["description"] = null;
