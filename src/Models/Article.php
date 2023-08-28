@@ -218,6 +218,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     {
         return $this->meta->seo;
     }
+
     protected function setSeoAttribute($value): static
     {
         $this->meta->seo->fill($value);
@@ -229,6 +230,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     {
         return $this->meta->assets;
     }
+
     protected function setAssetsAttribute($value): static
     {
         $this->meta->assets->fill($value);
@@ -264,8 +266,22 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     protected function description(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ?? $this->limitContent(),
+            get: fn($value) => Str::of($value ?? Str::limit(strip_tags($this->content), 300))->replaceMatches('/\r\n+/', "\r\n"),
             set: static fn($value) => $value,
+        );
+    }
+
+    protected function descriptionHtml(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => nl2br($this->description),
+        );
+    }
+
+    protected function short_content(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $this->limitContent(),
         );
     }
 
@@ -295,7 +311,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     protected function nextArticle(): Attribute
     {
-        if (!$this->nextArticleCache) {
+        if ($this->id && !$this->nextArticleCache) {
             $this->nextArticleCache = self::where('id', '>', $this->id)->orderBy('id', 'asc')->withCount('comments')->first();
         }
 
@@ -308,7 +324,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     protected function previousArticle(): Attribute
     {
         if (!$this->previousArticleCache) {
-            $this->previousArticleCache = self::where('id', '<', $this->id)->orderBy('id', 'desc')->withCount(['comments'])->first();
+            $this->previousArticleCache = ($this->id ? self::where('id', '<', $this->id) : self::query())->orderBy('id', 'desc')->withCount(['comments'])->first();
         }
 
         return Attribute::make(

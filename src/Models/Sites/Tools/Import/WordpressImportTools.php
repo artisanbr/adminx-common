@@ -11,6 +11,7 @@ use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Category;
 use Adminx\Common\Models\Pages\Page;
+use Adminx\Common\Models\Sites\Enums\SiteRouteType;
 use Adminx\Common\Models\Sites\Objects\Config\Import\WordpressImportConfig;
 use Adminx\Common\Models\Sites\Site;
 use Corcel\Model\Builder\PostBuilder;
@@ -24,6 +25,8 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
+use Thunder\Shortcode\Shortcode\ShortcodeInterface;
+use Thunder\Shortcode\ShortcodeFacade;
 
 class WordpressImportTools
 {
@@ -241,8 +244,8 @@ class WordpressImportTools
 
         return match ($section) {
             'pages' => $this->wpPages(static fn($q) => $q->paginate(10)),
-            'categories' => $this->wpCategories(static fn($q) => $q->paginate()),
-            'posts' => $this->wpPosts(static fn($q) => $q->paginate()),
+            //'categories' => $this->wpCategories(static fn($q) => $q->paginate()),
+            //'posts' => $this->wpPosts(static fn($q) => $q->paginate()),
             default => collect(),
         };
     }
@@ -274,9 +277,9 @@ class WordpressImportTools
     {
 
         return [
-            'models' => $this->sectionModels($section),
-            'items'  => $this->sectionItems($section),
-            'items_count'  => $this->sectionItemsCount($section),
+            'models'      => $this->sectionModels($section),
+            'items'       => $this->sectionItems($section),
+            'items_count' => $this->sectionItemsCount($section),
         ];
     }
     //endregion
@@ -284,6 +287,9 @@ class WordpressImportTools
     //region Import Helpers
     public function importPostsTo(Page $page, $step = 1, $step_items_number = 50): Collection
     {
+        /**
+         * @var \Illuminate\Database\Eloquent\Collection|WpPost[] $importPosts
+         */
         if (!$this->page) {
             $this->setPage($page);
         }
@@ -295,27 +301,74 @@ class WordpressImportTools
         if ($importPosts->count()) {
 
             foreach ($importPosts as $importPost) {
-                $localArticle = $this->page->articles()->where('options');
+                $localArticle = $this->page->articles()->where('meta->wp_id', $importPost->ID)->firstOrNew();
 
-                if($localParent){
-                    $localCategory = $localCategory->whereParentId($localParent->id);
+                $localArticle->meta->wp_id = $importPost->ID;
+
+                $localArticle->fill([
+                                        'site_id'      => $this->site->id,
+                                        'title'        => $importPost->title,
+                                        'slug'         => $importPost->slug,
+                                        'cover_url'    => $this->convertUrls($importPost->image),
+                                        'content'      => $this->traitContent($importPost->content),
+                                        'created_at'   => $importPost->created_at,
+                                        'updated_at'   => $importPost->updated_at,
+                                        'published_at' => $importPost->created_at,
+                                    ]);
+
+                $wpSeoDescription = $importPost->meta()->where('meta_key', '_yoast_wpseo_metadesc')->first()?->value ?? $localArticle->description;
+
+
+                $localArticle->meta->seo->fill([
+                                                   'title'       => $localArticle->title,
+                                                   'keywords'    => $importPost->keywords,
+                                                   'description' => $wpSeoDescription,
+                                               ]);
+
+
+                if (empty($localArticle->seo->keywords)) {
+                    $localArticle->seo->keywords = collect(Str::mostFrequentWords(strip_tags($localArticle->content)))->keys()->toArray();
                 }
 
-                $localCategory = $localCategory->firstOrNew();
+                $result = $localArticle->save();
 
-                $localCategory->fill([
-                                         'parent_id' => $localParent?->id ?? null,
-                                         'title'     => $importCategory->name,
-                                         'slug'      => $importCategory->slug,
-                                     ]);
+                if ($result) {
+                    //Vincular Categorias
+                    $wpPostCategories = $importPost->taxonomies()->category()->get();
+                    foreach ($wpPostCategories as $wpPostCategory) {
+                        $localCategory = $this->getLocalCategoryFrom($wpPostCategory);
 
-                $result = $localCategory->save();
+                        if ($localCategory) {
+                            $localArticle->categories()->attach([$localCategory->id]);
+                        }
+                    }
+
+                    //Rotas alternativas
+                    if ($importPost->url !== $localArticle->uri) {
+
+                        //Adicionar redirecionamento do URL do Wordpress
+                        $wpItemURl = $this->convertUrls($importPost->url, false);
+
+                        $wpItemURl = Str::endsWith($wpItemURl, '/') ? Str::substr($wpItemURl, 0, -1) : $wpItemURl;
+
+                        $wpRedirect = $localArticle->routes()->where('url', $wpItemURl)->firstOrNew();
+
+                        $wpRedirect->fill([
+                                              'site_id' => $localArticle->site_id,
+                                              'page_id' => $localArticle->page_id,
+                                              'url'     => $wpItemURl,
+                                              'type'    => SiteRouteType::Model->value,
+                                          ]);
+
+                        $wpRedirect->save();
+                    }
+                }
+
 
                 $resultCollection->add([
-                                           'title'  => $importCategory->title,
-                                           'slug'   => $importCategory->slug,
-                                           'result' => $result,
-                                           'moment' => date('d/m/Y - H:i:s'),
+                                           'article' => $localArticle,
+                                           'result'  => $result,
+                                           'moment'  => date('d/m/Y - H:i:s'),
                                        ]);
 
             }
@@ -324,6 +377,7 @@ class WordpressImportTools
         return $resultCollection;
 
     }
+
     public function importCategoriesTo(Site $site, ?Taxonomy $wpParentCategory = null, ?Category $localParent = null): Collection
     {
         if (!$this->site) {
@@ -337,13 +391,13 @@ class WordpressImportTools
         if ($importCategories->count()) {
 
             if ($wpParentCategory && !$localParent) {
-                $localParent = Category::whereSlug($wpParentCategory->slug)->first();
+                $localParent = $this->getLocalCategoryFrom($wpParentCategory, false);
             }
 
             foreach ($importCategories as $importCategory) {
                 $localCategory = Category::whereSlug($importCategory->slug);
 
-                if($localParent){
+                if ($localParent) {
                     $localCategory = $localCategory->whereParentId($localParent->id);
                 }
 
@@ -375,5 +429,61 @@ class WordpressImportTools
         return $resultCollection;
 
     }
+
+    protected function getLocalCategoryFrom(Taxonomy $wpCategory, $firstOrNew = true): ?Category
+    {
+        $query = Category::whereSlug($wpCategory->slug);
+
+        return $firstOrNew ? $query->firstOrNew() : $query->first();
+    }
+    //endregion
+
+    //region General Helpers
+    protected function convertUrls(string $content, $startsWithDash = true): string
+    {
+        $newUrlStarts = $startsWithDash ? '/' : '';
+
+
+        $wordpressUrl = $this->getWordpressUri();
+        $wordpressUrl .= Str::endsWith($wordpressUrl, '/') ? '' : '/';
+        $wordpressItemsUrl = $wordpressUrl . '?p=';
+        $wordpressMediaUrl = $wordpressUrl . 'wp-content/uploads/';
+        $wordpressRelativeMediaUrl = "{$newUrlStarts}wp-content/uploads/";
+        $newMediaUrl = "{$newUrlStarts}storage/{$this->site->uploadPathTo('wp/')}";
+        $newItemsUrl = "{$newUrlStarts}wp/page/";
+
+        $content = (string)Str::replace($wordpressItemsUrl, $newItemsUrl, $content);
+        $content = (string)Str::replace($wordpressMediaUrl, $newMediaUrl, $content);
+        $content = (string)Str::replace($wordpressRelativeMediaUrl, $newMediaUrl, $content);
+
+        return (string)Str::replace($wordpressUrl, $newUrlStarts, $content);
+
+    }
+    protected function traitContent(string $content): string
+    {
+        $content = $this->convertUrls($content);
+
+        $facade = new ShortcodeFacade();
+        $facade->addHandler('embed', function(ShortcodeInterface $s) {
+            $embedUrl = $s->getContent();
+            $embedRequest = Request::create($embedUrl);
+            $videoID = $embedRequest->query('v');
+            //$parsed_url = parse_url($embedUrl);
+
+            if (!$videoID) {
+                // Try to extract from a short URL
+                if (preg_match('/https?:\/\/(www\.)?youtu\.be\/([a-zA-Z0-9-_]+)/i', $embedRequest->url(), $matches)) {
+                    $videoID = collect($matches)->filter()->values()->get(1);
+                }
+            }
+
+            return $videoID ?? false ? "<iframe width=\"640\" height=\"360\" src=\"//www.youtube.com/embed/{$videoID}\" frameborder=\"0\" allowfullscreen></iframe>" : $embedUrl;
+            //return sprintf('<iframe width="640" height="360" src="//www.youtube.com/embed/%s" frameborder="0" allowfullscreen></iframe>', $videoID);
+        });
+
+        return $facade->process($content);
+
+    }
     //endregion
 }
+
