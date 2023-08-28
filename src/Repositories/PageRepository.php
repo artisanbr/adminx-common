@@ -1,22 +1,19 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Repositories;
 
-use Adminx\Common\Enums\FileType;
 use Adminx\Common\Facades\FileManager\FileUpload;
-use Adminx\Common\Libs\Helpers\FileHelper;
-use Adminx\Common\Libs\Helpers\MorphHelper;
-use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Article;
 use Adminx\Common\Repositories\Base\Repository;
 use Adminx\Common\Repositories\Traits\SeoModelRepository;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 
 /**
  * @property  array{config?: PageConfig, seo: array{image_file?: UploadedFile}} $data
@@ -69,7 +66,7 @@ class PageRepository extends Repository
         //endregion
 
         //Modules
-        $this->model->config->allowed_modules = $this->model->type->allowed_modules->toArray();
+        $this->model->config->allowed_modules = $this->model->type?->allowed_modules->toArray() ?? [];
 
         //endregion
 

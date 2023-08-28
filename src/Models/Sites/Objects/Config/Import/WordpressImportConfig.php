@@ -58,7 +58,7 @@ class WordpressImportConfig extends GenericModel
 
         $this->attributes['uri'] = WordpressImport::setConfig($this)->getWordpressUri();
 
-        return $this->uri;
+        return$this->uri;
     }
 
     public function lockPassword(): ?string
