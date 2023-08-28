@@ -16,7 +16,7 @@ use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Sites\SiteAccessLog;
-use Adminx\Common\Models\SiteUser;
+use Adminx\Common\Models\Sites\SiteUser;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasValidation;
