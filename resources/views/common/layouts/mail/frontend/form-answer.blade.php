@@ -4,7 +4,7 @@
  */
 ?>
 @extends('adminx-common::layouts.mail.base', [
-    'site' => $formAnswer->site ?? Auth::user()->site ?? new \Adminx\Common\Models\Site()
+    'site' => $formAnswer->site ?? Auth::user()->site ?? new \Adminx\Common\Models\Sites\Site()
 ])
 @section('subject', "Nova mensagem em \"{$formAnswer->form->title}\".")
 @section('description', 'Mensagem recebida às '.$formAnswer->created_at->format('d/m/Y \à\s H:i:s').', confira abaixo as respostas enviadas:')

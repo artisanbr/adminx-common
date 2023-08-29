@@ -5,7 +5,7 @@
  */
 
 
-$site = $site ?? \Adminx\Common\Libs\FrontendEngine\FrontendSite::current() ?? new \Adminx\Common\Models\Site();
+$site = $site ?? \Adminx\Common\Libs\FrontendEngine\FrontendSite::current() ?? new \Adminx\Common\Models\Sites\Site();
 $page = $page ?? $homePage ?? new \Adminx\Common\Models\Pages\Page([
                                                                                              'title'     => 'Erro',
                                                                                              'slug'      => 'error',

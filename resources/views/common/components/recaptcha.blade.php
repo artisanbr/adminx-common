@@ -1,5 +1,5 @@
 @props([
-    'site' => new \Adminx\Common\Models\Site(),
+    'site' => new \Adminx\Common\Models\Sites\Site(),
     'noAjax' => false,
     'id' => 'g-recaptcha-'.\Delight\Random\Random::alphaLowercaseHumanString(7),
     'callback' => null,
