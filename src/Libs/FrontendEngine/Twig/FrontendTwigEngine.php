@@ -319,8 +319,6 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //$pageContent = $page->page_template ? "{{ include('@template/index.twig') }}" : '';
 
-        dd($pageContent, $page);
-
 
         $this->templates->put('page', $this->getPageBaseTemplate($pageContent));
 
