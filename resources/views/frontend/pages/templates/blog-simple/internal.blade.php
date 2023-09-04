@@ -5,7 +5,7 @@
  * @var \Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase|\Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml $currentItem
  */
 ?>
-@extends('adminx-frontend::layout.partials.content', compact('page'))
+@extends('common-frontend::layout.partials.content', compact('page'))
 
 @section('content')
 

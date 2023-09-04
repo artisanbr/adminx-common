@@ -311,10 +311,10 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     protected function nextArticle(): Attribute
     {
-        if ($this->id && !$this->nextArticleCache) {
-            $this->nextArticleCache = self::where('id', '>', $this->id)->orderBy('id', 'asc')->withCount('comments')->first();
+        if ($this->attributes['id'] && !$this->nextArticleCache) {
+            $this->nextArticleCache = self::where('id', '>', $this->attributes['id'])->orderBy('id', 'asc')->withCount('comments')->first();
         }
-
+        
         return Attribute::make(
             get: fn($value) => $this->nextArticleCache
         );

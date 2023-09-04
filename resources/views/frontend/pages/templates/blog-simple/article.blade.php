@@ -6,7 +6,7 @@
  * @var string[]                                    $breadcrumbs
  */
 ?>
-@extends('adminx-frontend::layout.partials.content')
+@extends('common-frontend::layout.partials.content')
 
 @section('content')
 
@@ -191,7 +191,7 @@
                                     </div>
                                 @endforeach
 
-                                {{ $comments->links('adminx-frontend::layout.inc.pagination') }}
+                                {{ $comments->links('common-frontend::layout.inc.pagination') }}
                             </div>
 
                             <div id="comment-form" class="feedback-area with-bg mt-10 mb-5 pb-5">

@@ -1,19 +1,22 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Templates;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Scopes\WhereSiteWithNullScope;
-use Adminx\Common\Models\Templates\Global\Manager\Facade\PageTemplateManager;
+use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
 use Adminx\Common\Models\Templates\Objects\TemplateConfig;
 use Adminx\Common\Models\Traits\HasGenericConfig;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasValidation;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\View;
 
 class Template extends EloquentModelBase
 {
@@ -63,6 +66,11 @@ class Template extends EloquentModelBase
     public function getTemplateFile($file): string
     {
         return "{$this->full_path}/{$file}";
+    }
+
+    public function getTemplateBladeFile($file): string
+    {
+        return "common-templates::{$this->path}/{$file}";
     }
 
     public function getTemplateGlobalFile($file): string
@@ -150,6 +158,26 @@ class Template extends EloquentModelBase
         return Attribute::make(get: fn() => $finalTwig);
     }
 
+    protected function bladeFile(): Attribute
+    {
+        //$finalFile = $this->getTemplateGlobalFile($this->public_id);
+        $finalView = $this->getTemplateBladeFile($this->public_id);
+
+        if (!View::exists($finalView)) {
+            $finalView = $this->getTemplateBladeFile('index');
+
+            if (!View::exists($finalView)) {
+                $finalView = $this->getTemplateBladeFile('default');
+
+                if (!View::exists($finalView)) {
+                    $finalView = null;
+                }
+            }
+        }
+
+        return Attribute::make(get: static fn() => $finalView);
+    }
+
     protected function fileContents(): Attribute
     {
         $contents = '';
@@ -164,7 +192,6 @@ class Template extends EloquentModelBase
         return Attribute::make(get: static fn() => $contents);
     }
 
-
     protected function fullPath(): Attribute
     {
         $path = $this->global ? $this->global_path : Storage::path($this->path ?? '');
@@ -174,7 +201,7 @@ class Template extends EloquentModelBase
 
     protected function globalPath(): Attribute
     {
-        return Attribute::make(get: fn() => PageTemplateManager::globalTemplatesPath($this->path));
+        return Attribute::make(get: fn() => GlobalTemplateManager::globalTemplatesPath($this->path));
     }
 
     protected function relativeFile(): Attribute

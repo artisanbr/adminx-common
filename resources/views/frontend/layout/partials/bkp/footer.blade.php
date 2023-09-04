@@ -78,7 +78,7 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
 </script>
 {!! $captcha->renderJs() !!}
 
-@include('adminx-frontend::layout.inc.alerts')
+@include('common-frontend::layout.inc.alerts')
 
 @@stack('footer-includes')
 @@stack('js')

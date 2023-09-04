@@ -1,20 +1,24 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common;
 
 use Adminx\Common\Libs\Support\Str;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 
 class AdminxCommonServiceProvider extends ServiceProvider
 {
 
-    private $config_path = __DIR__ . '/../config/';
-    private $routes_path = __DIR__ . '/../routes/';
-    private $views_path  = __DIR__ . '/../resources/views/';
+    private $config_path    = __DIR__ . '/../config/';
+    private $routes_path    = __DIR__ . '/../routes/';
+    private $resources_path = __DIR__ . '/../resources/';
+    private $views_path     = __DIR__ . '/../resources/views/';
 
     private $config_files = [
         'location',
@@ -40,9 +44,9 @@ class AdminxCommonServiceProvider extends ServiceProvider
     public function register()
     {
         //Configs
-        foreach (File::allFiles($this->config_path) as $file){
+        foreach (File::allFiles($this->config_path) as $file) {
 
-            if($file->isFile() && $file->getExtension() === 'php'){
+            if ($file->isFile() && $file->getExtension() === 'php') {
                 $relativePathName = Str::replaceNative('/', '.', $file->getRelativePathname());
 
                 $relativePathName = Str::replaceNative('.php', '', $relativePathName);
@@ -51,8 +55,6 @@ class AdminxCommonServiceProvider extends ServiceProvider
                     $file->getPathname(), $relativePathName
                 );
             }
-
-
 
 
         }
@@ -68,10 +70,12 @@ class AdminxCommonServiceProvider extends ServiceProvider
     {
         $commonViewPath = $this->views_path . 'common';
         $frontendViewPath = $this->views_path . 'frontend';
+        $templatesViewPath = $this->resources_path . 'templates';
         //Common Views
-        $this->loadViewsFrom($commonViewPath, 'adminx-common');
-        $this->loadViewsFrom($frontendViewPath, 'adminx-frontend');
-        $this->loadViewsFrom($frontendViewPath.'/pages/templates', 'pages-templates');
+        $this->loadViewsFrom($commonViewPath, 'common');
+        $this->loadViewsFrom($frontendViewPath, 'common-frontend');
+        $this->loadViewsFrom($templatesViewPath, 'common-templates');
+        $this->loadViewsFrom($frontendViewPath . '/pages/templates', 'pages-templates');
 
         Blade::anonymousComponentPath($commonViewPath . '/components', 'common');
         Blade::anonymousComponentPath($frontendViewPath . '/components', 'frontend');

@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\View\Frontend\Components\Layouts;
 use Illuminate\View\Component;
@@ -11,6 +15,6 @@ class Frontend extends Component
     public function render()
     {
 
-        return view('adminx-frontend::layout.base');
+        return view('common-frontend::layout.base');
     }
 }

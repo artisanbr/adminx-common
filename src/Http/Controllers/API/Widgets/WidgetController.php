@@ -108,7 +108,7 @@ class WidgetController extends Controller
         }
 
         Debugbar::startMeasure('get widget');
-        $siteWidget = $this->site->widgets()->wherePublicId($public_id)->whereHas('widget')->first();
+        $siteWidget = $this->site->widgets()->wherePublicId($public_id)->first();
 
         if (!$siteWidget) {
             return Response::json('Widget not found', 404);
@@ -118,10 +118,36 @@ class WidgetController extends Controller
 
         //dd($siteWidget->toArray(), $viewData);
 
-        if(!empty($siteWidget->template_content)){
+
+        if($siteWidget->widget){
+            $widgetView = "common-frontend::api.Widgets.{$siteWidget->widget->type->slug}.{$siteWidget->widget->slug}";
+
+
+            Debugbar::startMeasure('check view');
+            if (!View::exists($widgetView)) {
+                return Response::json('Widget View not Found', 501);
+            }
+            Debugbar::stopMeasure('check view');
+
+
             Debugbar::startMeasure('get build data');
-            $viewData = $siteWidget->getTwigRenderData();
+            $viewData = $siteWidget->getViewRenderData();
             Debugbar::stopMeasure('get build data');
+
+            //$htmlMin = new HtmlMin();
+
+            Debugbar::startMeasure('render view');
+            $viewRender = view($widgetView, $viewData);
+            Debugbar::stopMeasure('render view');
+
+            return $viewRender;
+        }
+
+        Debugbar::startMeasure('get build data');
+        $viewData = $siteWidget->getTwigRenderData();
+        Debugbar::stopMeasure('get build data');
+
+        if($siteWidget->template){
 
             Debugbar::startMeasure('render widget template');
             $widgetRender = FrontendTwig::html($siteWidget->template_content, $viewData, 'widget-'.$siteWidget->public_id);
@@ -130,28 +156,16 @@ class WidgetController extends Controller
             return response($widgetRender);
         }
 
-        Debugbar::startMeasure('get build data');
-        $viewData = $siteWidget->getViewRenderData();
-        Debugbar::stopMeasure('get build data');
+        if($siteWidget->content && !empty($siteWidget->content->html)){
+            Debugbar::startMeasure('render widget html');
+            $widgetRender = FrontendTwig::html($siteWidget->content->html, $viewData, 'widget-'.$siteWidget->public_id);
+            Debugbar::stopMeasure('render widget html');
 
-
-        $widgetView = "adminx-frontend::api.Widgets.{$siteWidget->widget->type->slug}.{$siteWidget->widget->slug}";
-
-
-        Debugbar::startMeasure('check view');
-        if (!View::exists($widgetView)) {
-            return Response::json('Widget View not Found', 501);
+            return response($widgetRender);
         }
-        Debugbar::stopMeasure('check view');
 
+        return Response::json('Widget not Found', 404);
 
-        //$htmlMin = new HtmlMin();
-
-        Debugbar::startMeasure('render view');
-        $viewRender = view($widgetView, $viewData);
-        Debugbar::stopMeasure('render view');
-
-        return $viewRender;
 
         /*return Cache::remember("widget-view-{$this->site->public_id}-{$public_id}", 60 * 24 * 7, function() use($htmlMin, $viewRender){
             return $htmlMin->minify($viewRender);

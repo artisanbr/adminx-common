@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Exceptions;
 
@@ -47,7 +51,7 @@ class FrontendException extends Exception
                                     ], $this->getCode());
         }
 
-        return response()->view(['adminx-frontend::errors.'.$this->getCode(), 'adminx-frontend::errors.error'], [
+        return response()->view(['common-frontend::errors.'.$this->getCode(), 'common-frontend::errors.error'], [
             'exception' => $this,
             'message' => $this->getMessage()
         ], $this->getCode())->withException($this);

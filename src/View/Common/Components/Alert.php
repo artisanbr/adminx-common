@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\View\Common\Components;
 
@@ -29,7 +33,7 @@ class Alert extends Component
             // $data['attributes'];
             // $data['slot'];
 
-            return 'adminx-common::components.alert';
+            return 'common::components.alert';
         };
     }
 

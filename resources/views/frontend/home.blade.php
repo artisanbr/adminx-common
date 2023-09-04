@@ -4,7 +4,7 @@
  * @var \Adminx\Common\Models\Pages\Page $homePage
  */
 ?>
-@extends('adminx-frontend::layout.base', [
+@extends('common-frontend::layout.base', [
     'site' => $site ?? new \Adminx\Common\Models\Sites\Site(),
     'page' => $homePage ?? new \Adminx\Common\Models\Pages\Page(['is_home' => true])
 ])

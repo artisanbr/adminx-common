@@ -8,7 +8,7 @@
 
 $articlesQuery = $page->articles()->published();
 ?>
-@extends('adminx-common::layouts.api.ajax-view')
+@extends('common::layouts.api.ajax-view')
 
 @if($articles->count())
     <div class="row articles-mosaic articles-mosaic-{{ $widget->public_id }} widget-module widget-module-{{ $widget->public_id }}">

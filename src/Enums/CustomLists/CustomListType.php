@@ -1,14 +1,18 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Enums\CustomLists;
 
-use App\DataTables\AdminX\Elements\CustomLists\CustomListItems\CustomListItemDataTable;
-use App\DataTables\AdminX\Elements\CustomLists\CustomListItems\CustomListItemTestimonialDataTable;
 use Adminx\Common\Enums\Traits\EnumToArray;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListHtml;
 use Adminx\Common\Models\CustomLists\CustomListImageSlider;
 use Adminx\Common\Models\CustomLists\CustomListTestimonials;
+use App\DataTables\APP\Elements\CustomLists\CustomListItems\CustomListItemDataTable;
+use App\DataTables\APP\Elements\CustomLists\CustomListItems\CustomListItemTestimonialDataTable;
 
 enum CustomListType: string
 {

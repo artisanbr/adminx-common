@@ -3,11 +3,11 @@
  * @var \Adminx\Common\Models\Widgets\SiteWidget                                                                                       $widget
  * @var \Adminx\Common\Models\CustomLists\CustomListImageSlider                                                                $customList
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemImageSlider                                            $listItem
- * @var \Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas\Sliders\SliderDataButtons                                $button
+ * @var \Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\Sliders\SliderDataButtons                                $button
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemImageSlider[]|\Illuminate\Database\Eloquent\Collection $customListItems
  */
 ?>
-@extends('adminx-common::layouts.api.ajax-view')
+@extends('common::layouts.api.ajax-view')
 
 {{--@php
     $customList = \Adminx\Common\Models\CustomLists\CustomList::findAndMount($widget->source_ids->first());

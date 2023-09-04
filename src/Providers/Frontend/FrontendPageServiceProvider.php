@@ -16,7 +16,7 @@ use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Pages\Types\Manager\PageTypeManagerEngine;
 use Adminx\Common\Models\Sites\Site;
-use Adminx\Common\Models\Templates\Global\Manager\PageTemplateManagerEngine;
+use Adminx\Common\Models\Templates\Global\Manager\GlobalTemplateManagerEngine;
 use Adminx\Common\Models\Themes\Theme;
 use Butschster\Head\Facades\Meta as MetaFacade;
 use Butschster\Head\MetaTags\Meta;
@@ -229,11 +229,11 @@ class FrontendPageServiceProvider extends ServiceProvider
         //region PageTemplate
 
         //Singleton: PageTypeManagerEngine
-        $this->app->singleton(PageTemplateManagerEngine::class, function () {
-            return new PageTemplateManagerEngine();
+        $this->app->singleton(GlobalTemplateManagerEngine::class, function () {
+            return new GlobalTemplateManagerEngine();
         });
-        $this->app->bind('PageTemplateManagerEngine', function () {
-            return app()->make(PageTemplateManagerEngine::class);
+        $this->app->bind('GlobalTemplateManagerEngine', function () {
+            return app()->make(GlobalTemplateManagerEngine::class);
         });
 
         //endregion

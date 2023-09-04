@@ -3,7 +3,7 @@
  * @var \Adminx\Common\Models\Pages\Page $page
  */
 ?>
-@extends('adminx-frontend::layout.partials.content', compact('page'))
+@extends('common-frontend::layout.partials.content', compact('page'))
 
 @section('content')
     @if(!$page->is_home && ($page->config->breadcrumb ? $page->config->breadcrumb->enable : $site->theme->config->breadcrumb->enable))

@@ -216,7 +216,7 @@ class AdvancedHtmlEngine
         }
 
         //Widget View
-        $widgeteableView = View::make(($widget->config->ajax_render ?? true) ? 'adminx-common::Elements.Widgets.renders.ajax-render' : 'adminx-common::Elements.Widgets.renders.static-render', [
+        $widgeteableView = View::make(($widget->config->ajax_render ?? true) ? 'common::Elements.Widgets.renders.ajax-render' : 'common::Elements.Widgets.renders.static-render', [
             'widgeteable' => $widget,
         ]);
 

@@ -3,7 +3,7 @@
      * @var Exception $exception
  */
     ?>
-@extends('adminx-frontend::errors.layout')
+@extends('common-frontend::errors.layout')
 
 @section('code', 401)
 @section('title', __('procedimento não autorizado!'))

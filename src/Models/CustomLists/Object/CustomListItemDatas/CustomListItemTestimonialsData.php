@@ -4,7 +4,7 @@
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
-namespace Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas;
+namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas;
 
 use ArtisanLabs\GModel\GenericModel;
 
@@ -12,15 +12,26 @@ class CustomListItemTestimonialsData extends GenericModel
 {
 
     protected $fillable = [
+        'subtitle',
         'image_url',
         //'image',
         'content',
+        'rating',
+        'max_rating',
     ];
 
     protected $casts = [
-        'image_url' => 'string',
+        'image_url'   => 'string',
+        'subtitle' => 'string',
         //'image' => GenericImageFile::class, //todo: remove
-        'content' => 'string',
+        'content'     => 'string',
+        'rating'      => 'int',
+        'max_rating'  => 'int',
+    ];
+
+    protected $attributes = [
+        'rating' => 5,
+        'max_rating' => 5,
     ];
 
     protected $appends = [

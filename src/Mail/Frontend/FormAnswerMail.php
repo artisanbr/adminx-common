@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Mail\Frontend;
 
@@ -128,7 +132,7 @@ class FormAnswerMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'adminx-common::layouts.mail.frontend.form-answer',
+            view: 'common::layouts.mail.frontend.form-answer',
             with: [
                       'formAnswer' => $this->formAnswer,
                   ]

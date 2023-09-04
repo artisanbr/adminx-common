@@ -4,7 +4,7 @@
  * @var \Adminx\Common\Models\Form       $form
  */
 ?>
-@extends('adminx-common::layouts.api.ajax-view')
+@extends('common::layouts.api.ajax-view')
 
 {{--@php
     $form = $widget->sources->first();

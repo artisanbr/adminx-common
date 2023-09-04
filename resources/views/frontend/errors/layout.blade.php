@@ -1,5 +1,5 @@
 
-@extends('adminx-frontend::layout.base')
+@extends('common-frontend::layout.base')
 @section('content')
 
     {{-- <x-frontend::breadcrumb :append="[ View::getSection('title', 'Erro ' . View::getSection('code', '')) ]" :site="\Adminx\Common\Libs\FrontendEngine\FrontendSiteEngine::current()" />--}}

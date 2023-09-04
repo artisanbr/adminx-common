@@ -6,7 +6,7 @@
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemTestimonials[]|\Illuminate\Database\Eloquent\Collection $customListItems
  */
 ?>
-@extends('adminx-common::layouts.api.ajax-view')
+@extends('common::layouts.api.ajax-view')
 
 @if($customListItems->count())
     <div class="testimonials-carousel testimonials-carousel-{{ $widget->public_id }} widget-module widget-module-{{ $widget->public_id }}">

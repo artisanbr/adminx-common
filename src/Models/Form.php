@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models;
 
@@ -6,6 +10,7 @@ use Adminx\Common\Elements\Forms\FormElement;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Configs\FormConfig;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasSlugAttribute;
@@ -17,7 +22,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Adminx\Common\Models\Pages\Page;
 
 /**
  * @property Collection|FormElement[] $elements
@@ -44,6 +48,8 @@ class Form extends EloquentModelBase
         'elements' => AsCollectionOf::class.':'.FormElement::class,
         'events' => 'collection'
     ];
+
+    protected $with = ['site'];
 
     //region VALIDATIONS
     public static function createRules(FormRequest $request = null): array

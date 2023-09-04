@@ -3,7 +3,7 @@
      * @var Exception $exception
  */
     ?>
-@extends('adminx-frontend::errors.layout')
+@extends('common-frontend::errors.layout')
 
 @section('code', $code ?? $exception->getCode() ?? 404)
 @section('title', __($title ?? 'não encontramos o que esta procurando!'))

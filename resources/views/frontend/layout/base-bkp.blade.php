@@ -46,14 +46,14 @@ $includeData = [
 {{--Main--}}
 <div id="root">
     {{--Header--}}
-    @include('adminx-frontend::layout.header', $includeData)
+    @include('common-frontend::layout.header', $includeData)
 
     <main class="main-content">
         {{--Content--}}
         @yield('content')
     </main>
     {{--Footer--}}
-    @include('adminx-frontend::layout.footer', $includeData)
+    @include('common-frontend::layout.footer', $includeData)
 </div>
 {{--Scripts--}}
 {!! Meta::footer()->toHtml() !!}
@@ -79,7 +79,7 @@ $includeData = [
 
 </script>
 
-@include('adminx-frontend::layout.inc.alerts', $includeData)
+@include('common-frontend::layout.inc.alerts', $includeData)
 
 @stack('scripts')
 @stack('js')

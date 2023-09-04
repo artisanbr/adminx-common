@@ -1,10 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-namespace Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas\Sliders;
+namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\Sliders;
 
-use Adminx\Common\Models\Generics\Files\GenericImageFile;
 use ArtisanLabs\GModel\GenericModel;
-use Illuminate\Support\Facades\Blade;
 
 class SliderDataButtons extends GenericModel
 {

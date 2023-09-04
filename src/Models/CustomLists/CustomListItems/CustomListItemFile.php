@@ -1,9 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\CustomLists\CustomListItems;
 
 use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
-use Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas\CustomListItemFileData;
+use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemFileData;
 
 class CustomListItemFile extends CustomListItemBase
 {

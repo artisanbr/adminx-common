@@ -3,7 +3,7 @@
  * @var \Adminx\Common\Models\FormAnswer $formAnswer
  */
 ?>
-@extends('adminx-common::layouts.mail.base', [
+@extends('common::layouts.mail.base', [
     'site' => $formAnswer->site ?? Auth::user()->site ?? new \Adminx\Common\Models\Sites\Site()
 ])
 @section('subject', "Nova mensagem em \"{$formAnswer->form->title}\".")

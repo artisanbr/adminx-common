@@ -6,7 +6,7 @@
  * @var \Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml[]|\Illuminate\Database\Eloquent\Collection $customListItems
  */
 ?>
-@extends('adminx-common::layouts.api.ajax-view')
+@extends('common::layouts.api.ajax-view')
 
 @if($customListItems->count())
     <div

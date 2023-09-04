@@ -13,7 +13,7 @@ use Adminx\Common\Libs\FrontendEngine\Twig\Extensions\FrontendTwigExtension;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Templates\Global\Manager\Facade\PageTemplateManager;
+use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Themes\ThemeBuild;
 use Exception;
@@ -132,13 +132,13 @@ class FrontendTwigEngine extends FrontendEngineBase
         $arrayTemplates = [];
         $this->twigArrayLoader = new ArrayLoader($this->getTemplatesToTwig());
 
-        $this->twigFileLoader->addPath(PageTemplateManager::globalTemplatesPath('base'), 'base');
-        $this->twigFileLoader->addPath(PageTemplateManager::globalTemplatesPath('pages'), 'pages');
+        $this->twigFileLoader->addPath(GlobalTemplateManager::globalTemplatesPath('base'), 'base');
+        $this->twigFileLoader->addPath(GlobalTemplateManager::globalTemplatesPath('pages'), 'pages');
 
         /*if ($this->currentPage) {
             $arrayTemplates[$this->getTwigTemplateName($mainViewName)] = $this->getPageBaseTemplate();
 
-            //$this->twigFileLoader->addPath(PageTemplateManager::globalTemplatesPath('widgets'), 'widgets');
+            //$this->twigFileLoader->addPath(GlobalTemplateManager::globalTemplatesPath('widgets'), 'widgets');
 
             $pageTemplate = $this->currentPage->page_template;
             if ($pageTemplate) {

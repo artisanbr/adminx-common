@@ -4,7 +4,7 @@
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
-namespace Adminx\Common\Models\CustomLists\Generic\CustomListItemDatas;
+namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Objects\Seo\Seo;

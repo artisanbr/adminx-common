@@ -9,6 +9,7 @@ namespace Adminx\Common\Libs\FrontendEngine\Twig\Extensions;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\CustomLists\CustomList;
+use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Menu;
 use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Widgets\SiteWidget;
@@ -28,7 +29,13 @@ class FrontendTwigExtension extends AbstractExtension
      */
     protected array|Collection $widgets;
 
+    /**
+     * @var Collection|Form[]|Builder
+     */
+    protected array|Collection $forms;
+
     protected ?SiteWidget $currentSiteWidget = null;
+    protected ?Form $currentForm = null;
 
     //protected Site $currentSite;
 
@@ -48,6 +55,7 @@ class FrontendTwigExtension extends AbstractExtension
             $this->currentSite = FrontendSite::current();
         }
         $this->widgets = collect();
+        $this->forms = collect();
 
         $this->menus = collect();
         $this->customLists = collect();
@@ -58,6 +66,7 @@ class FrontendTwigExtension extends AbstractExtension
     {
         return [
             new TwigFunction('widget', [$this, 'widget'], ['needs_context' => true]),
+            new TwigFunction('form', [$this, 'form'], ['needs_context' => true]),
             new TwigFunction('menu', [$this, 'menu'], ['needs_context' => true]),
             new TwigFunction('custom_list', [$this, 'customList'], ['needs_context' => true]),
         ];
@@ -67,6 +76,7 @@ class FrontendTwigExtension extends AbstractExtension
     {
         return [
             new TwigFilter('widget', [$this, 'widget'], ['needs_context' => true]),
+            new TwigFilter('form', [$this, 'form'], ['needs_context' => true]),
             new TwigFilter('menu', [$this, 'menu'], ['needs_context' => true]),
             new TwigFilter('custom_list', [$this, 'customList'], ['needs_context' => true]),
         ];
@@ -105,7 +115,47 @@ class FrontendTwigExtension extends AbstractExtension
             $this->currentSiteWidget->save();
         }*/
 
-        if (!$this->currentSiteWidget->config->ajax_render) {
+        if($this->currentSiteWidget->config->ajax_render){
+
+            return $this->currentSiteWidget->content->portal ?? $this->currentSiteWidget->content->html ?? '';
+
+        }
+
+
+        $templateContent = $this->currentSiteWidget->template?->id ? $this->currentSiteWidget->template_content : $this->currentSiteWidget->content->html;
+
+        $template = $this->twig->createTemplate($templateContent, "widget-{$this->currentSiteWidget->public_id}");
+
+        return $template->render($this->currentSiteWidget->getViewRenderData());
+
+    }
+
+    /*public function form($context, string $form_slug): string
+    {
+
+        if (!$this->currentForm || ((string) $this->currentForm->public_id !== $form_slug && (string) $this->currentForm->slug !== $form_slug)) {
+            //Não foi o ultimo utilizado, Verificar no cache
+            $this->currentForm = $this->forms->firstWhere('public_id', $form_slug) ?? $this->forms->firstWhere('slug', $form_slug);
+
+            //Não encontrou, buscar no banco
+            if (!$this->currentForm) {
+                $this->currentForm = $this->currentSite->forms()->where('public_id', $form_slug)->orWhere('slug', $form_slug)->first();
+
+                if ($this->currentForm) {
+                    $this->forms->add($this->currentForm);
+                }
+            }
+
+            //Se não encontrar parar aqui.
+            if (!$this->currentForm) {
+                return "Formulário '{$form_slug}' não encontrado";
+            }
+        }
+
+
+        //Se estiver sem content, compilar
+
+        if (!$this->currentForm->config->ajax_render) {
 
             $templateContent = $this->currentSiteWidget->template?->id ? $this->currentSiteWidget->template_content : $this->currentSiteWidget->content->html;
 
@@ -116,7 +166,7 @@ class FrontendTwigExtension extends AbstractExtension
 
         return $this->currentSiteWidget->content->html;
 
-    }
+    }*/
 
     public function menu($context, $menuSlug)
     {

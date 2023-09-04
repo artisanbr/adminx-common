@@ -137,7 +137,7 @@
                                         </div>
                                     </div>
                                 {% endfor %}
-                                {{ comments.paginate(5, ['*'], 'comments_page').links('adminx-frontend::layout.inc.pagination') }}
+                                {{ comments.paginate(5, ['*'], 'comments_page').links('common-frontend::layout.inc.pagination') }}
 
                             {% endif %}
 

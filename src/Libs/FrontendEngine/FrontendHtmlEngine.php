@@ -1,22 +1,24 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Facades\Frontend\FrontendSite;
-use Adminx\Common\Libs\FrontendEngine\Twig\Extensions\FrontendTwigExtension;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Menu;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Widgets\SiteWidget;
-use Adminx\Common\Models\Templates\Global\Manager\Facade\PageTemplateManager;
+use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Themes\ThemeBuild;
-use Barryvdh\Debugbar\Facades\Debugbar;
+use Adminx\Common\Models\Widgets\SiteWidget;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Blade;
@@ -199,13 +201,13 @@ blade;
         ];
 
         $fileLoader = new FilesystemLoader();
-        $fileLoader->addPath(PageTemplateManager::globalTemplatesPath('base'), 'base');
-        $fileLoader->addPath(PageTemplateManager::globalTemplatesPath('pages'), 'pages');
+        $fileLoader->addPath(GlobalTemplateManager::globalTemplatesPath('base'), 'base');
+        $fileLoader->addPath(GlobalTemplateManager::globalTemplatesPath('pages'), 'pages');
 
         if ($this->currentPage) {
             $arrayTemplates[$this->getTwigTemplateName($mainViewName)] = $this->getPageBaseTemplate();
 
-            //$fileLoader->addPath(PageTemplateManager::globalTemplatesPath('widgets'), 'widgets');
+            //$fileLoader->addPath(GlobalTemplateManager::globalTemplatesPath('widgets'), 'widgets');
 
             $pageTemplate = $this->currentPage->page_template;
             if ($pageTemplate) {

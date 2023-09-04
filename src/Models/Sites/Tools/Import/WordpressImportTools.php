@@ -10,6 +10,7 @@ use Adminx\Common\Libs\Helpers\HtmlHelper;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Category;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Sites\Enums\SiteRouteType;
 use Adminx\Common\Models\Sites\Objects\Config\Import\WordpressImportConfig;
@@ -118,6 +119,11 @@ class WordpressImportTools
     }
 
     //region Queries
+    public function wpPostTypesQuery(): PostBuilder
+    {
+        return WpPost::groupBy('post_type')->distinct();
+    }
+
     public function wpPostQuery(): PostBuilder
     {
         return WpPost::published()->type('post');
@@ -136,6 +142,31 @@ class WordpressImportTools
     //endregion
 
     //region WpModels
+    /**
+     * @param callable(PostBuilder): (LengthAwarePaginator|Collection)|null $query
+     *
+     * @return array|LengthAwarePaginator|Collection
+     */
+    public function wpTypes(?callable $query = null): array|Collection
+    {
+
+        $items = $this->wpPostTypesQuery();
+
+        if (!is_callable($query)) {
+            $query = static function (PostBuilder $q) {
+                return $q->get();
+            };
+        }
+
+        $items = $query($items);
+
+        if (get_class($items) === PostBuilder::class) {
+            $items = $items->get();
+        }
+
+        return $items->pluck('post_type', 'post_type');
+    }
+
     /**
      * @param callable(PostBuilder): (LengthAwarePaginator|Collection)|null $query
      *
@@ -258,6 +289,7 @@ class WordpressImportTools
             'pages' => $this->wpPages()->count(),
             'categories' => $this->wpCategories()->count(),
             'posts' => $this->wpPosts()->count(),
+            'lists' => $this->wpTypes()->count(),
             default => 0,
         };
     }
@@ -285,7 +317,127 @@ class WordpressImportTools
     //endregion
 
     //region Import Helpers
-    public function importPostsTo(Page $page, $step = 1, $step_items_number = 50): Collection
+    public function importPostsToList(CustomListBase $customList, $wpType, $step = 1, $step_items_number = 50): Collection
+    {
+        /**
+         * @var \Illuminate\Database\Eloquent\Collection|WpPost[] $importPosts
+         */
+
+        $resultCollection = collect();
+
+        $importPosts = WpPost::type($wpType)->forPage($step, $step_items_number)->get();
+
+        if ($importPosts->count()) {
+
+            $this->setSite($customList->site);
+
+            foreach ($importPosts as $importPost) {
+
+                //CustomListItem
+                $customListItem = $customList->items()->where('slug', $importPost->slug)->firstOrNew();
+
+                //Real Testimonials Plugin
+                $realTestimonialsPlugin = $importPost->meta()->where('meta_key', 'sp_tpro_meta_options')->first();
+
+                if ($realTestimonialsPlugin) {
+                    $customListItem->fill([
+                                              'title' => $realTestimonialsPlugin->value['tpro_name'] ?? 'Sem Nome',
+                                              'data'  => [
+                                                  'subtitle' => $realTestimonialsPlugin->value['tpro_designation'] ?? 'Sem Nome',
+                                              ],
+                                          ]);
+                }
+                else {
+
+                    $customListItem->fill(['title' => $importPost->title]);
+
+                }
+
+                $customListItem->fill([
+                                          'site_id'    => $this->site->id,
+                                          'config'     => [
+                                              'wp_post_id' => $importPost->ID,
+                                          ],
+                                          'data'       => [
+                                              'content'   => $this->traitContent($importPost->content),
+                                              'image_url' => $this->convertUrls($importPost->image),
+                                          ],
+                                          'slug'       => $importPost->slug,
+                                          'created_at' => $importPost->created_at,
+                                          'updated_at' => $importPost->updated_at,
+                                      ]);
+
+
+                //dd($customListItem->uri, $customList->toArray());
+                /*
+                                $wpSeoDescription = $importPost->meta()->where('meta_key', '_yoast_wpseo_metadesc')->first()?->value ?? $localArticle->description;
+
+
+                                $localArticle->meta->seo->fill([
+                                                                   'title'       => $localArticle->title,
+                                                                   'keywords'    => $importPost->keywords,
+                                                                   'description' => $wpSeoDescription,
+                                                               ]);
+
+
+                                if (empty($localArticle->seo->keywords)) {
+                                    $localArticle->seo->keywords = collect(Str::mostFrequentWords(strip_tags($localArticle->content)))->keys()->toArray();
+                                }*/
+
+                $result = $customListItem->save();
+
+                if ($result) {
+                    //Vincular Categorias
+                    /*$wpPostCategories = $importPost->taxonomies()->category()->get();
+
+                    $localCategoriesIds = collect();
+                    foreach ($wpPostCategories as $wpPostCategory) {
+                        $localCategory = $this->getLocalCategoryFrom($wpPostCategory);
+
+                        if ($localCategory) {
+                            $localCategoriesIds->add($localCategory->id);
+                        }
+                    }
+
+                    $localArticle->categories()->detach();
+
+                    $localArticle->categories()->sync($localCategoriesIds->toArray());*/
+
+                    //Rotas alternativas
+                    if ($customList->page_internal && $importPost->url !== $customListItem->uri) {
+
+                        //Adicionar redirecionamento do URL do Wordpress
+                        $wpItemURl = $this->convertUrls($importPost->url, false);
+
+                        $wpItemURl = Str::endsWith($wpItemURl, '/') ? Str::substr($wpItemURl, 0, -1) : $wpItemURl;
+
+                        $wpRedirect = $customListItem->routes()->where('url', $wpItemURl)->firstOrNew();
+
+                        $wpRedirect->fill([
+                                              'site_id' => $customListItem->site_id,
+                                              'page_id' => $customList->page_internal?->page_id,
+                                              'url'     => $wpItemURl,
+                                              'type'    => SiteRouteType::Model->value,
+                                          ]);
+
+                        $wpRedirect->save();
+                    }
+                }
+
+                $resultCollection->add([
+                                           'article' => $customListItem,
+                                           'result'  => $result,
+                                           'moment'  => date('d/m/Y - H:i:s'),
+                                       ]);
+
+            }
+        }
+
+        return $resultCollection;
+
+    }
+
+    public function importPostsToPage(Page $page, $step = 1, $step_items_number = 50): Collection
     {
         /**
          * @var \Illuminate\Database\Eloquent\Collection|WpPost[] $importPosts
@@ -465,12 +617,13 @@ class WordpressImportTools
         return (string)Str::replace($wordpressUrl, $newUrlStarts, $content);
 
     }
+
     protected function traitContent(string $content): string
     {
         $content = $this->convertUrls($content);
 
         $facade = new ShortcodeFacade();
-        $facade->addHandler('embed', function(ShortcodeInterface $s) {
+        $facade->addHandler('embed', function (ShortcodeInterface $s) {
             $embedUrl = $s->getContent();
             $embedRequest = Request::create($embedUrl);
             $videoID = $embedRequest->query('v');

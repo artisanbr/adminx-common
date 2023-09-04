@@ -1,18 +1,16 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Templates\Objects;
 
-use Adminx\Common\Enums\ContentEditorType;
 use Adminx\Common\Models\Casts\AsCollectionOf;
-use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
-use Adminx\Common\Models\Generics\DataSource;
-use Adminx\Common\Models\Generics\Widgets\WidgetConfigPaging;
-use Adminx\Common\Models\Generics\Widgets\WidgetConfigSorting;
-use Adminx\Common\Models\Generics\Widgets\WidgetConfigVariable;
 use Adminx\Common\Models\Pages\Modules\Traits\HasPageModulesManager;
+use Adminx\Common\Models\Templates\Enums\TemplateRenderEngine;
 use Adminx\Common\Models\Templates\Enums\TemplateRenderMode;
 use ArtisanLabs\GModel\GenericModel;
-use Illuminate\Support\Collection;
 
 
 class TemplateConfig extends GenericModel
@@ -22,17 +20,28 @@ class TemplateConfig extends GenericModel
     protected $fillable = [
         'required_modules',
 
+        'require_source',
+        'source_types',
+
         'variables',
         'sorting',
         'paging',
 
         'render_mode',
+        'render_engine',
+
+        'use_files',
+
         'is_editable',
     ];
 
     protected $attributes = [
-        'render_mode'      => 'ajax',
+        'render_mode'   => 'ajax',
+        'render_engine' => 'twig',
+
         'is_editable'      => true,
+        'require_source'   => true,
+        'source_types'     => [],
         'required_modules' => [],
         'variables'        => [],
         'sorting'          => [],
@@ -40,13 +49,20 @@ class TemplateConfig extends GenericModel
     ];
 
     protected $casts = [
-        'required_modules' => 'collection',
-        'variables'        => AsCollectionOf::class . ':' . TemplateConfigVariable::class,
+        'variables' => AsCollectionOf::class . ':' . TemplateConfigVariable::class,
 
         'sorting' => TemplateConfigSorting::class,
         'paging'  => TemplateConfigPaging::class,
-        'render_mode'  => TemplateRenderMode::class,
+
+
+        'render_mode'   => TemplateRenderMode::class,
+        'render_engine' => TemplateRenderEngine::class,
+
         'is_editable'      => 'boolean',
+        'use_files'        => 'boolean',
+        'require_source'   => 'boolean',
+        'source_types'     => 'collection',
+        'required_modules' => 'collection',
     ];
 
     //region Attributes

@@ -6,7 +6,6 @@
 
 namespace Adminx\Common\Models\Templates\Global\Abstract;
 
-use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Templates\Objects\TemplateConfig;
 use Adminx\Common\Models\Templates\Template;
 use Adminx\Common\Models\Traits\HasSelect2;
@@ -15,7 +14,7 @@ use ArtisanLabs\GModel\GenericModel;
 /**
  * @property array{slug: string, description: string, title: string} $attributes
  */
-abstract class AbstractPageTemplate extends GenericModel
+abstract class AbstractTemplate extends GenericModel
 {
     use HasSelect2;
 

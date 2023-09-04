@@ -10,6 +10,7 @@ use Adminx\Common\Enums\CustomLists\CustomListItemType;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
+use Adminx\Common\Models\CustomLists\Object\Configs\CustomListItems\CustomListItemConfig;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
@@ -17,6 +18,7 @@ use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasPublicIdUriAttributes;
 use Adminx\Common\Models\Traits\HasSelect2;
+use Adminx\Common\Models\Traits\HasSiteRoutes;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
@@ -31,7 +33,7 @@ use Illuminate\Support\Facades\DB;
 
 abstract class CustomListItemBase extends EloquentModelBase implements OwneredModel, PublicIdModel, UploadModel
 {
-    use HasParent, HasOwners, BelongsToUser, BelongsToSite, BelongsToAccount, HasMorphAssigns, HasValidation, HasSelect2, HasPublicIdAttribute, HasPublicIdUriAttributes, HasUriAttributes, HasFiles;
+    use HasParent, HasOwners, BelongsToUser, BelongsToSite, BelongsToAccount, HasMorphAssigns, HasValidation, HasSelect2, HasPublicIdAttribute, HasPublicIdUriAttributes, HasUriAttributes, HasFiles, HasSiteRoutes;
 
     protected $table = 'custom_list_items';
 
@@ -52,6 +54,8 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
         'listable_id',
         'listable_type',
         'data',
+        'created_at',
+        'updated_at'
     ];
 
     protected $attributes = [
@@ -60,13 +64,13 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
     ];
 
     protected $casts = [
-        'title' => 'string',
-        'slug' => 'string',
-        'public_id' => 'string',
-        'position' => 'int',
-        'type' => CustomListItemType::class,
-        'config' => 'object',
-        'data' => 'object',
+        'title'      => 'string',
+        'slug'       => 'string',
+        'public_id'  => 'string',
+        'position'   => 'int',
+        'type'       => CustomListItemType::class,
+        'config'     => CustomListItemConfig::class,
+        'data'       => 'object',
         'created_at' => 'datetime:d/m/Y H:i:s',
     ];
 
@@ -129,10 +133,15 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
     {
         return ($this->list->url ?? '') . ($this->slug ?? $this->public_id);
     }
+    protected function getUriAttribute()
+    {
+        return ($this->list->uri ?? '') . ($this->slug ?? $this->public_id);
+    }
     //endregion
 
     //region RELATIONS
-    public function list(){
+    public function list()
+    {
         return $this->belongsTo($this->listClass);
     }
 

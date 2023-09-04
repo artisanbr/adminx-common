@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Widgets\Objects;
 
@@ -6,7 +10,6 @@ use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigPaging;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigSorting;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigVariable;
-use Adminx\Common\Models\Pages\Page;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
@@ -27,18 +30,18 @@ class WidgetConfigObject extends GenericModel
         'update_template',
 
         'require_source',
+        'source_types',
 
         'variables',
         'sorting',
         'paging',
 
-        'source_types',
         'ajax_render',
     ];
 
     protected $attributes = [
-        'require_source' => true,
         'ajax_render'    => true,
+        'require_source' => true,
         'source_types'   => [],
         'variables'      => [],
         'sorting'        => [],
@@ -46,10 +49,11 @@ class WidgetConfigObject extends GenericModel
     ];
 
     protected $casts = [
-        'require_source' => 'bool',
-
         'ajax_render'  => 'bool',
+
+        'require_source' => 'bool',
         'source_types' => 'collection',
+
         'variables'    => AsCollectionOf::class . ':' . WidgetConfigVariable::class,
 
         'sorting' => WidgetConfigSorting::class,

@@ -1,8 +1,11 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Providers;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,8 +30,8 @@ class BladeServiceProvider extends ServiceProvider
     {
         //Namespaces
         //Frontend Components
-        Blade::anonymousComponentNamespace('adminx-common::components', 'common');
-        Blade::anonymousComponentNamespace('adminx-frontend::components', 'frontend');
+        Blade::anonymousComponentNamespace('common::components', 'common');
+        Blade::anonymousComponentNamespace('common-frontend::components', 'frontend');
 
 
     }

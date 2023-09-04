@@ -1,14 +1,17 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Templates\Global\Manager;
 
 
 use Adminx\Common\Models\Pages\Modules\Abstract\AbstractPageModule;
-use Adminx\Common\Models\Pages\Types\Abstract\AbstractPageType;
-use Adminx\Common\Models\Templates\Global\Abstract\AbstractPageTemplate;
+use Adminx\Common\Models\Templates\Global\Abstract\AbstractTemplate;
 use Illuminate\Support\Collection;
 
-class PageTemplateManagerEngine
+class GlobalTemplateManagerEngine
 {
     /**
      * @var Collection|AbstractPageModule[]
@@ -18,7 +21,7 @@ class PageTemplateManagerEngine
      * @var Collection|string[]
      */
     protected Collection|array $classMap;
-    protected string           $configName = 'common.models.page.templates';
+    protected string           $configName = 'common.models.templates';
 
     public function __construct()
     {
@@ -43,7 +46,7 @@ class PageTemplateManagerEngine
     }
 
     /**
-     * @return AbstractPageTemplate[]|Collection
+     * @return AbstractTemplate[]|Collection
      */
     public function templates(): array|Collection
     {

@@ -33,8 +33,8 @@ use Adminx\Common\Models\Pages\Types\Abstract\AbstractPageType;
 use Adminx\Common\Models\Pages\Types\Manager\Facade\PageTypeManager;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Sites\SiteRoute;
-use Adminx\Common\Models\Templates\Global\Abstract\AbstractPageTemplate;
-use Adminx\Common\Models\Templates\Global\Manager\Facade\PageTemplateManager;
+use Adminx\Common\Models\Templates\Global\Abstract\AbstractTemplate;
+use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
 use Adminx\Common\Models\Traits\HasAdvancedHtml;
 use Adminx\Common\Models\Traits\HasBreadcrumbs;
 use Adminx\Common\Models\Traits\HasGenericConfig;
@@ -74,7 +74,7 @@ use Illuminate\Support\ViewErrorBag;
 /**
  * @property Collection|CustomList[]|CustomListHtml[] $data_sources
  * @property AbstractPageType                         $type
- * @property AbstractPageTemplate                     $template_global
+ * @property AbstractTemplate                         $template_global
  */
 class Page extends EloquentModelBase implements BuildableModel,
                                                 HtmlModel,
@@ -255,10 +255,10 @@ class Page extends EloquentModelBase implements BuildableModel,
     public function getBuildViewPath($append = null): string
     {
 
-        /*$pageViewPathType = "adminx-frontend::pages.{$this->type->slug}" . ($append ? ".{$append}" : '');
-        $pageViewPathModel = "adminx-frontend::pages.{$this->type->slug}.{$this->model->slug}" . ($append ? ".{$append}" : '');
+        /*$pageViewPathType = "common-frontend::pages.{$this->type->slug}" . ($append ? ".{$append}" : '');
+        $pageViewPathModel = "common-frontend::pages.{$this->type->slug}.{$this->model->slug}" . ($append ? ".{$append}" : '');
 
-        $pageViewFinalPath = 'adminx-frontend::pages.@default';
+        $pageViewFinalPath = 'common-frontend::pages.@default';
 
 
         if (View::exists($pageViewPathModel)) {
@@ -271,7 +271,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         return $pageViewFinalPath;*/
 
 
-        $pageDefaultView = 'adminx-frontend::pages.@default';
+        $pageDefaultView = 'common-frontend::pages.@default';
 
         $pageView = $pageDefaultView;
 
@@ -403,7 +403,7 @@ class Page extends EloquentModelBase implements BuildableModel,
     protected function templateGlobal(): Attribute
     {
         return Attribute::make(
-            get: fn() => PageTemplateManager::getTemplate($this->template_name)
+            get: fn() => GlobalTemplateManager::getTemplate($this->template_name)
         );
     }
 

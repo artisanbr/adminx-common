@@ -7,7 +7,7 @@
  */
 ?>
 
-@extends('adminx-frontend::layout.partials.content', compact('page'))
+@extends('common-frontend::layout.partials.content', compact('page'))
 
 @section('content')
     <main class="main-content">
@@ -67,7 +67,7 @@
                                 <div class="col-12">
                                     <div class="pagination-area pt-10">
                                         <nav aria-label="Paginação">
-                                            {!! $articles->links('adminx-frontend::layout.inc.pagination') !!}
+                                            {!! $articles->links('common-frontend::layout.inc.pagination') !!}
                                         </nav>
                                     </div>
                                 </div>

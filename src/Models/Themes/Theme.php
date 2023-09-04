@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Themes;
 
@@ -153,19 +157,19 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
                                                      'account_id' => $this->account_id,
                                                  ]);
 
-        $headHtml = View::make('adminx-frontend::layout.partials.head', [
+        $headHtml = View::make('common-frontend::layout.partials.head', [
             'site'      => $this->site,
             'theme'     => $this,
             'themeMeta' => $themeMeta,
         ])->render();
 
-        $headerHtml = View::make('adminx-frontend::layout.partials.header', [
+        $headerHtml = View::make('common-frontend::layout.partials.header', [
             'site'      => $this->site,
             'theme'     => $this,
             'themeMeta' => $themeMeta,
         ])->render();
 
-        $footerHtml = View::make('adminx-frontend::layout.partials.footer', [
+        $footerHtml = View::make('common-frontend::layout.partials.footer', [
             'site'      => $this->site,
             'theme'     => $this,
             'themeMeta' => $themeMeta,

@@ -1,20 +1,16 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Libs\Helpers\MorphHelper;
-use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Article;
-use Adminx\Common\Models\Widgets\Objects\WidgetConfigObject;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigVariable;
-use Adminx\Common\Models\Templates\Template;
-use Adminx\Common\Models\Widget;
 use Adminx\Common\Models\Widgets\SiteWidget;
 use Adminx\Common\Repositories\Base\Repository;
-use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 
 /**
  * @property  array{media?: object, seo: array{image_file?: UploadedFile}} $data
@@ -54,11 +50,11 @@ class SiteWidgetRepository extends Repository
 
         //$templateContent = $this->data['template_content'];
 
-        $this->model->config->update_template = (string) ($this->data['template_update_type'] ?? '') === '1';
+        $this->model->config->update_template = (string)($this->data['template_update_type'] ?? '') === '1';
 
-        if($this->data['template_id'] ?? false){
+        if ($this->data['template_id'] ?? false) {
             //Vincular template selecionado
-            $templateRelation = $this->model->model_template()->firstOrNew();
+            $templateRelation = $this->model->templatable()->firstOrNew();
 
             $templateRelation->template_id = $this->data['template_id'];
             $templateRelation->templatable_id = $this->model->id;
@@ -66,7 +62,16 @@ class SiteWidgetRepository extends Repository
 
             $templateRelation->save();
 
-        }else{
+            if (
+                ($templateRelation->template ?? false) &&
+                ($templateRelation->template->config->require_source || ($this->data['config']['require_source'] ?? false))
+            ) {
+                $this->model->config->source_types = $templateRelation->template->config->source_types;
+                $this->model->source->type = $this->model->config->source_types->first(); // todo: temporary
+            }
+
+        }
+        else {
             //Excluir relação de templates existentes
             $this->model->model_template()->delete();
         }
@@ -98,8 +103,6 @@ class SiteWidgetRepository extends Repository
                         ]);
 
         $template->save();*/
-
-
 
 
         $this->model->save();
