@@ -11,6 +11,10 @@ use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
+use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml;
+use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemTestimonials;
+use Adminx\Common\Models\Objects\Seo\Seo;
+use Adminx\Common\Models\Objects\Seo\SiteSeo;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Sites\Enums\SiteRouteType;
 use Adminx\Common\Models\Sites\Objects\Config\Import\WordpressImportConfig;
@@ -317,6 +321,37 @@ class WordpressImportTools
     //endregion
 
     //region Import Helpers
+
+    /**
+     * Criar ou atualizar um objeto SEO partindo de um Post de Wordpress
+     */
+    public function getSeoFromPost(WpPost|WpPage $wpPost, Seo|SiteSeo $seo = new Seo()): Seo|SiteSeo
+    {
+
+
+        $seo->fill([
+                       'title'    => $wpPost->title,
+                       'keywords' => $wpPost->keywords,
+                       'image_url' => $this->convertUrls($wpPost->image),
+                   ]);
+
+
+        //Yoast
+        $wpSeoDescription = $wpPost->meta()->where('meta_key', '_yoast_wpseo_metadesc')->first()?->value ?? null;
+
+        if (!empty($wpSeoDescription)) {
+            $seo->fill([
+                           'description' => $wpSeoDescription,
+                       ]);
+        }
+
+        if (empty($seo->keywords)) {
+            $seo->keywords = collect(Str::mostFrequentWords(strip_tags($this->traitContent($wpPost->content))))->keys()->toArray();
+        }
+
+        return $seo;
+    }
+
     public function importPostsToList(CustomListBase $customList, $wpType, $step = 1, $step_items_number = 50): Collection
     {
         /**
@@ -336,27 +371,14 @@ class WordpressImportTools
                 //CustomListItem
                 $customListItem = $customList->items()->where('slug', $importPost->slug)->firstOrNew();
 
-                //Real Testimonials Plugin
-                $realTestimonialsPlugin = $importPost->meta()->where('meta_key', 'sp_tpro_meta_options')->first();
+                $listItemClass = get_class($customListItem);
 
-                if ($realTestimonialsPlugin) {
-                    $customListItem->fill([
-                                              'title' => $realTestimonialsPlugin->value['tpro_name'] ?? 'Sem Nome',
-                                              'data'  => [
-                                                  'subtitle' => $realTestimonialsPlugin->value['tpro_designation'] ?? 'Sem Nome',
-                                              ],
-                                          ]);
-                }
-                else {
-
-                    $customListItem->fill(['title' => $importPost->title]);
-
-                }
 
                 $customListItem->fill([
+                                          'title'      => $importPost->title,
                                           'site_id'    => $this->site->id,
                                           'config'     => [
-                                              'wp_post_id' => $importPost->ID,
+                                              'wp_id' => $importPost->ID,
                                           ],
                                           'data'       => [
                                               'content'   => $this->traitContent($importPost->content),
@@ -368,6 +390,26 @@ class WordpressImportTools
                                       ]);
 
 
+                //Depoimentos
+                switch ($listItemClass) {
+                    case CustomListItemHtml::class:
+                        $customListItem->seo = $this->getSeoFromPost($importPost, $customListItem->seo);
+                        break;
+                    case CustomListItemTestimonials::class:
+                        //Real Testimonials Plugin
+                        $realTestimonialsPlugin = $importPost->meta()->where('meta_key', 'sp_tpro_meta_options')->first();
+
+                        if ($realTestimonialsPlugin) {
+                            $customListItem->fill([
+                                                      'title' => $realTestimonialsPlugin->value['tpro_name'] ?? 'Sem Nome',
+                                                      'data'  => [
+                                                          'subtitle' => $realTestimonialsPlugin->value['tpro_designation'] ?? 'Sem Nome',
+                                                      ],
+                                                  ]);
+                        }
+                        break;
+                }
+                
                 //dd($customListItem->uri, $customList->toArray());
                 /*
                                 $wpSeoDescription = $importPost->meta()->where('meta_key', '_yoast_wpseo_metadesc')->first()?->value ?? $localArticle->description;
@@ -468,19 +510,7 @@ class WordpressImportTools
                                         'published_at' => $importPost->created_at,
                                     ]);
 
-                $wpSeoDescription = $importPost->meta()->where('meta_key', '_yoast_wpseo_metadesc')->first()?->value ?? $localArticle->description;
-
-
-                $localArticle->meta->seo->fill([
-                                                   'title'       => $localArticle->title,
-                                                   'keywords'    => $importPost->keywords,
-                                                   'description' => $wpSeoDescription,
-                                               ]);
-
-
-                if (empty($localArticle->seo->keywords)) {
-                    $localArticle->seo->keywords = collect(Str::mostFrequentWords(strip_tags($localArticle->content)))->keys()->toArray();
-                }
+                $localArticle->seo = $this->getSeoFromPost($importPost, $localArticle->seo);
 
                 $result = $localArticle->save();
 

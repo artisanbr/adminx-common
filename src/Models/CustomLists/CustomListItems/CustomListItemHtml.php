@@ -9,6 +9,7 @@ namespace Adminx\Common\Models\CustomLists\CustomListItems;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
 use Adminx\Common\Models\CustomLists\CustomListHtml;
 use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemHtmlData;
+use Adminx\Common\Models\Objects\Seo\Seo;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class CustomListItemHtml extends CustomListItemBase
@@ -39,6 +40,22 @@ class CustomListItemHtml extends CustomListItemBase
     }
 
     //region Attributes
+    protected function getSeoAttribute(): Seo
+    {
+        return $this->data->seo;
+    }
+
+    protected function setSeoAttribute($value): static
+    {
+        if(is_array($value)){
+            $this->data->seo->fill($value);
+        }else /*if(get_class($value) === Seo::class)*/ {
+            $this->data->seo = $value;
+        }
+
+        return $this;
+    }
+    
     public function html(): Attribute {
         return Attribute::make(get: fn() => $this->data->html);
     }

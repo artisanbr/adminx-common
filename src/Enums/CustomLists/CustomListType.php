@@ -112,16 +112,17 @@ enum CustomListType: string
     public static function getTitleTo($type): string
     {
         return match ($type) {
-            self::Gallery => 'Galeria',
-            self::ImageGallery => 'Galeria de Imagens',
-            self::VideoGallery => 'Galeria de vídeos',
-            self::Files => 'Arquivos',
-            self::Posts => 'Postagens',
             self::HTML => 'HTML\'s Personalizados',
             self::ImageSlider => 'Slider de Imagens',
             self::Testimonials => 'Depoimentos ou Testemunhos',
-            self::Clients => 'Clientes',
-            self::Events => 'Eventos',
+
+            self::Gallery => 'Galeria (em breve)',
+            self::ImageGallery => 'Galeria de Imagens (em breve)',
+            self::VideoGallery => 'Galeria de vídeos (em breve)',
+            self::Files => 'Arquivos (em breve)',
+            self::Posts => 'Postagens (em breve)',
+            self::Clients => 'Clientes (em breve)',
+            self::Events => 'Eventos (em breve)',
         };
     }
 

@@ -12,13 +12,13 @@ class CustomListItemConfig extends GenericModel
 {
 
     protected $fillable = [
-        'wp_post_id',
+        'wp_id',
     ];
 
     protected $attributes = [
     ];
 
     protected $casts = [
-        'wp_post_id' => 'int',
+        'wp_id' => 'int',
     ];
 }

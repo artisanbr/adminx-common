@@ -221,7 +221,11 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     protected function setSeoAttribute($value): static
     {
-        $this->meta->seo->fill($value);
+        if(is_array($value)){
+            $this->meta->seo->fill($value);
+        }else /*if(get_class($value) === Seo::class)*/ {
+            $this->meta->seo = $value;
+        }
 
         return $this;
     }
@@ -464,13 +468,9 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         return $this->morphMany(MenuItem::class, 'menuable',);
     }
 
-    public function cover()
+    /*public function cover()
     {
         return $this->hasOne(File::class, 'id', 'cover_id');
-    }
-
-    /*public function site() {
-        return $this->hasOneThrough(Site::class, Page::class);
     }*/
 
     //endregion
