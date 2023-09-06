@@ -7,6 +7,7 @@
 namespace Adminx\Common\Models\Sites\Tools\Import;
 
 use Adminx\Common\Libs\Helpers\HtmlHelper;
+use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Category;
@@ -409,7 +410,7 @@ class WordpressImportTools
                         }
                         break;
                 }
-                
+
                 //dd($customListItem->uri, $customList->toArray());
                 /*
                                 $wpSeoDescription = $importPost->meta()->where('meta_key', '_yoast_wpseo_metadesc')->first()?->value ?? $localArticle->description;
@@ -460,6 +461,7 @@ class WordpressImportTools
                                               'page_id' => $customList->page_internal?->page_id,
                                               'url'     => $wpItemURl,
                                               'type'    => SiteRouteType::Model->value,
+                                              'model_type' => MorphHelper::getMorphTypeTo($customListItem),
                                           ]);
 
                         $wpRedirect->save();
@@ -546,6 +548,7 @@ class WordpressImportTools
                                               'page_id' => $localArticle->page_id,
                                               'url'     => $wpItemURl,
                                               'type'    => SiteRouteType::Model->value,
+                                              'model_type' => MorphHelper::getMorphTypeTo($localArticle),
                                           ]);
 
                         $wpRedirect->save();

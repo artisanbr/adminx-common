@@ -1,18 +1,19 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Enums\ContentEditorType;
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
-use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
-use Adminx\Common\Models\Pages\Objects\PageBreadcrumb;
-use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
+use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Objects\PageInternalConfig;
 use Adminx\Common\Models\Traits\HasBreadcrumbs;
 use Adminx\Common\Models\Traits\HasGenericConfig;
@@ -22,7 +23,6 @@ use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToPage;
-use Butschster\Head\Facades\Meta;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Http\FormRequest;
@@ -155,7 +155,7 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
     }
     protected function getUrlAttribute(): string
     {
-        return $this->page->urlTo($this->slug ? "{$this->slug}/" : '');
+        return $this->page->urlTo( !empty($this->slug) ? "{$this->slug}/" : '');
     }
     //endregion
 

@@ -11,6 +11,9 @@ use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
 use Adminx\Common\Models\CustomLists\Object\Configs\CustomListItems\CustomListItemConfig;
+use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemHtmlData;
+use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemImageSliderData;
+use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemTestimonialsData;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
@@ -31,6 +34,9 @@ use Adminx\Common\Observers\OwneredModelObserver;
 use Adminx\Common\Observers\PublicIdModelObserver;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @property CustomListItemHtmlData|CustomListItemImageSliderData|CustomListItemTestimonialsData|null $data
+ */
 abstract class CustomListItemBase extends EloquentModelBase implements OwneredModel, PublicIdModel, UploadModel
 {
     use HasParent, HasOwners, BelongsToUser, BelongsToSite, BelongsToAccount, HasMorphAssigns, HasValidation, HasSelect2, HasPublicIdAttribute, HasPublicIdUriAttributes, HasUriAttributes, HasFiles, HasSiteRoutes;
@@ -136,6 +142,18 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
     protected function getUriAttribute()
     {
         return ($this->list->uri ?? '') . ($this->slug ?? $this->public_id);
+    }
+    //endregion
+
+    //region OVERRIDES
+    public function getAttribute($key) {
+        $value = parent::getAttribute($key);
+
+        if(empty($value) && @$this->data && (method_exists($this->data, 'getAttribute'))){
+            $value = $this->data->getAttribute($key);
+        }
+
+        return $value;
     }
     //endregion
 

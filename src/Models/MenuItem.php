@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models;
 
@@ -6,19 +10,18 @@ use Adminx\Common\Enums\MenuItemType;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\MenuItemConfig;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
 use Adminx\Common\Models\Traits\Relations\HasParent;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Spatie\Menu\Laravel\Link;
 use Spatie\Menu\Laravel\Menu as SpatieMenu;
-use Adminx\Common\Models\Pages\Page;
 
 class MenuItem extends EloquentModelBase
 {
@@ -143,8 +146,15 @@ class MenuItem extends EloquentModelBase
 
                         //Debugbar::debug($this->menuable->model);
 
-                        foreach ($this->menuable->model->items as $modelItem) {
-                            $subMenu->add(Link::to($this->menuable->urlTo($modelItem->url), $modelItem->title)->addParentClass($menu->config->menu_item_class ?? ''));
+                        $customList = $this->menuable->model;
+
+                        if(method_exists($customList, 'mountModel')){
+                            $customList = $customList->mountModel();
+                        }
+
+
+                        foreach ($customList->items as $modelItem) {
+                            $subMenu->add(Link::to($modelItem->url, $modelItem->title)->addParentClass($menu->config->menu_item_class ?? ''));
                         }
 
                     }/*else if ($this->config->is_source_submenu && $this->config->submenu_source->data->id ?? false) {
