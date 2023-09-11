@@ -1,6 +1,10 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Menus;
 
 use Illuminate\Database\Eloquent\Relations\Pivot;
 

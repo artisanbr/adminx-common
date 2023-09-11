@@ -20,7 +20,7 @@ use Adminx\Common\Models\Generics\Contact\Contact;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
-use Adminx\Common\Models\Menu;
+use Adminx\Common\Models\Menus\Menu;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\SiteSeo;
 use Adminx\Common\Models\Pages\Page;

@@ -4,12 +4,12 @@
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Menus;
 
 use Adminx\Common\Enums\MenuItemType;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Generics\Configs\MenuItemConfig;
+use Adminx\Common\Models\Menus\Objects\MenuItemConfig;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasUriAttributes;
@@ -64,36 +64,36 @@ class MenuItem extends EloquentModelBase
     //protected $with = ['children'];
 
     //region VALIDATIONS
-    public static function createRules(FormRequest $request = null): array
+    public static function createRules(?FormRequest $request = null): array
     {
         return [
-            'title'                     => ['required'],
-            'external'                  => ['boolean', 'nullable'],
-            'menuable_type'             => ['nullable'],
-            'menuable_type_page_id'     => [
-                Rule::requiredIf($request->type !== 'link' && collect([
-                                             'page',
-                                             'article',
-                                             'category',
-                                             'page_internal',
-                                         ])->contains($request->menuable_type ?? '') !== false),
+            'title'                          => ['required'],
+            'external'                       => ['boolean', 'nullable'],
+            'menuable_type'                  => ['nullable'],
+            'menuable_type_page_id'          => [
+                Rule::requiredIf($request?->type !== 'link' && collect([
+                                                                           'page',
+                                                                           'article',
+                                                                           'category',
+                                                                           'page_internal',
+                                                                       ])->contains($request?->menuable_type ?? '') !== false),
             ],
-            'menuable_type_article_id'  => [Rule::requiredIf(($request->menuable_type ?? '') === 'article')],
-            'menuable_type_category_id' => [Rule::requiredIf(($request->menuable_type ?? '') === 'category')],
-            'menuable_type_page_internal_id' => [Rule::requiredIf(($request->menuable_type ?? '') === 'page_internal')],
-            'url'                       => [Rule::requiredIf(($request->menuable_type ?? null) === 'link')],
+            'menuable_type_article_id'       => [Rule::requiredIf(($request?->menuable_type ?? '') === 'article')],
+            'menuable_type_category_id'      => [Rule::requiredIf(($request?->menuable_type ?? '') === 'category')],
+            'menuable_type_page_internal_id' => [Rule::requiredIf(($request?->menuable_type ?? '') === 'page_internal')],
+            'url'                            => [Rule::requiredIf(($request?->menuable_type ?? null) === 'link')],
         ];
     }
 
     public static function createMessages(): array
     {
         return [
-            'menuable_type.required'             => 'Selecione o tipo de Item.',
-            'menuable_type_page_id.required'     => 'Selecione uma página.',
-            'menuable_type_article_id.required'  => 'Selecione um Post.',
-            'menuable_type_category_id.required' => 'Selecione uma Categoria.',
+            'menuable_type.required'                  => 'Selecione o tipo de Item.',
+            'menuable_type_page_id.required'          => 'Selecione uma página.',
+            'menuable_type_article_id.required'       => 'Selecione um Post.',
+            'menuable_type_category_id.required'      => 'Selecione uma Categoria.',
             'menuable_type_page_internal_id.required' => 'Selecione uma Página Interna.',
-            'url.required'                       => 'Insira um Link para seu Item.',
+            'url.required'                            => 'Insira um Link para seu Item.',
         ];
     }
     //endregion
@@ -121,7 +121,7 @@ class MenuItem extends EloquentModelBase
         return $this;
     }
 
-    public function mount(SpatieMenu $menuBuilder, Menu|null $menu = null): SpatieMenu
+    public function mount(SpatieMenu $menuBuilder, ?Menu $menu = null): SpatieMenu
     {
         if (!$menu) {
             $menu = $this->menu;
@@ -132,29 +132,33 @@ class MenuItem extends EloquentModelBase
             /*$subMenu = SpatieMenu::new()
                                  ->addClass($this->menu->config->submenu_class ?? '');*/
 
+            $useUrl = ($this->config->use_submenu_url && $this->url);
+
             $menuBuilder->submenu(
-                Link::to('#', $this->title)
+                Link::to($useUrl ? $this->url : '#', $this->title)
                     ->setAttributes([
                                         'data-toggle' => 'dropdown',
-                                        'role'        => 'button',
+                                        ...(!$useUrl ? [
+                                            'role' => 'button',
+                                        ] : []),
                                     ]),
                 function (SpatieMenu $subMenu) use ($menu) {
 
-                    $subMenu->addClass($menu->config->submenu_class ?? '');
+                    $subMenu->addClass($menu->config->render->submenu->class ?? '');
 
-                    if ($this->menuable_type === 'page_internal' && $this->menuable && $this->menuable->model && method_exists($this->menuable->model, 'items')){
+                    if ($this->menuable_type === 'page_internal' && $this->menuable && $this->menuable->model && method_exists($this->menuable->model, 'items')) {
 
                         //Debugbar::debug($this->menuable->model);
 
                         $customList = $this->menuable->model;
 
-                        if(method_exists($customList, 'mountModel')){
+                        if (method_exists($customList, 'mountModel')) {
                             $customList = $customList->mountModel();
                         }
 
 
                         foreach ($customList->items as $modelItem) {
-                            $subMenu->add(Link::to($modelItem->url, $modelItem->title)->addParentClass($menu->config->menu_item_class ?? ''));
+                            $subMenu->add(Link::to($modelItem->url, $modelItem->title)->addParentClass($menu->config->render->item->class ?? ''));
                         }
 
                     }/*else if ($this->config->is_source_submenu && $this->config->submenu_source->data->id ?? false) {
@@ -195,7 +199,7 @@ class MenuItem extends EloquentModelBase
 
         }
         else {
-            $menuBuilder->add(Link::to($this->url, $this->title)->addParentClass($menu->config->menu_item_class ?? ''));
+            $menuBuilder->add(Link::to($this->url, $this->title)->addParentClass($menu->config->render->item->class ?? ''));
         }
 
         return $menuBuilder;

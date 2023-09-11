@@ -12,7 +12,7 @@ use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\CustomLists\CustomList;
-use Adminx\Common\Models\Menu;
+use Adminx\Common\Models\Menus\Menu;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;

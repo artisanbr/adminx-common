@@ -1,15 +1,16 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Enums\MenuItemType;
 use Adminx\Common\Libs\Helpers\MorphHelper;
-use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Menu;
-use Adminx\Common\Models\MenuItem;
-use Adminx\Common\Models\Pages\Page;
+use Adminx\Common\Models\Menus\Menu;
+use Adminx\Common\Models\Menus\MenuItem;
 use Adminx\Common\Repositories\Base\Repository;
-use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /***

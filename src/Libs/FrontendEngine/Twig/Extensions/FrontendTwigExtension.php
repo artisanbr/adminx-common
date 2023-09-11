@@ -10,7 +10,7 @@ use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Form;
-use Adminx\Common\Models\Menu;
+use Adminx\Common\Models\Menus\Menu;
 use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Widgets\SiteWidget;
 use Illuminate\Contracts\Database\Eloquent\Builder;

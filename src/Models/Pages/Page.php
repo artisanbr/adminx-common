@@ -22,7 +22,7 @@ use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
-use Adminx\Common\Models\MenuItem;
+use Adminx\Common\Models\Menus\MenuItem;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;

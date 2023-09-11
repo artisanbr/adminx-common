@@ -1,11 +1,15 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-namespace Adminx\Common\Models;
+namespace Adminx\Common\Models\Menus;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Generics\Configs\MenuConfig;
 use Adminx\Common\Models\Interfaces\OwneredModel;
+use Adminx\Common\Models\Menus\Objects\MenuConfig;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasUriAttributes;
@@ -77,22 +81,39 @@ class Menu extends EloquentModelBase implements OwneredModel
     public function mount(callable $callback = null): SpatieMenu|string
     {
 
-        $menuBuilder = SpatieMenu::new()->addClass($this->config->menu_class ?? '');
+        $menuBuilder = SpatieMenu::new()->addClass($this->config->render->menu->class ?? '');
 
         $menuParentItems = $this->parent_items;
+
 
         foreach ($menuParentItems as $menuItem) {
             $menuBuilder = $menuItem->mount($menuBuilder, $this);
         }
 
         return $menuBuilder->each(function (SpatieMenu $submenu) {
-            $submenu->addParentClass($this->config->menu_item_submenu_class ?? '');
-            $submenu->addParentClass($this->config->menu_item_class ?? '');
+            $submenu->addParentClass($this->config->render->item_submenu->class ?? '');
+
+            $submenu->addParentClass($this->config->render->item->class ?? '');
+
+            $submenu->each(function (Link $link) {
+                /*$link->prepend($this->config->menu_item_prepend ?? '');
+
+                $link->append($this->config->menu_item_append ?? '');*/
+
+                $link->addParentClass($this->config->render->submenu_item->class ?? '');
+
+                $link->addClass($this->config->render->submenu_item_link->class ?? '');
+            });
+
         })->each(function (Link $link) {
             $link->prepend($this->config->menu_item_prepend ?? '');
             $link->append($this->config->menu_item_append ?? '');
-            $link->addParentClass($this->config->menu_item_class ?? '');
-        });
+
+            $link->addParentClass($this->config->render->item->class ?? '');
+
+            $link->addClass($this->config->render->item_link->class ?? '');
+
+        });;
 
 
     }
@@ -101,7 +122,28 @@ class Menu extends EloquentModelBase implements OwneredModel
     //region ATTRIBUTES
     public function mount_html()
     {
-        return $this->mount()->render();
+        $submenuItensWithLink = $this->items()->where('config->use_submenu_url', true)->count();
+
+        return $this->mount()->render() . ($submenuItensWithLink ? <<<html
+<script>
+document.addEventListener('DOMContentLoaded', (event) => {
+    $('ul > li > a[href][data-toggle]').click(function(e) {
+        var dropdown = $(this).next('.dropdown-menu');
+    
+        if (dropdown.length == 0 || dropdown.css('display') !== 'none') {
+        
+        console.log(this.href);
+            if (this.href && this.href != '#') {
+                e.preventDefault();
+                location.href = this.href;
+                
+                return false;
+            }
+        }
+    });
+});
+</script>
+html: '');
     }
 
     /*public function html(): Attribute
