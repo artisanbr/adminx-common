@@ -346,7 +346,7 @@ blade;
                                                                     'customPageTemplate' => $this->currentPage->page_template ? '@template/index.twig' : false,
                                                                 ]*/));
 
-        $this->setFrontendBuild($this->currentPage->frontendBuild());
+        $this->setFrontendBuild($this->currentPage->prepareFrontendBuild());
 
         $this->frontendBuild->meta->registerSeoForPage($this->currentPage);
 
@@ -383,7 +383,7 @@ blade;
 
         //dd($this->themeBuild);
 
-        $this->setFrontendBuild($article->frontendBuild());
+        $this->setFrontendBuild($article->prepareFrontendBuild());
 
         $this->frontendBuild->meta->registerSeoForArticle($article);
 

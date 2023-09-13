@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Observers;
 
@@ -18,6 +22,18 @@ class ArticleObserver
         if(empty($model->published_at)){
             $model->published_at = $model->created_at ?? Carbon::now();
         }
+
+        $model->meta->frontend_build = $model->prepareFrontendBuild(true);
+        $model->seo->html = $model->meta->frontend_build->seo->html;
+        /*$model->meta->frontend_build->seo = $model->seo;
+        $model->meta->frontend_build->seo->fill([
+                                              'title'       => $model->getTitle(),
+                                              'description' => $model->getDescription(),
+                                              'keywords'    => $model->getKeywords(),
+                                              'image_url'   => $model->seoImage(),
+                                          ]);*/
+
+        //dd($model->meta->frontend_build->seo,$model->meta->frontend_build->seo->html);
 
         /*if ($model->id) {
 

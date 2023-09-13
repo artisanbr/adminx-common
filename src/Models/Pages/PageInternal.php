@@ -98,9 +98,9 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
         return ($this->page ? $this->page->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
     }
 
-    public function frontendBuild(): FrontendBuildObject
+    public function prepareFrontendBuild($buildMeta = false): FrontendBuildObject
     {
-        $frontendBuild = $this->page->frontendBuild();
+        $frontendBuild = $this->page->frontend_build;
 
         //Antes inicio da tag head
         //$frontendBuild->head->addBefore(Meta::toHtml());
@@ -117,6 +117,14 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
 
         //Fim do body
         $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
+
+        if($buildMeta){
+            $frontendBuild->meta->reset();
+            $frontendBuild->meta->registerSeoForPageInternal($this);
+
+            //$frontendBuild->head->addBefore($frontendBuild->meta->toHtml());
+            $frontendBuild->seo->html = $frontendBuild->meta->toHtml();
+        }
 
         return $frontendBuild;
     }

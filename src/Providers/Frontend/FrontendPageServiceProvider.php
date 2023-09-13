@@ -87,11 +87,44 @@ class FrontendPageServiceProvider extends ServiceProvider
         Meta::macro('registerSeoForPage', function (Page $page) {
 
             if ($page->site->seo->config->show_parent_title) {
-                $this->prependTitle($page->site->getTitle());
+                $this->prependTitle("{{ site.getTitle() }}");
             }
 
-            //Page
             $this->setMetaFrom($page);
+
+            $metaOg = new OpenGraphPackage('site_og_article');
+            $metaTwitter = new TwitterCardPackage('site_tt_article');
+
+            if ($page->seoImage()) {
+                $metaTwitter
+                    ->setType('summary_large_image')
+                    ->setImage($page->seoImage())
+                    ->addMeta('image:alt', $page->getTitle());
+
+                $metaOg->addImage($page->seoImage(), [
+                    'type' => 'image',
+                    'alt'  => $page->getTitle(),
+                ]);
+            }
+
+            $metaOg
+                ->setType('page')
+                ->setTitle($page->getTitle())
+                ->setDescription($page->getDescription())
+                //->setUrl($article->uri)
+                //->addOgMeta('article:author', $article->user->name)
+                ->addOgMeta('og:updated_time', $page->updated_at->toIso8601String());
+
+            $metaTwitter
+                ->setTitle($page->getTitle())
+                ->setDescription($page->getDescription());
+
+
+            //Page
+            $this
+                //->setPaginationLinks($articles) todo
+                ->registerPackage($metaOg)
+                ->registerPackage($metaTwitter);
 
         });
 
@@ -101,14 +134,19 @@ class FrontendPageServiceProvider extends ServiceProvider
 
         Meta::macro('registerSeoForArticle', function (Article $article) {
 
+            $site = FrontendSite::current() ?? $article->site;
+            $page = FrontendPage::current() ?? $article->page;
+
+            if ($site->seo->config->show_parent_title) {
+                $this->prependTitle("{{ site.getTitle() }} - {{ page.getTitle() }}");
+            }
+
             //$article->load(['site','page']);
             $metaOg = new OpenGraphPackage('site_og_article');
             $metaTwitter = new TwitterCardPackage('site_tt_article');
 
-            $site = FrontendSite::current();
-            $page = FrontendPage::current();
 
-            $seoFullTitle = $site->seoTitle($page->seoTitle($article->getTitle()));
+            $seoFullTitle = $article->getTitle(); //$site->seoTitle($page->seoTitle($article->getTitle()));
 
             $metaOg
                 ->setType('article')
@@ -126,14 +164,14 @@ class FrontendPageServiceProvider extends ServiceProvider
                 ->setTitle($seoFullTitle)
                 ->setDescription($article->getDescription());
 
-            if ($article->seo_image) {
+            if ($article->seoImage()) {
                 $metaTwitter
                     ->setType('summary_large_image')
-                    ->setImage($article->seo->image_uri)
+                    ->setImage($article->seoImage())
                     ->addMeta('image:alt', $article->getTitle());
 
-                $metaOg->addImage($article->seo->image_uri, [
-                    'type' => $article->seo_image->type,
+                $metaOg->addImage($article->seoImage(), [
+                    'type' => 'image',
                     'alt'  => $article->getTitle(),
                 ]);
             }
@@ -144,45 +182,55 @@ class FrontendPageServiceProvider extends ServiceProvider
                 ->setMetaFrom($article)
                 ->setTitle($seoFullTitle)
                 ->setDescription($article->getDescription())
+                ->setKeywords($article->getKeywords())
                 ->registerPackage($metaOg)
                 ->setPaginationLinks($comments)
                 //->setCanonical($article->uri)
                 ->registerPackage($metaTwitter);
         });
 
-        MetaFacade::macro('registerSeoForPageInternal', function (PageInternal $pageInternal, $modelItem = null) {
+        MetaFacade::macro('registerSeoForPageInternal', function (PageInternal $pageInternal, $modelItem) {
 
             $metaOg = new OpenGraphPackage('site_og_page_internal');
             $metaTwitter = new TwitterCardPackage('site_tt_page_internal');
 
+            if ($pageInternal->page->site->seo->config->show_parent_title) {
+                $this->prependTitle("{{ site.getTitle() }} - {{ page.getTitle() }}");
+            }
 
-            $seoFullTitle = $pageInternal->page->site->seoTitle($pageInternal->page->seoTitle($modelItem->title ?? null));
+            $seoFullTitle = @$modelItem->seoTitle() ?? @$modelItem->title ?? null; //$pageInternal->page->site->seoTitle($pageInternal->page->seoTitle(@$modelItem->seoTitle() ?? @$modelItem->title ?? null));
+
+            $seoDescription = @$modelItem->getDescription() ?? @$modelItem->description ?? $pageInternal->page->getDescription();
+            $seoKeywords = @$modelItem->getKeywords() ?? @$modelItem->keywords ?? $pageInternal->page->getKeywords();
 
             $metaOg
                 ->setType('article')
                 ->setTitle($seoFullTitle)
-                ->setDescription($pageInternal->page->getDescription())
-                ->setUrl($pageInternal->uriTo($modelItem->url));
+                ->setDescription($seoDescription)
+                ->setUrl($modelItem->uri);
 
             $metaTwitter
                 ->setTitle($seoFullTitle)
-                ->setDescription($pageInternal->page->getDescription());
+                ->setDescription($seoDescription);
 
-            if ($pageInternal->breadcrumb_config->background_url) {
+            $seoImg = @$modelItem->cover_url ?? @$modelItem->image_url ?? $pageInternal->breadcrumb_config->background_url ?? null;
+
+            if ($seoImg) {
                 $metaTwitter
                     ->setType('summary_large_image')
-                    ->setImage($pageInternal->breadcrumb_config->background_url)
+                    ->setImage($seoImg)
                     ->addMeta('image:alt', $modelItem->title ?? $pageInternal->page->title);
 
-                $metaOg->addImage($pageInternal->breadcrumb_config->background_url, [
-                    'type' => $pageInternal->breadcrumb_config->background->type,
+                $metaOg->addImage($seoImg, [
+                    'type' => @$pageInternal->breadcrumb_config->background->type ?? 'image',
                     'alt'  => $modelItem->title ?? $pageInternal->page->title,
                 ]);
             }
 
             $this
                 ->setTitle($seoFullTitle)
-                ->setDescription($pageInternal->page->getDescription())
+                ->setDescription($seoDescription)
+                ->setKeywords($seoKeywords)
                 ->registerPackage($metaOg)
                 ->registerPackage($metaTwitter);
         });

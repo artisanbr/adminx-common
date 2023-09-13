@@ -16,7 +16,6 @@ use Adminx\Common\Models\CustomLists\CustomListHtml;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
-use Adminx\Common\Models\Generics\Elements\PageElements;
 use Adminx\Common\Models\Interfaces\BuildableModel;
 use Adminx\Common\Models\Interfaces\HtmlModel;
 use Adminx\Common\Models\Interfaces\OwneredModel;
@@ -75,6 +74,7 @@ use Illuminate\Support\ViewErrorBag;
  * @property Collection|CustomList[]|CustomListHtml[] $data_sources
  * @property AbstractPageType                         $type
  * @property AbstractTemplate                         $template_global
+ * @property BreadcrumbConfig                         $breadcrumb_config
  */
 class Page extends EloquentModelBase implements BuildableModel,
                                                 HtmlModel,
@@ -139,7 +139,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         'seo',
         'published_at',
         'unpublished_at',
-        'elements',
+        //'elements',
     ];
 
     protected $casts = [
@@ -153,13 +153,14 @@ class Page extends EloquentModelBase implements BuildableModel,
         'assets'     => FrontendAssetsBundle::class,
 
 
-        'config'   => PageConfig::class,
-        'seo'      => Seo::class,
-        'css'      => GenericAssetElementCSS::class,
-        'js'       => GenericAssetElementJS::class,
-        'elements' => PageElements::class,
-        'html'     => 'string',
-        'html_raw' => 'string',
+        'config'         => PageConfig::class,
+        'seo'            => Seo::class,
+        'css'            => GenericAssetElementCSS::class,
+        'js'             => GenericAssetElementJS::class,
+        'frontend_build' => FrontendBuildObject::class,
+        //'elements' => PageElements::class,
+        'html'           => 'string',
+        'html_raw'       => 'string',
 
 
         'is_home'         => 'boolean',
@@ -213,9 +214,9 @@ class Page extends EloquentModelBase implements BuildableModel,
     public static function createMessages(): array
     {
         return [
-            'title.required'    => 'O título da página é obrigatório',
-            'type_id.required'  => 'Selecione o tipo da página',
-            'model_id.required' => 'Selecione o modelo da página',
+            'title.required'     => 'O título da página é obrigatório',
+            'type_name.required' => 'Selecione o tipo da página',
+            //'model_id.required' => 'Selecione o modelo da página',
         ];
     }
     //endregion
@@ -350,7 +351,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         return [...$viewData, ...$merge_data];
     }
 
-    public function frontendBuild(?\Butschster\Head\MetaTags\Meta $meta = null): FrontendBuildObject
+    public function prepareFrontendBuild($buildMeta = false): FrontendBuildObject
     {
 
 
@@ -368,6 +369,14 @@ class Page extends EloquentModelBase implements BuildableModel,
         $frontendBuild->body->class = "page-{$slug} page-{$this->public_id}";
         $frontendBuild->body->addBefore($this->assets->js->before_body->html ?? '');
         $frontendBuild->body->addAfter($this->assets->js->after_body->html ?? '');
+
+        if($buildMeta){
+            $frontendBuild->meta->reset();
+            $frontendBuild->meta->registerSeoForPage($this);
+
+            //$frontendBuild->head->addBefore($frontendBuild->meta->toHtml());
+            $frontendBuild->seo->html = $frontendBuild->meta->toHtml();
+        }
 
         return $frontendBuild;
     }
@@ -531,6 +540,19 @@ class Page extends EloquentModelBase implements BuildableModel,
         $urlId = $this->slug ?? $this->public_id;
 
         return "/{$urlId}/";
+    }
+
+    protected function getCoverUrlAttribute()
+    {
+        if (!empty($this->breadcrumb_config->background_url ?? null)) {
+            return $this->breadcrumb_config->background_url;
+        }
+
+        if (!empty($this->seo->image_url ?? null)) {
+            return $this->seo->image_url;
+        }
+
+        return null;
     }
     //endregion
 

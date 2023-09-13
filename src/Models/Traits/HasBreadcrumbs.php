@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Traits;
 
@@ -7,7 +11,6 @@ use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Pages\Objects\PageBreadcrumb;
 use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Pages\Objects\PageInternalConfig;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**
  * @var EloquentModelBase                  $this
@@ -21,9 +24,9 @@ trait HasBreadcrumbs
     public function breadcrumb(?array $mergeItems = null, ?BreadcrumbConfig $config = null): PageBreadcrumb
     {
 
-        if ($this->breadcrumbCache === null) {
+        if (!$this->breadcrumbCache) {
             $breadcrumbConfig = $config ?? $this->breadcrumb_config;
-            $breadcrumbItems = [$this->breadcrumb_items, ...($mergeItems ?? []), ...$this->getSelfBreadcrumbItem()];
+            $breadcrumbItems = [@$this->breadcrumb_items, ...($mergeItems ?? []), ...$this->getSelfBreadcrumbItem()];
 
             $this->setBreadcrumb(collect($breadcrumbItems)->filter()->toArray(), $breadcrumbConfig);
         }

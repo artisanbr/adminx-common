@@ -6,6 +6,7 @@
 
 namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas;
 
+use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use ArtisanLabs\GModel\GenericModel;
 
 class CustomListItemTestimonialsData extends GenericModel
@@ -18,6 +19,7 @@ class CustomListItemTestimonialsData extends GenericModel
         'content',
         'rating',
         'max_rating',
+        'frontend_build',
     ];
 
     protected $casts = [
@@ -27,6 +29,7 @@ class CustomListItemTestimonialsData extends GenericModel
         'content'     => 'string',
         'rating'      => 'int',
         'max_rating'  => 'int',
+        'frontend_build' => FrontendBuildObject::class,
     ];
 
     protected $attributes = [

@@ -26,6 +26,7 @@ trait HasSEO
     {
         return [
             'seo.image_file' => [
+                'nullable',
                 'image',
                 'mimes:' . collect(config('adminx.defines.files.types.image'))->implode(','),
                 'max:1536',
@@ -51,28 +52,38 @@ trait HasSEO
 
     public function seoDescription($default = ''): string
     {
-        return $this->seo->description ?? $default;
+        return $this->seo->description ?? @$this->description ?? $default;
     }
 
     public function seoKeywords($default = ''): string
     {
-        return $this->seo->keywords ?? $default;
+        return $this->seo->keywords ?? @$this->keywords ?? $default;
     }
 
-    public function seoImage(): string
+    public function seoImage(): ?string
     {
 
-        if (!empty($this->seo->image_url)) {
-            return $this->seo->image_url;
+
+        if ($this->attributes['cover_url'] ?? false) {
+            return $this->attributes['cover_url'];
         }
 
         if ($this->cover_url ?? false) {
             return $this->cover_url;
         }
 
+        if (!empty($this->seo->image_url ?? null)) {
+            return $this->seo->image_url;
+        }
+
+
+        if ($this->image_url ?? false) {
+            return $this->image_url;
+        }
+
         //todo: Considerar imagens vinculadas
 
-        return '';
+        return null;
     }
     //endregion
 
@@ -90,17 +101,17 @@ trait HasSEO
             return $this->seo->description ?? $this->site->getDescription();
         }
 
-        return $this->seo->description ?? '';
+        return $this->seoDescription();
     }
 
     public function getKeywords(): string
     {
 
         if(get_class($this) !== Site::class && ($this->site ?? false) && $this->site->seo->config->use_defaults){
-            return $this->seo->keywords ?? $this->site->getKeywords();
+            return $this->seoKeywords() ?? $this->site->getKeywords();
         }
 
-        return $this->seo->keywords ?? '';
+        return $this->seoKeywords();
 
         //return $this->seoKeywords($this->site->seo->keywords ?? '');
     }

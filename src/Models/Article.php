@@ -13,6 +13,7 @@ use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
+use Adminx\Common\Models\Menus\MenuItem;
 use Adminx\Common\Models\Objects\ArticleMetaObject;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
@@ -167,7 +168,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
         $viewData = [
             'article'       => $this,
-            'frontendBuild' => $this->frontendBuild(),
+            'frontendBuild' => $this->prepareFrontendBuild(),
             'comments'      => $this->comments, //todo: $this->comments()->paginate(5, ['*'], 'comments_page'),
             //'breadcrumbs'   => [$this->seoTitle()],
         ];
@@ -175,9 +176,9 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         return [...$this->page->getBuildViewData($viewData), ...$merge_data];
     }
 
-    public function frontendBuild(): FrontendBuildObject
+    public function prepareFrontendBuild($buildMeta = false): FrontendBuildObject
     {
-        $frontendBuild = $this->page->frontendBuild();
+        $frontendBuild = $this->page->prepareFrontendBuild();
 
         //Gtag
         $frontendBuild->head->gtag_script = $this->getGTagScript();
@@ -201,6 +202,22 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         //Fim do body
         $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
 
+
+        $frontendBuild->seo->fill([
+                                      ...$this->seo->toArray(),
+                                      'title'       => $this->getTitle(),
+                                      'description' => $this->getDescription(),
+                                      'keywords'    => $this->getKeywords(),
+                                      'image_url'   => $this->seoImage(),
+                                  ]);
+
+        if ($buildMeta) {
+            $frontendBuild->meta->reset();
+            $frontendBuild->meta->registerSeoForArticle($this);
+            //$frontendBuild->head->addBefore($frontendBuild->meta->toHtml());
+            $frontendBuild->seo->html = $frontendBuild->meta->toHtml();
+        }
+
         return $frontendBuild;
     }
 
@@ -214,6 +231,14 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     }
 
     //region ATTRIBUTES
+
+    protected function buildedHtml(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => FrontendTwig::article($this),
+        );
+    }
+
     protected function getSeoAttribute(): Seo
     {
         return $this->meta->seo;
@@ -221,9 +246,10 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     protected function setSeoAttribute($value): static
     {
-        if(is_array($value)){
+        if (is_array($value)) {
             $this->meta->seo->fill($value);
-        }else /*if(get_class($value) === Seo::class)*/ {
+        }
+        else /*if(get_class($value) === Seo::class)*/ {
             $this->meta->seo = $value;
         }
 
@@ -318,7 +344,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         if ($this->attributes['id'] && !$this->nextArticleCache) {
             $this->nextArticleCache = self::where('id', '>', $this->attributes['id'])->orderBy('id', 'asc')->withCount('comments')->first();
         }
-        
+
         return Attribute::make(
             get: fn($value) => $this->nextArticleCache
         );
@@ -335,13 +361,6 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
             get: fn($value) => $this->previousArticleCache
         );
 
-    }
-
-    protected function buildedHtml(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => FrontendTwig::article($this),
-        );
     }
 
     protected function isPublished(): Attribute

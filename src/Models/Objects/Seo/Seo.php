@@ -1,12 +1,15 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Objects\Seo;
 
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\File;
 use Adminx\Common\Models\Objects\Seo\Config\SeoConfig;
-use Illuminate\Support\Collection;
 use ArtisanLabs\GModel\GenericModel;
+use Illuminate\Support\Collection;
 
 
 class Seo extends GenericModel
@@ -19,7 +22,8 @@ class Seo extends GenericModel
         'keywords',
         'robots',
         'config',
-        'gtag'
+        'gtag',
+        'html',
     ];
 
     protected $attributes = [
@@ -38,6 +42,7 @@ class Seo extends GenericModel
         'keywords'       => 'string',
         'keywords_array' => 'collection',
         'robots'         => 'string',
+        'html'         => 'string',
         'config'         => SeoConfig::class,
     ];
 

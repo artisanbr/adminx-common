@@ -1,8 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Generics\Configs;
 
 use Adminx\Common\Enums\Themes\BreadcrumbSeparator;
-use Adminx\Common\Models\Generics\Files\GenericFile;
 use Adminx\Common\Models\Objects\BreadcrumbBackgroundObject;
 use ArtisanLabs\GModel\GenericModel;
 
@@ -48,4 +52,9 @@ class BreadcrumbConfig extends GenericModel
 
         return $this;
     }
+
+    /*protected function getBackgroundUrlAttribute()
+    {
+        return $this->background->url ?? null;
+    }*/
 }

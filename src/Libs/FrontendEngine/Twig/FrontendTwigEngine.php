@@ -11,8 +11,12 @@ use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\FrontendEngine\FrontendEngineBase;
 use Adminx\Common\Libs\FrontendEngine\Twig\Extensions\FrontendTwigExtension;
 use Adminx\Common\Models\Article;
+use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
+use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Page;
+use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Themes\ThemeBuild;
@@ -84,6 +88,9 @@ class FrontendTwigEngine extends FrontendEngineBase
     public function setFrontendBuild(FrontendBuildObject $frontendBuild = new FrontendBuildObject()): static
     {
         $this->frontendBuild = $frontendBuild;
+
+        $this->frontendBuild->meta->initialize();
+        $this->frontendBuild->meta->addCsrfToken();
 
         return $this;
     }
@@ -283,6 +290,34 @@ class FrontendTwigEngine extends FrontendEngineBase
         return $this->renderTwig($templateName);
     }
 
+    public function getPageBaseTemplate(string $content): string
+    {
+
+        $headHtml = $this->themeBuild->head;
+        $headerHtml = $this->themeBuild->header;
+        $footerHtml = $this->themeBuild->footer;
+        $seoHtml = $this->frontendBuild->seo->html;
+
+        return <<<html
+                <html lang="pt-BR">
+                    <head>
+                        {$seoHtml}
+                        {$headHtml}
+                    </head>
+                    <body id="{{ frontendBuild.body.id }}" class="{{ frontendBuild.body.class }}">
+                        {$headerHtml}
+                        <main class="main-content">
+                            {% if breadcrumb and breadcrumb.enabled %}
+                                {{ include('@base/components/breadcrumb.twig') }}
+                            {% endif %}
+                            {$content}
+                        </main>
+                        {$footerHtml}
+                    </body>
+                </html>
+                html;
+
+    }
 
     /**
      * @throws FrontendException
@@ -296,9 +331,9 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $this->setViewData($page->getBuildViewData());
 
-        $this->setFrontendBuild($page->frontendBuild());
+        $this->setFrontendBuild($page->frontend_build);
 
-        $this->frontendBuild->meta->registerSeoForPage($page);
+        //$this->frontendBuild->meta->registerSeoForPage($page);
 
         $this->currentSite = $page->site;
 
@@ -337,33 +372,6 @@ class FrontendTwigEngine extends FrontendEngineBase
         return $renderedTemplate;
     }
 
-    public function getPageBaseTemplate(string $content): string
-    {
-
-        $headHtml = $this->themeBuild->head;
-        $headerHtml = $this->themeBuild->header;
-        $footerHtml = $this->themeBuild->footer;
-
-        return <<<html
-                <html lang="pt-BR">
-                    <head>
-                        {$headHtml}
-                    </head>
-                    <body id="{{ frontendBuild.body.id }}" class="{{ frontendBuild.body.class }}">
-                        {$headerHtml}
-                        <main class="main-content">
-                            {% if breadcrumb and breadcrumb.enabled %}
-                                {{ include('@base/components/breadcrumb.twig') }}
-                            {% endif %}
-                            {$content}
-                        </main>
-                        {$footerHtml}
-                    </body>
-                </html>
-                html;
-
-    }
-
     /**
      * @throws FrontendException
      */
@@ -381,9 +389,9 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //dd($this->themeBuild);
 
-        $this->setFrontendBuild($article->frontendBuild());
+        $this->setFrontendBuild($article->meta->frontend_build);
 
-        $this->frontendBuild->meta->registerSeoForArticle($article);
+        //$this->frontendBuild->meta->registerSeoForArticle($article);
 
         if ($page->site->theme) {
             $this->applyTheme($page->site->theme);
@@ -409,6 +417,72 @@ class FrontendTwigEngine extends FrontendEngineBase
 
 
         if ($page->site->config->enable_html_minify ?? false) {
+            $htmlMin = new HtmlMin();
+
+            $renderedTemplate = $htmlMin->minify($renderedTemplate);
+        }
+
+        return $renderedTemplate;
+    }
+
+    /**
+     * @throws FrontendException
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function pageInternal(PageInternal $pageInternal, $modelItem): string
+    {
+        /**
+         * @var EloquentModelBase|CustomListItemBase|CustomListItemHtml $modelItem
+         */
+
+        $this->templateNamePrefix = 'page-internal-' . $pageInternal->public_id . '-' . (@$modelItem->public_id ?? @$modelItem->slug ?? time());
+
+        $pageInternal->breadcrumb_config->background_url = $modelItem->data->image_url;
+
+        $this->setViewData($pageInternal->page->getBuildViewData([
+                                                       'pageInternal'   => $pageInternal,
+                                                       'currentItem' => $modelItem,
+                                                       'breadcrumb'  => $pageInternal->breadcrumb([
+                                                                                                      ...$pageInternal->page->breadcrumb->items->toArray(),
+                                                                                                      '#' => $modelItem->title,
+                                                                                                  ]),
+                                                   ]));
+
+        $this->setFrontendBuild($modelItem->data->frontend_build ?? $pageInternal->frontend_build);
+
+        //$this->frontendBuild->meta->registerSeoForPage($page);
+
+        $this->currentSite = $pageInternal->page->site;
+
+        if ($this->currentSite->theme ?? false) {
+            $this->applyTheme($this->currentSite->theme);
+        }
+
+        //$pageTemplate = $pageInternal->page_template;
+
+        $pageContent = $pageInternal->content;
+
+       /* if ($pageTemplate) {
+            //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
+            $this->twigFileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
+            $pageContent .= "{{ include('@template/index.twig') }}";
+        }*/
+
+
+        //$pageContent = $page->page_template ? "{{ include('@template/index.twig') }}" : '';
+
+
+        $this->templates->put('page', $this->getPageBaseTemplate($pageContent));
+
+
+        $renderedTemplate = $this->renderTwig('page');
+
+
+        //$renderedBlade = Blade::render($rawBlade, $this->viewData);
+
+        if ($this->currentSite->config->enable_html_minify) {
             $htmlMin = new HtmlMin();
 
             $renderedTemplate = $htmlMin->minify($renderedTemplate);

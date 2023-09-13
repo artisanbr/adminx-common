@@ -10,10 +10,13 @@ use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
 use Adminx\Common\Models\CustomLists\CustomListHtml;
 use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemHtmlData;
 use Adminx\Common\Models\Objects\Seo\Seo;
+use Adminx\Common\Models\Traits\HasSEO;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class CustomListItemHtml extends CustomListItemBase
 {
+    use HasSEO;
+
     protected string $listClass = CustomListHtml::class;
 
     /*protected $casts = [

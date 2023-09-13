@@ -7,6 +7,7 @@
 namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas;
 
 use Adminx\Common\Libs\Support\Str;
+use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
 use ArtisanLabs\GModel\GenericModel;
 
@@ -19,7 +20,8 @@ class CustomListItemHtmlData extends GenericModel
         'description',
         'content',
         //'content_string',
-        'seo'
+        'seo',
+        'frontend_build'
     ];
 
     protected $casts = [
@@ -28,6 +30,7 @@ class CustomListItemHtmlData extends GenericModel
         'content' => 'string',
         //'content_string' => 'string',
         'seo' => Seo::class,
+        'frontend_build' => FrontendBuildObject::class,
     ];
 
     /*protected $attributes = [
