@@ -62,7 +62,7 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
         'listable_type',
         'data',
         'created_at',
-        'updated_at'
+        'updated_at',
     ];
 
     protected $attributes = [
@@ -171,6 +171,7 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
     {
         return ($this->list->url ?? '') . ($this->slug ?? $this->public_id);
     }
+
     protected function getUriAttribute()
     {
         return ($this->list->uri ?? '') . ($this->slug ?? $this->public_id);
@@ -178,10 +179,11 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
     //endregion
 
     //region OVERRIDES
-    public function getAttribute($key) {
+    public function getAttribute($key)
+    {
         $value = parent::getAttribute($key);
 
-        if(empty($value) && @$this->data && (method_exists($this->data, 'getAttribute'))){
+        if (empty($value) && @$this->data && (method_exists($this->data, 'getAttribute'))) {
             $value = $this->data->getAttribute($key);
         }
 
@@ -190,10 +192,16 @@ abstract class CustomListItemBase extends EloquentModelBase implements OwneredMo
 
     public function save(array $options = [])
     {
-        if(parent::save($options)){
-            $this->data->frontend_build = $this->prepareFrontendBuild(true);
-            $this->data->seo->html = $this->data->frontend_build->seo->html;
-            return parent::save($options);
+        if (parent::save($options)) {
+            $this->load(['list']);
+            if ($this->list->page_internal) {
+                $this->data->frontend_build = $this->prepareFrontendBuild(true);
+                $this->data->seo->html = $this->data->frontend_build->seo->html;
+
+                return parent::save($options);
+            }
+
+            return true;
         }
 
 
