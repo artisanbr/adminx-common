@@ -17,6 +17,7 @@ class Seo extends GenericModel
 
     protected $fillable = [
         'title',
+        'title_prefix',
         'image_url',
         'description',
         'keywords',
@@ -24,32 +25,54 @@ class Seo extends GenericModel
         'config',
         'gtag',
         'html',
+        'document_type',
+        'canonical_uri',
+        'published_at',
+        'updated_at',
     ];
 
     protected $attributes = [
-        'title'       => '',
-        'description' => '',
-        'keywords'    => '',
-        'robots'      => 'index, follow',
-        'config'      => [],
-        'gtag'    => null,
+        'document_type' => 'page', // (page, article)
+        'title'         => '',
+        'title_prefix' => null,
+        'description'   => '',
+        'keywords'      => '',
+        'robots'        => 'index, follow',
+        'config'        => [],
+        'gtag'          => null,
+        'canonical_uri' => null,
     ];
 
     protected $casts = [
         'title'          => 'string',
-        'image_url'          => 'string',
+        'image_url'      => 'string',
         'description'    => 'string',
         'keywords'       => 'string',
         'keywords_array' => 'collection',
         'robots'         => 'string',
-        'html'         => 'string',
+        'html'           => 'string',
+        'document_type'  => 'string',
+        'canonical_uri'  => 'string',
+        'gtag'           => 'string',
         'config'         => SeoConfig::class,
+        'published_at'   => 'string',
+        'updated_at'     => 'string',
     ];
 
     protected $appends = [
         'keywords_array',
         //'image',
     ];
+
+    public function mergeWith(self $seo): static
+    {
+
+        $mergeAttrs = $seo->toArray();
+        $mergeAttrs = collect($mergeAttrs)->filter(fn($item) => !empty($item))->toArray();
+        $this->fill($mergeAttrs);
+
+        return $this;
+    }
 
 
     //region ATTRIBUTES
@@ -58,7 +81,7 @@ class Seo extends GenericModel
     protected function setKeywordsAttribute($value): void
     {
         if (is_array($value)) {
-            $this->attributes['keywords'] = implode(',', $value);
+            $this->attributes['keywords'] = collect($value)->filter()->implode(',');
         }
         else {
             $this->attributes['keywords'] = (string)$value;
@@ -73,9 +96,10 @@ class Seo extends GenericModel
     {
         return $this->attributes['keywords'] ?? '';
     }
+
     protected function getKeywordsArrayAttribute(): Collection
     {
-        return collect(explode(',', $this->attributes['keywords']));
+        return collect(explode(',', $this->attributes['keywords']))->filter();
     }
 
     //endregion

@@ -98,6 +98,7 @@ class WidgetController extends Controller
         /**
          * @var ?SiteWidget $siteWidget
          */
+        Debugbar::startMeasure('controller render');
         Debugbar::startMeasure('get site');
         $this->site = FrontendSite::current();
         Debugbar::stopMeasure('get site');
@@ -119,12 +120,28 @@ class WidgetController extends Controller
         //dd($siteWidget->toArray(), $viewData);
 
 
+        if($siteWidget->template && !empty($siteWidget->template_content ?? null)){
+            //dd($siteWidget->template_content);
+
+            Debugbar::startMeasure('get build data');
+            $viewData = $siteWidget->getTwigRenderData();
+            Debugbar::stopMeasure('get build data');
+
+            Debugbar::startMeasure('render widget template');
+            $widgetRender = FrontendTwig::html($siteWidget->template_content, $viewData, 'widget-'.$siteWidget->public_id);
+            Debugbar::stopMeasure('render widget template');
+
+            Debugbar::stopMeasure('controller render');
+            return response($widgetRender);
+        }
+
         if($siteWidget->widget){
             $widgetView = "common-frontend::api.Widgets.{$siteWidget->widget->type->slug}.{$siteWidget->widget->slug}";
 
 
             Debugbar::startMeasure('check view');
             if (!View::exists($widgetView)) {
+                Debugbar::stopMeasure('controller render');
                 return Response::json('Widget View not Found', 501);
             }
             Debugbar::stopMeasure('check view');
@@ -137,32 +154,26 @@ class WidgetController extends Controller
             //$htmlMin = new HtmlMin();
 
             Debugbar::startMeasure('render view');
-            $viewRender = view($widgetView, $viewData);
+            $viewRender = View::make($widgetView, $viewData)->render();
             Debugbar::stopMeasure('render view');
 
+            Debugbar::stopMeasure('controller render');
             return $viewRender;
         }
 
-        Debugbar::startMeasure('get build data');
-        $viewData = $siteWidget->getTwigRenderData();
-        Debugbar::stopMeasure('get build data');
-
-        if($siteWidget->template){
-
-            Debugbar::startMeasure('render widget template');
-            $widgetRender = FrontendTwig::html($siteWidget->template_content, $viewData, 'widget-'.$siteWidget->public_id);
-            Debugbar::stopMeasure('render widget template');
-
-            return response($widgetRender);
-        }
-
         if($siteWidget->content && !empty($siteWidget->content->html)){
+            Debugbar::startMeasure('get build data');
+            $viewData = $siteWidget->getTwigRenderData();
+            Debugbar::stopMeasure('get build data');
+            
             Debugbar::startMeasure('render widget html');
             $widgetRender = FrontendTwig::html($siteWidget->content->html, $viewData, 'widget-'.$siteWidget->public_id);
             Debugbar::stopMeasure('render widget html');
 
+            Debugbar::stopMeasure('controller render');
             return response($widgetRender);
         }
+        Debugbar::stopMeasure('controller render');
 
         return Response::json('Widget not Found', 404);
 

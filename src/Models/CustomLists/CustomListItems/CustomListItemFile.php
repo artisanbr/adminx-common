@@ -6,10 +6,10 @@
 
 namespace Adminx\Common\Models\CustomLists\CustomListItems;
 
-use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemFileData;
 
-class CustomListItemFile extends CustomListItemBase
+class CustomListItemFile extends CustomListItemAbstract
 {
 
     /*protected $casts = [

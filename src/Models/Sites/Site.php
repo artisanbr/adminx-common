@@ -223,7 +223,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
     protected function getHomePageAttribute()
     {
-        return $this->pages()->isHome()->first();
+        return $this->pages()->homePage()->first();
     }
 
     /*protected function getScriptsUriAttribute(){

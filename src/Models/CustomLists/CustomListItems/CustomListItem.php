@@ -1,10 +1,14 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\CustomLists\CustomListItems;
 
-use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 
-class CustomListItem extends CustomListItemBase
+class CustomListItem extends CustomListItemAbstract
 {
 
    /* protected $casts = [

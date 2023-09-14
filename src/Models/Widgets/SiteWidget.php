@@ -76,6 +76,8 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
         ///'no_widget',
     ];
 
+    protected $hidden = ['template_content'];
+
     protected array $viewRenderData = [];
 
     //region HELPERS
@@ -234,6 +236,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
     public function getTwigRenderData(array $merge_data = []): array
     {
         $twigData = $this->getViewRenderData([...$merge_data, 'widget' => $this->toCleanArray()]);
+        //$twigData = $this->getViewRenderData($merge_data);
 
         //$twigData['widget'] = $this->toCleanArray();
 

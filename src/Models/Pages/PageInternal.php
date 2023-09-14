@@ -9,7 +9,7 @@ namespace Adminx\Common\Models\Pages;
 use Adminx\Common\Enums\ContentEditorType;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Http\FormRequest;
 
 /**
- * @property EloquentModelBase|CustomListBase $model
+ * @property EloquentModelBase|CustomListAbstract $model
  */
 class PageInternal extends EloquentModelBase implements PublicIdModel, UploadModel
 
@@ -51,13 +51,15 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
         'content',
         'config',
         'assets',
+        'frontend_build',
     ];
 
     protected $casts = [
-        'title' => 'string',
-        'content' => 'string',
-        'config'  => PageInternalConfig::class,
-        'assets'  => FrontendAssetsBundle::class,
+        'title'          => 'string',
+        'content'        => 'string',
+        'config'         => PageInternalConfig::class,
+        'assets'         => FrontendAssetsBundle::class,
+        'frontend_build' => FrontendBuildObject::class,
     ];
 
     protected $attributes = [
@@ -100,7 +102,8 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
 
     public function prepareFrontendBuild($buildMeta = false): FrontendBuildObject
     {
-        $frontendBuild = $this->page->frontend_build;
+        //$frontendBuild = $this->page->frontend_build;
+        $frontendBuild = new FrontendBuildObject();
 
         //Antes inicio da tag head
         //$frontendBuild->head->addBefore(Meta::toHtml());
@@ -118,13 +121,26 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
         //Fim do body
         $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
 
-        if($buildMeta){
+        /*$frontendBuild->seo->fill([
+                                      'title'         => $this->getTitle(),
+                                      'title_prefix' => "{{ site.getTitle() }} - {{ page.getTitle() }}",
+                                      'description'   => $this->getDescription(),
+                                      'keywords'      => $this->getKeywords(),
+                                      'image_url'     => $this->seoImage(),
+                                      'published_at'  => $this->created_at->toIso8601String(),
+                                      'updated_at'    => $this->updated_at->toIso8601String(),
+                                      'canonical_uri' => $this->uri,
+                                      'document_type' => 'page',
+                                      'html'          => '',
+                                  ]);*/
+
+        /*if($buildMeta){
             $frontendBuild->meta->reset();
             $frontendBuild->meta->registerSeoForPageInternal($this);
 
             //$frontendBuild->head->addBefore($frontendBuild->meta->toHtml());
             $frontendBuild->seo->html = $frontendBuild->meta->toHtml();
-        }
+        }*/
 
         return $frontendBuild;
     }
@@ -151,6 +167,7 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
     {
         $title = $this->model->title ?? 'Sem Título';
         $type = $this->model?->type?->title() ?? '';
+
         return Attribute::make(
             get: fn() => "<h4>{$title}</h4> {$type}",
         );
@@ -161,12 +178,28 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
     {
         return $this->config->breadcrumb ?? $this->page->breadcrumb_config;
     }
+
     protected function getUrlAttribute(): string
     {
-        return $this->page->urlTo( !empty($this->slug) ? "{$this->slug}/" : '');
+        return $this->page->urlTo(!empty($this->slug) ? "{$this->slug}/" : '');
     }
     //endregion
 
+    //endregion
+
+    //region OVERRIDES
+
+    public function save(array $options = [])
+    {
+        if (parent::save($options)) {
+            $this->frontend_build = $this->prepareFrontendBuild();
+
+            return parent::save($options);
+        }
+
+
+        return false;
+    }
     //endregion
 
     //region RELATIONS

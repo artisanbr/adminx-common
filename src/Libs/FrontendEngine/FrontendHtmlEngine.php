@@ -10,7 +10,7 @@ use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Article;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Menus\Menu;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
@@ -46,7 +46,7 @@ class FrontendHtmlEngine extends FrontendEngineBase
      */
     protected mixed $menus;
     /**
-     * @var Collection|mixed|CustomListBase[]
+     * @var Collection|mixed|CustomListAbstract[]
      */
     protected mixed $customLists;
 

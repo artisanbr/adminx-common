@@ -7,7 +7,7 @@
 namespace Adminx\Common\Libs\FrontendEngine\Twig\Extensions;
 
 use Adminx\Common\Facades\Frontend\FrontendSite;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Menus\Menu;
@@ -45,7 +45,7 @@ class FrontendTwigExtension extends AbstractExtension
      */
     protected mixed $menus;
     /**
-     * @var Collection|mixed|CustomListBase[]
+     * @var Collection|mixed|CustomListAbstract[]
      */
     protected mixed $customLists;
 

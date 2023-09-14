@@ -11,6 +11,7 @@ use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\FrontendEngine\FrontendPageEngine;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Category;
+use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Pages\Modules\Manager\PageModuleManagerEngine;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Pages\PageInternal;
@@ -185,6 +186,60 @@ class FrontendPageServiceProvider extends ServiceProvider
                 ->setKeywords($article->getKeywords())
                 ->registerPackage($metaOg)
                 ->setPaginationLinks($comments)
+                //->setCanonical($article->uri)
+                ->registerPackage($metaTwitter);
+        });
+
+
+        Meta::macro('registerSeoObject', function (Seo $seo) {
+
+            //$site = $site ?? FrontendSite::current();
+
+            if (!empty($seo->title_prefix)) {
+                $this->prependTitle($seo->title_prefix);
+            }
+
+            //$article->load(['site','page']);
+            $metaOg = new OpenGraphPackage('site_og_seo');
+            $metaTwitter = new TwitterCardPackage('site_tt_seo');
+
+
+            //$seoFullTitle = $seo->title; //$site->seoTitle($page->seoTitle($article->getTitle()));
+
+            $metaOg
+                ->setType($seo->document_type)
+                ->setTitle($seo->title)
+                ->setDescription($seo->description)
+                //->setUrl($article->uri)
+                //->addOgMeta('article:author', $article->user->name)
+                ->addOgMeta('article:section', $seo->title)
+                ->addOgMeta('article:tag', $seo->keywords)
+                ->addOgMeta('article:published_time', $seo->published_at)
+                ->addOgMeta('article:modified_time', $seo->updated_at)
+                ->addOgMeta('og:updated_time', $seo->updated_at);
+
+            $metaTwitter
+                ->setTitle($seo->title)
+                ->setDescription($seo->description);
+
+            if ($seo->image_url) {
+                $metaTwitter
+                    ->setType('summary_large_image')
+                    ->setImage($seo->image_url)
+                    ->addMeta('image:alt', $seo->title);
+
+                $metaOg->addImage($seo->image_url, [
+                    'type' => 'image',
+                    'alt'  => $seo->title,
+                ]);
+            }
+
+
+            $this
+                ->setTitle($seo->title)
+                ->setDescription($seo->description)
+                ->setKeywords($seo->keywords)
+                ->registerPackage($metaOg)
                 //->setCanonical($article->uri)
                 ->registerPackage($metaTwitter);
         });

@@ -7,24 +7,24 @@
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Facades\FileManager\FileUpload;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
 use Adminx\Common\Repositories\Base\Repository;
 use Exception;
 
 /**
- * @property ?CustomListItemBase $model
+ * @property ?CustomListItemAbstract $model
  */
 class CustomListItemRepository extends Repository
 {
-    public ?int           $list_id;
-    public CustomListBase $customList;
-    protected string $modelClass = CustomListItem::class;
+    public ?int               $list_id;
+    public CustomListAbstract $customList;
+    protected string          $modelClass = CustomListItem::class;
 
     /*public function __construct(
-        protected CustomListItemBase|null $listItem = null,
+        protected CustomListItemAbstract|null $listItem = null,
     ) {}*/
 
     public function customList($list_id): static
@@ -37,7 +37,7 @@ class CustomListItemRepository extends Repository
     }
 
 
-    public function saveTransaction(): ?CustomListItemBase
+    public function saveTransaction(): ?CustomListItemAbstract
     {
         $this->setModel($this->customList->items()->findOrNew($this->data['id'] ?? null));
 
