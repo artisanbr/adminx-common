@@ -354,7 +354,6 @@ class Page extends EloquentModelBase implements BuildableModel,
     public function prepareFrontendBuild($buildMeta = false): FrontendBuildObject
     {
 
-
         $frontendBuild = $this->site->frontendBuild();
 
         $frontendBuild->head->gtag_script = $this->getGTagScript();
@@ -370,13 +369,25 @@ class Page extends EloquentModelBase implements BuildableModel,
         $frontendBuild->body->addBefore($this->assets->js->before_body->html ?? '');
         $frontendBuild->body->addAfter($this->assets->js->after_body->html ?? '');
 
-        if($buildMeta){
-            $frontendBuild->meta->reset();
-            $frontendBuild->meta->registerSeoForPage($this);
+        $frontendBuild->seo->fill([
+                                      'title'         => "{{ page.getTitle() }}",
+                                      'title_prefix'  => "{{ site.getTitle() }}",
+                                      'description'   => $this->getDescription(),
+                                      'keywords'      => $this->getKeywords(),
+                                      'image_url'     => $this->seoImage(),
+                                      'published_at'  => $this->published_at->toIso8601String(),
+                                      'updated_at'    => $this->updated_at->toIso8601String(),
+                                      'canonical_uri' => $this->uri,
+                                      'html'          => '',
+                                  ]);
 
-            //$frontendBuild->head->addBefore($frontendBuild->meta->toHtml());
-            $frontendBuild->seo->html = $frontendBuild->meta->toHtml();
-        }
+        /* if($buildMeta){
+             $frontendBuild->meta->reset();
+             $frontendBuild->meta->registerSeoForPage($this);
+
+             //$frontendBuild->head->addBefore($frontendBuild->meta->toHtml());
+             $frontendBuild->seo->html = $frontendBuild->meta->toHtml();
+         }*/
 
         return $frontendBuild;
     }
@@ -573,9 +584,21 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     //region SCOPES
 
+    public function scopeHomePage(Builder $query): Builder
+    {
+        return $query->isHome()->orWhere(function (Builder $q) {
+            $q->emptySlug();
+        });
+    }
+
     public function scopeIsHome(Builder $query, $is_home = true): Builder
     {
         return $query->where('is_home', $is_home);
+    }
+
+    public function scopeEmptySlug(Builder $query): Builder
+    {
+        return $query->where('slug', null)->orWhere('slug', '');
     }
 
     public function scopeBuild(Builder $query)

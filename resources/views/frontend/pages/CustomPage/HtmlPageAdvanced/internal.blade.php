@@ -1,8 +1,8 @@
 <?php
 /***
- * @var \Adminx\Common\Models\Sites\Site                                                                                                        $site
- * @var \Adminx\Common\Models\Pages\Page                                                                                                        $page
- * @var \Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase|\Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml $currentItem
+ * @var \Adminx\Common\Models\Sites\Site                                                                                                                              $site
+ * @var \Adminx\Common\Models\Pages\Page                                                                                                                              $page
+ * @var \Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract\CustomListItemAbstract|\Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml $currentItem
  */
 ?>
 @extends('common-frontend::layout.partials.content', compact('page'))

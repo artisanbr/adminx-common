@@ -52,6 +52,7 @@ class SiteWidgetRepository extends Repository
 
         $this->model->config->update_template = (string)($this->data['template_update_type'] ?? '') === '1';
 
+
         if ($this->data['template_id'] ?? false) {
             //Vincular template selecionado
             $templateRelation = $this->model->templatable()->firstOrNew();

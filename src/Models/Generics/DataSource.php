@@ -10,7 +10,7 @@ use Adminx\Common\Enums\CustomLists\CustomListType;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Article;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Sites\Site;
@@ -20,8 +20,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * @property Page|Form|Article|CustomListBase|null $data
- * @property Page|null                             $page
+ * @property Page|Form|Article|CustomListAbstract|null $data
+ * @property Page|null                                 $page
  */
 class DataSource extends GenericModel
 {
@@ -192,7 +192,7 @@ class DataSource extends GenericModel
                     case $dataType === 'list' || Str::contains($dataType, 'list.'):
                         //Listas Customizadas
                         /**
-                         * @var CustomListBase $customList
+                         * @var CustomListAbstract $customList
                          */
                         $customList = $site->lists()->where('id', $dataId)->first();
 

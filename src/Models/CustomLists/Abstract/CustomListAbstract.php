@@ -1,9 +1,14 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\CustomLists\Abstract;
 
 use Adminx\Common\Enums\CustomLists\CustomListType;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
 use Adminx\Common\Models\Interfaces\OwneredModel;
@@ -19,7 +24,6 @@ use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
-use Adminx\Common\Models\Traits\Relations\BelongsToPage;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Observers\OwneredModelObserver;
@@ -27,7 +31,7 @@ use Adminx\Common\Observers\PublicIdModelObserver;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Http\FormRequest;
 
-abstract class CustomListBase extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
+abstract class CustomListAbstract extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
     use BelongsToAccount,
         //BelongsToPage,
@@ -127,9 +131,9 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
      * @param $id
      * @param $type
      *
-     * @return CustomListBase
+     * @return CustomListAbstract
      */
-    public static function findAndMount($id = null, $type = null): CustomListBase
+    public static function findAndMount($id = null, $type = null): CustomListAbstract
     {
         if (!$type && $id) {
             //dd(CustomList::where('id',$id)->select(['type'])->get());
@@ -156,12 +160,12 @@ abstract class CustomListBase extends EloquentModelBase implements PublicIdModel
         //return self::findAndMount($this->id, $this->type->value);
     }
 
-    public function itemUrl(CustomListItemBase $listItem): string
+    public function itemUrl(CustomListItemAbstract $listItem): string
     {
         return $this->url . ($listItem->slug ?? $listItem->public_id) . '/';
     }
 
-    public function itemUri(CustomListItemBase $listItem): string
+    public function itemUri(CustomListItemAbstract $listItem): string
     {
         return $this->uri . '/' . ($listItem->slug ?? $listItem->public_id);
     }

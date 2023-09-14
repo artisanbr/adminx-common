@@ -1,11 +1,15 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\CustomLists;
 
-use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Illuminate\Foundation\Http\FormRequest;
 
-class CustomList extends CustomListBase
+class CustomList extends CustomListAbstract
 {
 
     /*protected $casts = [

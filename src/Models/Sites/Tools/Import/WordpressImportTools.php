@@ -11,7 +11,7 @@ use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Category;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemTestimonials;
 use Adminx\Common\Models\Objects\Seo\Seo;
@@ -353,7 +353,7 @@ class WordpressImportTools
         return $seo;
     }
 
-    public function importPostsToList(CustomListBase $customList, $wpType, $step = 1, $step_items_number = 50): Collection
+    public function importPostsToList(CustomListAbstract $customList, $wpType, $step = 1, $step_items_number = 50): Collection
     {
         /**
          * @var \Illuminate\Database\Eloquent\Collection|WpPost[] $importPosts

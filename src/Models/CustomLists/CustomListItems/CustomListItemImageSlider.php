@@ -6,11 +6,11 @@
 
 namespace Adminx\Common\Models\CustomLists\CustomListItems;
 
-use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 use Adminx\Common\Models\CustomLists\CustomListImageSlider;
 use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemImageSliderData;
 
-class CustomListItemImageSlider extends CustomListItemBase
+class CustomListItemImageSlider extends CustomListItemAbstract
 {
     protected string $listClass = CustomListImageSlider::class;
 

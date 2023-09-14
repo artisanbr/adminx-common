@@ -12,7 +12,7 @@ use Adminx\Common\Libs\FrontendEngine\FrontendEngineBase;
 use Adminx\Common\Libs\FrontendEngine\Twig\Extensions\FrontendTwigExtension;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Pages\Page;
@@ -59,6 +59,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         $this->templates = collect();
         $this->templateNamePrefix = 'tpl-' . time();
         $this->twigFileLoader = new FilesystemLoader();
+        $this->frontendBuild = new FrontendBuildObject();
     }
 
     public function setViewData(array $viewData = []): static
@@ -89,8 +90,60 @@ class FrontendTwigEngine extends FrontendEngineBase
     {
         $this->frontendBuild = $frontendBuild;
 
+        $this->initFrontendBuild();
+
+        return $this;
+    }
+
+    public function registerFrontendBuild(FrontendBuildObject $frontendBuild = new FrontendBuildObject()): static
+    {
+
+        if (!empty($frontendBuild->head->gtag_script)) {
+            $this->frontendBuild->head->gtag_script = $frontendBuild->head->gtag_script;
+        }
+
+        if (!empty($frontendBuild->head->css)) {
+            $this->frontendBuild->head->css .= $frontendBuild->head->css;
+        }
+
+        if (!empty($frontendBuild->head->before)) {
+            $this->frontendBuild->head->addBefore($frontendBuild->head->before);
+        }
+
+        if (!empty($frontendBuild->head->after)) {
+            $this->frontendBuild->head->addAfter($frontendBuild->head->after);
+        }
+
+        if (!empty($frontendBuild->body->id)) {
+            $this->frontendBuild->body->id = $frontendBuild->body->id;
+        }
+
+        if (!empty($frontendBuild->body->class)) {
+            $this->frontendBuild->body->class = $frontendBuild->body->class;
+        }
+
+        if (!empty($frontendBuild->body->before)) {
+            $this->frontendBuild->body->addBefore($frontendBuild->body->before);
+        }
+
+        if (!empty($frontendBuild->body->after)) {
+            $this->frontendBuild->body->addAfter($frontendBuild->body->after);
+        }
+
+        $this->frontendBuild->seo->mergeWith($frontendBuild->seo);
+
+        return $this;
+    }
+
+    public
+    function initFrontendBuild(): static
+    {
         $this->frontendBuild->meta->initialize();
         $this->frontendBuild->meta->addCsrfToken();
+
+        $this->frontendBuild->meta->registerSeoObject($this->frontendBuild->seo);
+
+        $this->frontendBuild->seo->html = $this->frontendBuild->meta->toHtml();
 
         return $this;
     }
@@ -98,7 +151,8 @@ class FrontendTwigEngine extends FrontendEngineBase
     /**
      * @throws FrontendException
      */
-    public function applyTheme(Theme $theme): static
+    public
+    function applyTheme(Theme $theme): static
     {
         $themeBuild = $theme->build;
 
@@ -133,7 +187,8 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws LoaderError
      * @throws LoaderError
      */
-    protected function prepareTwig(): static
+    protected
+    function prepareTwig(): static
     {
 
         $arrayTemplates = [];
@@ -216,12 +271,14 @@ class FrontendTwigEngine extends FrontendEngineBase
         return $this;
     }
 
-    protected function getTemplatesToTwig()
+    protected
+    function getTemplatesToTwig()
     {
         return $this->templates->mapWithKeys(fn($template, $name) => [$this->getTemplateName($name) => $template])->toArray();
     }
 
-    protected function getTemplateName($template): string
+    protected
+    function getTemplateName($template): string
     {
         return $this->templateNamePrefix . '-' . $template;
     }
@@ -232,7 +289,8 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws LoaderError
      * @throws Exception
      */
-    public function renderTwig(string $template): string
+    public
+    function renderTwig(string $template): string
     {
         $this->prepareTwig();
 
@@ -254,7 +312,8 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function html($rawHtml = '', $viewData = null, $templateName = null, ?Theme $theme = null): string
+    public
+    function html($rawHtml = '', $viewData = null, $templateName = null, ?Theme $theme = null): string
     {
         if ($viewData) {
             $this->addViewData($viewData);
@@ -273,7 +332,8 @@ class FrontendTwigEngine extends FrontendEngineBase
         return $this->renderTwig($templateName);
     }
 
-    public function content($rawHtml = '', $viewData = null, $templateName = null, ?Theme $theme = null): string
+    public
+    function content($rawHtml = '', $viewData = null, $templateName = null, ?Theme $theme = null): string
     {
         if ($viewData) {
             $this->addViewData($viewData);
@@ -290,8 +350,11 @@ class FrontendTwigEngine extends FrontendEngineBase
         return $this->renderTwig($templateName);
     }
 
-    public function getPageBaseTemplate(string $content): string
+    public
+    function getPageBaseTemplate(string $content): string
     {
+
+        $this->initFrontendBuild();
 
         $headHtml = $this->themeBuild->head;
         $headerHtml = $this->themeBuild->header;
@@ -325,13 +388,14 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function page(Page $page): string
+    public
+    function page(Page $page): string
     {
         $this->templateNamePrefix = 'page-' . $page->public_id;
 
         $this->setViewData($page->getBuildViewData());
 
-        $this->setFrontendBuild($page->frontend_build);
+        $this->registerFrontendBuild($page->frontend_build);
 
         //$this->frontendBuild->meta->registerSeoForPage($page);
 
@@ -375,7 +439,8 @@ class FrontendTwigEngine extends FrontendEngineBase
     /**
      * @throws FrontendException
      */
-    public function article(Article $article): string
+    public
+    function article(Article $article): string
     {
         $page = $article->page;
         $this->templateNamePrefix = 'article-' . $article->public_id;
@@ -389,7 +454,7 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //dd($this->themeBuild);
 
-        $this->setFrontendBuild($article->meta->frontend_build);
+        $this->registerFrontendBuild($article->meta->frontend_build);
 
         //$this->frontendBuild->meta->registerSeoForArticle($article);
 
@@ -431,10 +496,11 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function pageInternal(PageInternal $pageInternal, $modelItem): string
+    public
+    function pageInternal(PageInternal $pageInternal, $modelItem): string
     {
         /**
-         * @var EloquentModelBase|CustomListItemBase|CustomListItemHtml $modelItem
+         * @var EloquentModelBase|CustomListItemAbstract|CustomListItemHtml $modelItem
          */
 
         $this->templateNamePrefix = 'page-internal-' . $pageInternal->public_id . '-' . (@$modelItem->public_id ?? @$modelItem->slug ?? time());
@@ -442,15 +508,20 @@ class FrontendTwigEngine extends FrontendEngineBase
         $pageInternal->breadcrumb_config->background_url = $modelItem->data->image_url;
 
         $this->setViewData($pageInternal->page->getBuildViewData([
-                                                       'pageInternal'   => $pageInternal,
-                                                       'currentItem' => $modelItem,
-                                                       'breadcrumb'  => $pageInternal->breadcrumb([
-                                                                                                      ...$pageInternal->page->breadcrumb->items->toArray(),
-                                                                                                      '#' => $modelItem->title,
-                                                                                                  ]),
-                                                   ]));
+                                                                     'pageInternal' => $pageInternal,
+                                                                     'currentItem'  => $modelItem,
+                                                                     'breadcrumb'   => $pageInternal->breadcrumb([
+                                                                                                                     ...$pageInternal->page->breadcrumb->items->toArray(),
+                                                                                                                     '#' => $modelItem->title,
+                                                                                                                 ]),
+                                                                 ]));
 
-        $this->setFrontendBuild($modelItem->data->frontend_build ?? $pageInternal->frontend_build);
+        if ($pageInternal->frontend_build ?? false) {
+            $this->registerFrontendBuild($pageInternal->frontend_build);
+        }
+        if ($modelItem->data->frontend_build ?? false) {
+            $this->registerFrontendBuild($modelItem->data->frontend_build);
+        }
 
         //$this->frontendBuild->meta->registerSeoForPage($page);
 
@@ -464,11 +535,11 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $pageContent = $pageInternal->content;
 
-       /* if ($pageTemplate) {
-            //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
-            $this->twigFileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
-            $pageContent .= "{{ include('@template/index.twig') }}";
-        }*/
+        /* if ($pageTemplate) {
+             //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
+             $this->twigFileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
+             $pageContent .= "{{ include('@template/index.twig') }}";
+         }*/
 
 
         //$pageContent = $page->page_template ? "{{ include('@template/index.twig') }}" : '';

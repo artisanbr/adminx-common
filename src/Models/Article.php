@@ -168,7 +168,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
         $viewData = [
             'article'       => $this,
-            'frontendBuild' => $this->prepareFrontendBuild(),
+            'frontendBuild' => $this->meta->frontend_build,
             'comments'      => $this->comments, //todo: $this->comments()->paginate(5, ['*'], 'comments_page'),
             //'breadcrumbs'   => [$this->seoTitle()],
         ];
@@ -178,7 +178,8 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     public function prepareFrontendBuild($buildMeta = false): FrontendBuildObject
     {
-        $frontendBuild = $this->page->prepareFrontendBuild();
+        //$frontendBuild = $this->page->prepareFrontendBuild();
+        $frontendBuild = new FrontendBuildObject();
 
         //Gtag
         $frontendBuild->head->gtag_script = $this->getGTagScript();
@@ -203,20 +204,34 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
 
 
-        $frontendBuild->seo->fill([
+        /*$frontendBuild->seo->fill([
                                       ...$this->seo->toArray(),
                                       'title'       => $this->getTitle(),
                                       'description' => $this->getDescription(),
                                       'keywords'    => $this->getKeywords(),
                                       'image_url'   => $this->seoImage(),
+                                  ]);*/
+
+        $frontendBuild->seo->fill([
+                                      'title'         => $this->getTitle(),
+                                      'title_prefix'  => "{{ site.getTitle() }} - {{ page.getTitle() }}",
+                                      'description'   => $this->getDescription(),
+                                      'keywords'      => $this->getKeywords(),
+                                      'image_url'     => $this->seoImage(),
+                                      'published_at'  => $this->published_at->toIso8601String(),
+                                      'updated_at'    => $this->updated_at->toIso8601String(),
+                                      'canonical_uri' => $this->uri,
+                                      'document_type' => 'article',
+                                      'html'          => '',
                                   ]);
 
-        if ($buildMeta) {
+
+        /*if ($buildMeta) {
             $frontendBuild->meta->reset();
             $frontendBuild->meta->registerSeoForArticle($this);
             //$frontendBuild->head->addBefore($frontendBuild->meta->toHtml());
             $frontendBuild->seo->html = $frontendBuild->meta->toHtml();
-        }
+        }*/
 
         return $frontendBuild;
     }
@@ -296,8 +311,15 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     protected function description(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => Str::of($value ?? Str::limit(strip_tags($this->content), 300))->replaceMatches('/\r\n+/', "\r\n"),
+            get: fn($value) => empty($value) ? $this->content_description : Str::of($value)->replaceMatches('/\r\n+/', "\r\n"),
             set: static fn($value) => $value,
+        );
+    }
+
+    protected function contentDescription(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => Str::of(Str::limit(strip_tags($this->content), 300))->replaceMatches('/\r\n+/', "\r\n"),
         );
     }
 
@@ -318,7 +340,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     protected function hasCustomDescription(): Attribute
     {
         return Attribute::make(
-            get: fn() => (bool)($this->attributes['description'] ?? false),
+            get: fn() => (string)$this->content_description !== (string)$this->description,
         );
     }
 

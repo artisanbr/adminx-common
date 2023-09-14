@@ -6,11 +6,11 @@
 
 namespace Adminx\Common\Models\CustomLists\CustomListItems;
 
-use Adminx\Common\Models\CustomLists\Abstract\CustomListItemBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 use Adminx\Common\Models\CustomLists\CustomListTestimonials;
 use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemTestimonialsData;
 
-class CustomListItemTestimonials extends CustomListItemBase
+class CustomListItemTestimonials extends CustomListItemAbstract
 {
     protected string $listClass = CustomListTestimonials::class;
 
