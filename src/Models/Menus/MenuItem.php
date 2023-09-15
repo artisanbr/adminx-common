@@ -134,14 +134,21 @@ class MenuItem extends EloquentModelBase
 
             $useUrl = ($this->config->use_submenu_url && $this->url);
 
+            $itemLink = Link::to($useUrl ? $this->url : '#', $this->title)
+                            ->setAttributes([
+                                                'data-toggle' => 'dropdown',
+                                                ...(!$useUrl ? [
+                                                    'role' => 'button',
+                                                ] : []),
+                                            ]);
+
+            if (!$this->parent_id) {
+                $itemLink->addClass($menu->config->render->parent_item_link->class ?? '');
+                $itemLink->addParentClass($menu->config->render->parent_item->class ?? '');
+            }
+
             $menuBuilder->submenu(
-                Link::to($useUrl ? $this->url : '#', $this->title)
-                    ->setAttributes([
-                                        'data-toggle' => 'dropdown',
-                                        ...(!$useUrl ? [
-                                            'role' => 'button',
-                                        ] : []),
-                                    ]),
+                $itemLink,
                 function (SpatieMenu $subMenu) use ($menu) {
 
                     $subMenu->addClass($menu->config->render->submenu->class ?? '');
@@ -199,7 +206,14 @@ class MenuItem extends EloquentModelBase
 
         }
         else {
-            $menuBuilder->add(Link::to($this->url, $this->title)->addParentClass($menu->config->render->item->class ?? ''));
+            $itemLink = Link::to($this->url, $this->title)->addParentClass($menu->config->render->item->class ?? '');
+
+            if (!$this->parent_id) {
+                $itemLink->addClass($menu->config->render->parent_item_link->class ?? '');
+                $itemLink->addParentClass($menu->config->render->parent_item->class ?? '');
+            }
+
+            $menuBuilder->add($itemLink);
         }
 
         return $menuBuilder;
