@@ -27,6 +27,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Extension\DebugExtension;
+use Twig\Extension\StringLoaderExtension;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
@@ -238,6 +239,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         $this->twig->addExtension(new DebugExtension());
 
         $this->twig->addExtension(new FrontendTwigExtension($this->twig, $this->currentSite));
+        $this->twig->addExtension(new StringLoaderExtension());
 
 
         /*$this->twig->addFunction(new TwigFunction('getTemplate', function (string $file) {
