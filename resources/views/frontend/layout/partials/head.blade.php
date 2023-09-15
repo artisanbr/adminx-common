@@ -5,14 +5,13 @@
  * @var \Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject $frontendBuild
  */
 ?>
-{{--before--}}
+{{--GTag--}}
 @{{ frontendBuild.head.gtag_script }}
-<!--Meta Before-->
+{{--Before Head--}}
 @{{ frontendBuild.head.before }}
 {{--Assets--}}
-<!--Meta HTML-->
-@{{ frontendBuild.meta.toHtml() }}
-<!--End Meta HTML-->
+{{--Meta--}}
+{{--@{{ frontendBuild.meta.toHtml() }}--}}
 {{--Pre meta--}}
 @if($themeMeta ?? false)
     {!! $themeMeta->toHtml() !!}
