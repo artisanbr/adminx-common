@@ -140,7 +140,9 @@ class MenuItem extends EloquentModelBase
                                                 ...(!$useUrl ? [
                                                     'role' => 'button',
                                                 ] : []),
-                                            ]);
+                                            ])
+                            ->addParentClass($menu->config->render->item->class ?? '')
+                            ->addClass($menu->config->render->item_link->class ?? '');
 
             if (!$this->parent_id) {
                 $itemLink->addClass($menu->config->render->parent_item_link->class ?? '');
@@ -165,7 +167,13 @@ class MenuItem extends EloquentModelBase
 
 
                         foreach ($customList->items as $modelItem) {
-                            $subMenu->add(Link::to($modelItem->url, $modelItem->title)->addParentClass($menu->config->render->item->class ?? ''));
+                            $listItemLink = Link::to($modelItem->url, $modelItem->title)
+                                                ->addParentClass($menu->config->render->item->class ?? '')
+                                                ->addParentClass($menu->config->render->submenu_item->class ?? '')
+                                                ->addClass($menu->config->render->item_link->class ?? '')
+                                                ->addClass($menu->config->render->submenu_item_link->class ?? '');
+
+                            $subMenu->add($listItemLink);
                         }
 
                     }/*else if ($this->config->is_source_submenu && $this->config->submenu_source->data->id ?? false) {
@@ -206,7 +214,9 @@ class MenuItem extends EloquentModelBase
 
         }
         else {
-            $itemLink = Link::to($this->url, $this->title)->addParentClass($menu->config->render->item->class ?? '');
+            $itemLink = Link::to($this->url, $this->title)
+                            ->addParentClass($menu->config->render->item->class ?? '')
+                            ->addClass($menu->config->render->item_link->class ?? '');
 
             if (!$this->parent_id) {
                 $itemLink->addClass($menu->config->render->parent_item_link->class ?? '');
