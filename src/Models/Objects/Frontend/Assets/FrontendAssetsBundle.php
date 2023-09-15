@@ -1,10 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Objects\Frontend\Assets;
 
 use Adminx\Common\Models\Objects\Frontend\FrontendHtmlObject;
 use ArtisanLabs\GModel\GenericModel;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 
 /**
  * @property string $css_bundle_html
@@ -36,6 +39,13 @@ class FrontendAssetsBundle extends GenericModel
         $this->scss->compile();
         $this->js->minify();
         $this->head_script->minify();
+
+        return $this;
+    }
+
+    public function compile()
+    {
+        $this->scss->compile();
 
         return $this;
     }

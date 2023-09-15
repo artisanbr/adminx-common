@@ -191,6 +191,8 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
 
     public function save(array $options = [])
     {
+        $this->assets->compile();
+        
         if (parent::save($options)) {
             $this->frontend_build = $this->prepareFrontendBuild();
 
