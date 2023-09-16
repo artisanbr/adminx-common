@@ -17,7 +17,7 @@ return [
         'keywords' =>
             'adminx, painel, criação de sites, cms, painel administrativo, gerenciador de conteúdo, content manager',
 
-        'version' => '0.7.0-alpha',
+        'version' => '0.7.2-alpha',
     ],
 
     'provider' => [
