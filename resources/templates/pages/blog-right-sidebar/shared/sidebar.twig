@@ -1,0 +1,31 @@
+<?php
+/**
+ * @var \Adminx\Common\Models\Sites\Site                                                  site
+ * @var \Adminx\Common\Models\Pages\Page                                            page
+ * @var \Illuminate\Pagination\LengthAwarePaginator|\Adminx\Common\Models\Article[] articles
+ * @var string|null                                                                 searchTerm
+ */
+?>
+<div class="blog-sidebar-area sidebar-area mb-5 pb-5 pt-4 sidebar">
+
+    <div class="widget search-widget">
+        <form id="blog-widget-searchbox-form" method="get" action="{{ page.uri }}">
+            <input type="text" name="q" placeholder="Pesquisar" aria-label="Pesquisar"
+                   aria-describedby="blog-widget-searchbox-submit">
+            <button type="submit" id="blog-widget-searchbox-submit">
+                <i class="far fa-search"></i>
+            </button>
+        </form>
+    </div>
+
+
+
+    {{ include('@template/widgets/categories.twig') }}
+    {{ include('@template/widgets/last-articles.twig') }}
+    {# @include('pages-templates::blog-simple.widgets.last-articles', compact('page', 'site'))
+    @include('pages-templates::blog-simple.widgets.categories', compact('page', 'site')) #}
+    {# todo:
+    {{--@include('pages-templates::blog-simple.widgets.archive', compact('page', 'site'))--}}
+    {{--@include('pages-templates::blog-simple.widgets.subscribe', compact('page', 'site'))--}}
+    {{--@include('pages-templates::blog-simple.widgets.tags', compact('page', 'site'))--}} #}
+</div>

@@ -7,6 +7,7 @@
 namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Enums\ContentEditorType;
+use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\Frontend\FrontendHtml;
 use Adminx\Common\Facades\Frontend\FrontendTwig;
 use Adminx\Common\Models\Article;
@@ -307,13 +308,26 @@ class Page extends EloquentModelBase implements BuildableModel,
             $articles = $this->articles()->published();
 
             //Categorias
-            if ($requestData['categorySlug'] ?? false) {
-                $category = $this->categories()->where('slug', $requestData['categorySlug'])->first();
+            //dd(Route::current()->parameter('categorySlug'));
+            $categorySlug = Route::current()->parameter('categorySlug') ?? $requestData['categorySlug'] ?? false;
+
+            if ($categorySlug) {
+                $category = $this->categories()->where('slug', $categorySlug)->orWhere('id', $categorySlug)->first();
                 if ($category) {
                     $articles = $articles->whereHas('categories', function (Builder $query) use ($category) {
                         $query->where('id', $category->id);
                     });
-                    Meta::registerSeoMetaTagsForCategory($this, $category);
+                    $viewData['category'] = $category;
+                    if($this->show_breadcrumb && $viewData['breadcrumb']){
+                        $viewData['breadcrumb']->items = $viewData['breadcrumb']->items->merge([$category->url => $category->title]);
+                        /*dd($viewData['breadcrumb']->items);
+                        $viewData['breadcrumb'] = $this->breadcrumb([$category->title]);*/
+                    }
+
+                    //Meta::registerSeoMetaTagsForCategory($this, $category);
+                }
+                else {
+                    throw new FrontendException('Categoria não encontrada');
                 }
             }
 

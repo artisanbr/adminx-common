@@ -1,0 +1,15 @@
+{% if page.categories.count() %}
+<div class="widget cat-widget">
+    <h4 class="widget-title">Categorias</h4>
+
+    <ul>
+        {% for category in page.categories.sortBy('title') %}
+            <li >
+                <a href="{{ category.url }}">
+                    {{ category.title }} <span><i class="far fa-angle-right"></i></span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

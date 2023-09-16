@@ -6,6 +6,7 @@
 
 namespace Adminx\Common\Models;
 
+use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Interfaces\OwneredModel;
@@ -87,7 +88,15 @@ class Category extends EloquentModelBase implements OwneredModel
     //region GETS
     protected function getUrlAttribute()
     {
-        return "/category/{$this->slug}";
+        $currentPage = FrontendPage::current() ?? null;
+
+        $url = "/category/{$this->slug}";
+
+        if ($currentPage) {
+            return $currentPage->urlTo($url);
+        }
+
+        return $url;
     }
     //endregion
     //endregion
@@ -156,7 +165,7 @@ class Category extends EloquentModelBase implements OwneredModel
 
     public function menu_items()
     {
-        return $this->morphMany(MenuItem::class, 'menuable');
+        return $this->morphMany(\Adminx\Common\Models\Menus\MenuItem::class, 'menuable');
     }
 
     //endregion

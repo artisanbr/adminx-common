@@ -1,0 +1,31 @@
+{% set showAuthor = showAuthor ?? false %}
+{% set showDate = showDate ?? true %}
+{% set showMeta = showMeta ?? true %}
+{% set showComments = showComments ?? false %}
+{% set showIcons = showIcons ?? true %}
+{% set showCover = showCover ?? true %}
+{% set showDescription = showDescription ?? true %}
+{% set big = big ?? false %}
+{% set small = small ?? false %}
+{% set bottomMeta = bottomMeta ?? false %}
+
+<article id="article-item-{{ article.id }}" class="single-post {{ (big ?? false) ? 'mb-5' : 'mb-4' }}">
+    {% if showCover and article.cover_url %}
+        <div class="post-thumb">
+            <a href="{{ article.url }}">
+                <img src="{{ article.cover_url }}" alt="{{ article.title }}"/>
+            </a>
+        </div>
+    {% endif %}
+    <div class="post-desc">
+        <span class="date">
+            <i class="far fa-calendar-alt"></i>
+            <time datetime="{{ article.published_at.format('Y-m-d H:i:S') }}">
+                {{ article.published_at.diffForHumans() }}
+            </time>
+        </span>
+        <a href="{{ article.url }}" data-bs-toggle="tooltip" title="{{ article.title }}">
+            {{ article.title }}
+        </a>
+    </div>
+</article>

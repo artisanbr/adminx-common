@@ -569,10 +569,10 @@ class WordpressImportTools
 
     }
 
-    public function importCategoriesTo(Site $site, ?Taxonomy $wpParentCategory = null, ?Category $localParent = null): Collection
+    public function importCategoriesTo(Page $page, ?Taxonomy $wpParentCategory = null, ?Category $localParent = null): Collection
     {
-        if (!$this->site) {
-            $this->setSite($site);
+        if (!$this->page) {
+            $this->setPage($page);
         }
 
         $resultCollection = collect();
@@ -602,6 +602,10 @@ class WordpressImportTools
 
                 $result = $localCategory->save();
 
+                if($result){
+                    $this->page->categories()->syncWithoutDetaching([$localCategory->id]);
+                }
+
                 $resultCollection->add([
                                            'title'  => $importCategory->title,
                                            'slug'   => $importCategory->slug,
@@ -611,7 +615,7 @@ class WordpressImportTools
 
                 if ($result) {
                     //Get childs
-                    $resultCollection = $resultCollection->merge($this->importCategoriesTo($site, $importCategory, $localCategory)->toArray());
+                    $resultCollection = $resultCollection->merge($this->importCategoriesTo($page, $importCategory, $localCategory)->toArray());
                 }
 
             }

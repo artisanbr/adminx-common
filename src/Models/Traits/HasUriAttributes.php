@@ -86,19 +86,29 @@ trait HasUriAttributes
 
     public function urlTo($path, $endWithDash = true)
     {
-        if(Str::startsWith($path, '/') && Str::endsWith($this->url, '/')){
+        /*if(Str::startsWith($path, '/') && Str::endsWith($this->url, '/')){
             $path = Str::substr($path, 0, -1);
-        }
+        }*/
         return $this->url . $this->traitPath($path, $endWithDash);
     }
 
     private function traitPath(string $path, $endWithDash = true, $comparesWithAttr = 'url'): string
     {
-        $path = (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, -1) : $path;
+        //$path = (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, 1) : $path;
+        $path = collect(explode('/', $path))->filter()->implode('/');
 
         if($endWithDash){
-            $path .= !Str::endsWith($this->{$comparesWithAttr}, '/') ? '/' : '';
+            //$path .= !Str::endsWith($this->{$path}, '/') ? '/' : '';
+            $path .= '/';
         }
+
+        if(!Str::endsWith($this->{$comparesWithAttr}, '/')){
+            //$path .= !Str::endsWith($this->{$path}, '/') ? '/' : '';
+            $path = '/'.$path;
+        }
+        /*else{
+            $path = Str::endsWith($path, '/') ? Str::substr($path, 0, -1) : $path;
+        }*/
 
         return $path;
     }

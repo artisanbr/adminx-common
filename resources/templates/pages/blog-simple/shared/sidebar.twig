@@ -20,8 +20,8 @@
             </form>
         </div>
     </div>
+    {{ include('@template/widgets/categories.twig') }}
     {{ include('@template/widgets/last-articles.twig') }}
-    {#todo: {{ include('@template/widgets/categories.twig') }}#}
     {#@include('pages-templates::blog-simple.widgets.last-articles', compact('page', 'site'))
     @include('pages-templates::blog-simple.widgets.categories', compact('page', 'site'))#}
     {#todo:

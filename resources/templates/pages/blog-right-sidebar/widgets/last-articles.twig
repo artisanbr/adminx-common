@@ -1,0 +1,28 @@
+<?php
+/**
+ * @var \Adminx\Common\Models\Sites\Site site
+ * @var \Adminx\Common\Models\Pages\Page page
+ */
+?>
+
+<div class="mb-5 blog-widget-last-articles widget recent-post-widget">
+    <h5 class="widget-title">Postagens Recentes</h5>
+    <div class="post-loops">
+        {% for article in page.last_articles().limit(5).get() %}
+            {{ include('@template/components/articles/article-miniature-inline.twig', {
+                article: article,
+                class: 'sidebar-widget-last-articles-item',
+                showReadMore: false,
+                showCategories: false,
+                showDescription: false,
+                showCover: true,
+                bottomMeta: true,
+                small: true,
+            }) }}
+
+            {% if not loop.last %}
+                <hr class="mb-4"/>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>

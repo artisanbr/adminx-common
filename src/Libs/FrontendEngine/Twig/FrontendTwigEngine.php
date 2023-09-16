@@ -12,9 +12,11 @@ use Adminx\Common\Libs\FrontendEngine\FrontendEngineBase;
 use Adminx\Common\Libs\FrontendEngine\Twig\Extensions\FrontendTwigExtension;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
+use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
@@ -131,7 +133,15 @@ class FrontendTwigEngine extends FrontendEngineBase
             $this->frontendBuild->body->addAfter($frontendBuild->body->after);
         }
 
-        $this->frontendBuild->seo->mergeWith($frontendBuild->seo);
+        $this->registerFrontendSeo($frontendBuild->seo);
+
+        return $this;
+    }
+
+    public function registerFrontendSeo(Seo|array $seo): static
+    {
+
+        $this->frontendBuild->seo->mergeWith($seo);
 
         return $this;
     }
@@ -393,6 +403,9 @@ class FrontendTwigEngine extends FrontendEngineBase
     public
     function page(Page $page): string
     {
+        /**
+         * @var ?Category $category
+         */
         $this->templateNamePrefix = 'page-' . $page->public_id;
 
         $this->setViewData($page->getBuildViewData());
@@ -415,6 +428,16 @@ class FrontendTwigEngine extends FrontendEngineBase
             //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
             $this->twigFileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
             $pageContent .= "{{ include('@template/index.twig') }}";
+        }
+
+        $category = $this->viewData['category'] ?? null;
+        //dd($category);
+
+        if ($category) {
+            $this->registerFrontendSeo([
+                                           'title'        => $category->title,
+                                           'title_prefix' => '{{ site.getTitle() }} - {{ page.getTitle() }}',
+                                       ]);
         }
 
 

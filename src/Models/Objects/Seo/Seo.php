@@ -34,7 +34,7 @@ class Seo extends GenericModel
     protected $attributes = [
         'document_type' => 'page', // (page, article)
         'title'         => '',
-        'title_prefix' => null,
+        'title_prefix'  => null,
         'description'   => '',
         'keywords'      => '',
         'robots'        => 'index, follow',
@@ -64,12 +64,17 @@ class Seo extends GenericModel
         //'image',
     ];
 
-    public function mergeWith(self $seo): static
+    public function mergeWith(self|array $seo): static
     {
 
-        $mergeAttrs = $seo->toArray();
-        $mergeAttrs = collect($mergeAttrs)->filter(fn($item) => !empty($item))->toArray();
-        $this->fill($mergeAttrs);
+        if (is_array($seo)) {
+            $this->fill($seo);
+        }
+        else {
+            $mergeAttrs = $seo->toArray();
+            $mergeAttrs = collect($mergeAttrs)->filter(fn($item) => !empty($item))->toArray();
+            $this->fill($mergeAttrs);
+        }
 
         return $this;
     }

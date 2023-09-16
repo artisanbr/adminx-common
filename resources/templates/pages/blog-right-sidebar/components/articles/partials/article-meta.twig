@@ -1,0 +1,40 @@
+{% set showAuthor = showAuthor ?? false %}
+{% set showDate = showDate ?? true %}
+{% set showComments = showComments ?? false %}
+{% set showIcons = showIcons ?? true %}
+
+{% set dateHumanFormat = dateHumanFormat ?? true %}
+{% set dateFormat = dateFormat ?? 'd/m/Y H:i:s' %}
+{% set shortComments = shortComments ?? true %}
+
+{% set authorIcon = authorIcon ?? '<i class="fa-solid fa-user me-1"></i>' %}
+{% set dateIcon = dateIcon ?? '<i class="fa-solid fa-calendar-days me-1"></i>' %}
+{% set commentsIcon = commentsIcon ?? '<i class="fa-solid fa-comments me-1"></i>' %}
+
+<div id="article-meta-{{ article.id }}" class="article-meta mb-2 d-inline-row text-muted small {{  class ?? '' }}" >
+    {% if showAuthor %}
+        <span class="me-3 mr-3 article-meta-author" title="Autor">
+            {!! showIcons ? authorIcon : '' !!}
+            {{ article.user.name }}
+        </span>
+    {% endif %}
+
+    {% if showDate %}
+        <span class="me-3 mr-3 article-meta-date"
+              title="Postado {{ article.published_at_long }}">
+            {{ showIcons ? dateIcon : '' }}
+            <time datetime="{{ article.published_at.format('Y-m-d H:i:S') }}">
+                {{ dateHumanFormat ? article.published_at.diffForHumans() : article.published_at.format(dateFormat) }}
+            </time>
+        </span>
+    {% endif %}
+
+    {% if showComments %}
+        <span class="article-meta-comments" title="Comentários">
+            {{ showIcons ? commentsIcon : '' }}
+            {{ article.comments().count() }} {{ (not shortComments) ? 'Comentários' : '' }}
+        </span>
+    {% endif %}
+
+    {{ slot }}
+</div>
