@@ -88,9 +88,20 @@ class Category extends EloquentModelBase implements OwneredModel
     //region GETS
     protected function getUrlAttribute()
     {
-        $currentPage = FrontendPage::current() ?? null;
+        $currentPage = @FrontendPage::current() ?? null;
 
         $url = "/category/{$this->slug}";
+
+        if (!$currentPage && @$this->pivot->pivotParent) {
+            $model = $this->pivot->pivotParent;
+
+            if (get_class($model) === Page::class) {
+                $currentPage = $model;
+            }
+            else if (method_exists($model, 'page') && get_class($model->page) === Page::class) {
+                $currentPage = $model->page;
+            }
+        }
 
         if ($currentPage) {
             return $currentPage->urlTo($url);
@@ -148,6 +159,7 @@ class Category extends EloquentModelBase implements OwneredModel
     //endregion
 
     //region RELATIONS
+
     public function categorizables()
     {
         return $this->hasMany(Categorizable::class, 'category_id', 'id');
