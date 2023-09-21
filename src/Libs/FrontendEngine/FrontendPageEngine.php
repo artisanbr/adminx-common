@@ -10,16 +10,26 @@ namespace Adminx\Common\Libs\FrontendEngine;
 use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Article;
+use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
+use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
+use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Pages\Types\Manager\Facade\PageTypeManager;
+use Adminx\Common\Models\Sites\SiteRoute;
+use App\Http\Controllers\Frontend\Page\ArticlesController;
+use App\Http\Controllers\Frontend\Page\PageInternalController;
+use App\Http\Controllers\Frontend\Page\PagesController;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 class FrontendPageEngine extends FrontendEngineBase
 {
     public function __construct(
-        protected ?Page $currentPage = null
+        protected ?Page                                                                                      $currentPage = null,
+        protected EloquentModelBase|Page|Article|CustomListItemAbstract|CustomListAbstract|PageInternal|null $firstModel = null,
+        protected EloquentModelBase|Page|Article|CustomListItemAbstract|PageInternal|null                    $secondModel = null
     )
     {
         if (!$this->currentSite) {
@@ -60,7 +70,7 @@ class FrontendPageEngine extends FrontendEngineBase
      * @return Page|null
      * @throws FrontendException
      */
-    public function loadCurrentPageFromUrl($pageUrl = null, array|string|null $expectedTypes = null): ?Page
+    public function loadCurrentPageFromUrlByTypes($pageUrl = null, array|string|null $expectedTypes = null): ?Page
     {
 
         if ($this->currentSite->config->performance->enable_advanced_cache) {
@@ -75,6 +85,21 @@ class FrontendPageEngine extends FrontendEngineBase
         return $this->currentPage;
     }
 
+    public function loadCurrentPageFromUrl(?String $slug = null): ?Page
+    {
+
+        if ($this->currentSite->config->performance->enable_advanced_cache) {
+
+            $this->currentPage = Cache::remember($this->currentSite->relatedCacheName($slug ?? 'home'), $this->cacheMinutes * 60, fn() => $this->getPageByUrl($slug));
+
+        }
+        else {
+            $this->currentPage = $this->getPageByUrl($slug);
+        }
+
+        return $this->currentPage;
+    }
+
 
     /***
      *
@@ -82,7 +107,21 @@ class FrontendPageEngine extends FrontendEngineBase
      *
      * Encontrar página através da URL (slug ou public_id)
      */
-    public function getPageByUrl(?string $pageUrl = null, array|string|null $expectedTypes = null): ?Page
+    public function getPageByUrl(?string $pageUrl = null): ?Page
+    {
+
+
+        //Se não for informada URL retornar a home
+        if (empty($pageUrl)) {
+            return $this->currentSite->home_page;
+        }
+
+        //Se não for informada URL e a pagina atual não existir, ou não for a home, definir e retornar a home
+
+        return $this->currentSite->pages()->whereUrl($pageUrl)->first();
+    }
+
+    public function getPageByUrlByTypes(?string $pageUrl = null, array|string|null $expectedTypes = null): ?Page
     {
 
 
@@ -121,7 +160,12 @@ class FrontendPageEngine extends FrontendEngineBase
      */
     public function getArticleByUrl(string $url): ?Article
     {
-        return $this->currentPage?->articles()->where('slug', $url)->orWhere('public_id', $url)->first();
+        return $this->currentPage?->articles()->whereUrl($url)->first();
+    }
+
+    public function getSiteRouteByUrl(string $url): ?SiteRoute
+    {
+        return FrontendSite::current()->routes()->where('url', $url)->first();
     }
 
     /***
@@ -129,7 +173,7 @@ class FrontendPageEngine extends FrontendEngineBase
      */
     public function getPageInternalByUrl(string $url): ?PageInternal
     {
-        return $this->currentPage?->page_internals()->where('slug', $url)->orWhere('public_id', $url)->first() ?? $this->currentPage?->page_internals()->whereNot('slug')->first();
+        return $this->currentPage?->page_internals()->whereUrl('slug', $url)->first() ?? $this->currentPage?->page_internals()->whereNot('slug')->first();
     }
 
     public function getFirstInternalUrl($url): Article|PageInternal|null
@@ -138,10 +182,14 @@ class FrontendPageEngine extends FrontendEngineBase
         //Validar pelo tipo da página
         if ($this->currentPage) {
 
+            return $this->getInternalModel($url, $this->currentPage);
+
             if ($this->currentPage->can_use_articles) {
                 $article = $this->getArticleByUrl($url);
 
                 if ($article) {
+                    $this->firstModel = $article;
+
                     return $article;
                 }
             }
@@ -151,6 +199,8 @@ class FrontendPageEngine extends FrontendEngineBase
 
                 $pageInternal = $this->getPageInternalByUrl($url);
                 if ($pageInternal) {
+                    $this->firstModel = $pageInternal;
+
                     return $pageInternal;
                 }
 
@@ -161,32 +211,35 @@ class FrontendPageEngine extends FrontendEngineBase
         return null;
     }
 
-    public function getSecondInternalUrl($url)
+    public function getInternalModel($url, Article|PageInternal|FrontendModel|EloquentModelBase|Page $mainModel): Article|PageInternal|FrontendModel|CustomListItemAbstract|null
     {
 
-        dd($this->currentPage);
-
         //Validar pelo tipo da página
-        if ($this->currentPage) {
 
-            if ($this->currentPage->can_use_articles) {
-                $article = $this->getArticleByUrl($url);
+        if ((@$mainModel->can_use_articles ?? false) && method_exists($mainModel, 'articles') && ($article = $mainModel->articles()->whereUrl($url)->first()) && $article?->id) {
+            $this->firstModel = $article;
 
-                if ($article) {
-                    return $article;
-                }
+            return $article;
+        }
+
+        //Custom List Item
+        if (get_class($mainModel) === PageInternal::class && method_exists($mainModel->model, 'items')) {
+
+            if (method_exists($mainModel->model, 'mountModel')) {
+                $customList = $mainModel->model->mountModel();
+            }
+            else {
+                $customList = $mainModel->model;
             }
 
-            if ($this->currentPage->page_internals()->count()) {
+            return $customList->items()->where('slug', $url)->orWhere('public_id', $url)->first();
+        }
 
+        //$pageInternal = $mainModel->page_internals()->whereUrl($url)->first();
+        if (get_class($mainModel) === Page::class && ($pageInternal = $mainModel->page_internals()->whereUrl($url)->first() ?? $mainModel->page_internals()->whereNot('slug')->first()) && $pageInternal?->id) {
+            $this->firstModel = $pageInternal;
 
-                $pageInternal = $this->getPageInternalByUrl($url);
-                if ($pageInternal) {
-                    return $pageInternal;
-                }
-
-
-            }
+            return $pageInternal;
         }
 
         return null;
@@ -195,9 +248,10 @@ class FrontendPageEngine extends FrontendEngineBase
 
     public function getModelController($model): string
     {
-        return match (get_class($model)){
-            Article::class => 'App\Http\Controllers\Frontend\Page\ArticlesController',
-            PageInternal::class => 'App\Http\Controllers\Frontend\Page\PageInternalController'
+        return match (get_class($model)) {
+            Page::class => PagesController::class,
+            Article::class => ArticlesController::class,
+            PageInternal::class => PageInternalController::class
         };
     }
 

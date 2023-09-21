@@ -92,17 +92,17 @@ trait HasUriAttributes
         return $this->url . $this->traitPath($path, $endWithDash);
     }
 
-    private function traitPath(string $path, $endWithDash = true, $comparesWithAttr = 'url'): string
+    protected function traitPath(string $path, $endWithDash = true, $comparesWithAttr = 'url'): string
     {
         //$path = (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, 1) : $path;
         $path = collect(explode('/', $path))->filter()->implode('/');
 
-        if($endWithDash){
+        if(!empty($path) && $endWithDash){
             //$path .= !Str::endsWith($this->{$path}, '/') ? '/' : '';
             $path .= '/';
         }
 
-        if(!Str::endsWith($this->{$comparesWithAttr}, '/')){
+        if(!empty($path) && !Str::endsWith($this->{$comparesWithAttr}, '/') && !Str::startsWith($path, '/')){
             //$path .= !Str::endsWith($this->{$path}, '/') ? '/' : '';
             $path = '/'.$path;
         }

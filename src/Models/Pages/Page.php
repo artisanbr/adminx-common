@@ -12,13 +12,14 @@ use Adminx\Common\Facades\Frontend\FrontendHtml;
 use Adminx\Common\Facades\Frontend\FrontendTwig;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListHtml;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Interfaces\BuildableModel;
-use Adminx\Common\Models\Interfaces\HtmlModel;
+use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
@@ -35,7 +36,6 @@ use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Sites\SiteRoute;
 use Adminx\Common\Models\Templates\Global\Abstract\AbstractTemplate;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
-use Adminx\Common\Models\Traits\HasAdvancedHtml;
 use Adminx\Common\Models\Traits\HasBreadcrumbs;
 use Adminx\Common\Models\Traits\HasGenericConfig;
 use Adminx\Common\Models\Traits\HasOwners;
@@ -53,7 +53,6 @@ use Adminx\Common\Models\Traits\HasVisitCounter;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasArticles;
-use Adminx\Common\Models\Traits\Relations\HasCategoriesMorph;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
@@ -78,7 +77,7 @@ use Illuminate\Support\ViewErrorBag;
  * @property BreadcrumbConfig                         $breadcrumb_config
  */
 class Page extends EloquentModelBase implements BuildableModel,
-                                                HtmlModel,
+                                                FrontendModel,
                                                 OwneredModel,
                                                 PublicIdModel,
                                                 RobotsTagsInterface,
@@ -87,10 +86,8 @@ class Page extends EloquentModelBase implements BuildableModel,
 {
     use BelongsToSite,
         BelongsToUser,
-        HasAdvancedHtml,
         HasArticles,
         HasBreadcrumbs,
-        HasCategoriesMorph,
         HasFiles,
         HasGenericConfig,
         HasOwners,
@@ -189,16 +186,6 @@ class Page extends EloquentModelBase implements BuildableModel,
     protected $hidden = ['account_id', 'site_id', 'user_id', 'parent_id'];
 
     //protected $with = ['site'];
-
-    /*public array $buildSchema = [
-        'articles' => [
-            'categories',
-            'tags',
-        ],
-        'categories',
-        'tags',
-    ];*/
-
     //protected ViewContract|null $viewCache = null;
 
     //region VALIDATIONS
@@ -297,8 +284,10 @@ class Page extends EloquentModelBase implements BuildableModel,
             'recaptcha'  => '<div class="g-recaptcha mb-3" data-sitekey="' . $this->site->config->recaptcha_site_key . '"></div>',
             //Blade::render('<x-common::recaptcha :site="$page->site" no-ajax/>', ['page' => $this]),
             'errors'     => $errors,
-            'breadcrumb' => $this->show_breadcrumb ? $this->breadcrumb() : false,
+            //'breadcrumb' => $this->show_breadcrumb ? $this->breadcrumb() : false,
         ];
+
+        $breadcrumbAdd = collect();
 
         $requestData = request()->all() ?? [];
 
@@ -309,7 +298,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 
             //Categorias
             //dd(Route::current()->parameter('categorySlug'));
-            $categorySlug = Route::current()->parameter('categorySlug') ?? $requestData['categorySlug'] ?? false;
+            $categorySlug = Route::current()->parameter('categorySlug') ?? $requestData['categorySlug'] ?? $merge_data['categorySlug'] ?? false;
 
             if ($categorySlug) {
                 $category = $this->categories()->where('slug', $categorySlug)->orWhere('id', $categorySlug)->first();
@@ -318,11 +307,8 @@ class Page extends EloquentModelBase implements BuildableModel,
                         $query->where('id', $category->id);
                     });
                     $viewData['category'] = $category;
-                    if($this->show_breadcrumb && $viewData['breadcrumb']){
-                        $viewData['breadcrumb']->items = $viewData['breadcrumb']->items->merge([$category->url => $category->title]);
-                        /*dd($viewData['breadcrumb']->items);
-                        $viewData['breadcrumb'] = $this->breadcrumb([$category->title]);*/
-                    }
+
+                    $breadcrumbAdd = $breadcrumbAdd->merge([$category->url => $category->title]);
 
                     //Meta::registerSeoMetaTagsForCategory($this, $category);
                 }
@@ -360,6 +346,10 @@ class Page extends EloquentModelBase implements BuildableModel,
 
             $viewData['data'] = $sourceData;
         }*/
+
+        $viewData['breadcrumb'] = $this->show_breadcrumb ? $this->breadcrumb($breadcrumbAdd->toArray()) : false;
+
+        //dd($breadcrumbAdd->toArray());
 
 
         return [...$viewData, ...$merge_data];
@@ -517,7 +507,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         );
     }
 
-    protected function buildedHtml(): Attribute
+    protected function builtHtml(): Attribute
     {
         $page = $this;
 
@@ -598,6 +588,20 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     //region SCOPES
 
+    public function scopeWhereUrl(Builder $query, ?string $url = null): Builder
+    {
+
+        return $query->when(empty($url), static function (Builder $q) {
+            $q->emptySlug()->orWhere('is_home', true);
+        })->when($url, static function (Builder $q) use ($url) {
+            $q->where('slug', $url);
+            $q->orWhere([
+                            'public_id' => $url,
+                            'id'        => $url,
+                        ]);
+        });
+    }
+
     public function scopeHomePage(Builder $query): Builder
     {
         return $query->isHome()->orWhere(function (Builder $q) {
@@ -612,7 +616,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     public function scopeEmptySlug(Builder $query): Builder
     {
-        return $query->where('slug', null)->orWhere('slug', '');
+        return $query->whereNull('slug')->orWhere('slug', '');
     }
 
     public function scopeBuild(Builder $query)
@@ -693,11 +697,10 @@ class Page extends EloquentModelBase implements BuildableModel,
         return $this->morphMany(FormAnswer::class, 'formulable');
     }*/
 
-    /*
-    public function model()
+    public function categories()
     {
-        return $this->belongsTo(PageInternal::class);
-    }*/
+        return $this->hasMany(Category::class);
+    }
 
     /**
      * Páginas Internas

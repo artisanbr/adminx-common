@@ -214,9 +214,9 @@ class FrontendPageServiceProvider extends ServiceProvider
                 //->addOgMeta('article:author', $article->user->name)
                 ->addOgMeta('article:section', $seo->title)
                 ->addOgMeta('article:tag', $seo->keywords)
-                ->addOgMeta('article:published_time', $seo->published_at)
-                ->addOgMeta('article:modified_time', $seo->updated_at)
-                ->addOgMeta('og:updated_time', $seo->updated_at);
+                ->addOgMeta('article:published_time', $seo->published_at ?? '')
+                ->addOgMeta('article:modified_time', $seo->updated_at ?? '')
+                ->addOgMeta('og:updated_time', $seo->updated_at ?? '');
 
             $metaTwitter
                 ->setTitle($seo->title)

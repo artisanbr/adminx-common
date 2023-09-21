@@ -10,6 +10,7 @@ use Adminx\Common\Facades\Frontend\FrontendTwig;
 use Adminx\Common\Libs\Support\HtmlString;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
@@ -46,7 +47,7 @@ use Illuminate\Foundation\Http\FormRequest;
  * @property Seo                  $seo
  * @property FrontendAssetsBundle $assets
  */
-class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
+class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel, FrontendModel
 {
     use HasUriAttributes, HasSelect2, HasPublishTimestamps, SoftDeletes, HasValidation, HasSEO, HasFiles, BelongsToPage, BelongsToUser, BelongsToSite, HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes,
         HasSiteRoutes, HasPublicIdAttribute;
@@ -247,7 +248,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     //region ATTRIBUTES
 
-    protected function buildedHtml(): Attribute
+    protected function builtHtml(): Attribute
     {
         return Attribute::make(
             get: fn() => FrontendTwig::article($this),
@@ -445,6 +446,18 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     //endregion
 
     //region SCOPES
+
+    public function scopeWhereUrl(Builder $query, string $url): Builder
+    {
+
+        return $query->where(static function (Builder $q) use ($url) {
+            $q->where('slug', $url);
+            $q->orWhere([
+                            'public_id' => $url,
+                            'id'        => $url,
+                        ]);
+        });
+    }
 
     public function scopePublished(Builder $query)
     {

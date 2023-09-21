@@ -10,6 +10,7 @@ use Adminx\Common\Enums\ContentEditorType;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
+use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
@@ -23,6 +24,7 @@ use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToPage;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Http\FormRequest;
@@ -30,7 +32,7 @@ use Illuminate\Foundation\Http\FormRequest;
 /**
  * @property EloquentModelBase|CustomListAbstract $model
  */
-class PageInternal extends EloquentModelBase implements PublicIdModel, UploadModel
+class PageInternal extends EloquentModelBase implements PublicIdModel, UploadModel, FrontendModel
 
 {
     use HasSelect2,
@@ -147,6 +149,24 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
 
     //endregion
 
+    //region SCOPES
+    protected function scopeWhereUrl(Builder $query, string $url): Builder
+    {
+        return $query->where(function (Builder $q) use ($url) {
+            $q->where('slug', $url);
+            $q->orWhere([
+                            'public_id' => $url,
+                            'id'        => $url,
+                        ]);
+        });
+    }
+
+    public function scopeEmptySlug(Builder $query): Builder
+    {
+        return $query->whereNull('slug')->orWhere('slug', '');
+    }
+    //endregion
+
     //region ATTRIBUTES
 
     protected function slug(): Attribute
@@ -181,7 +201,7 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
 
     protected function getUrlAttribute(): string
     {
-        return $this->page->urlTo(!empty($this->slug) ? "{$this->slug}/" : '');
+        return $this->page->urlTo($this->slug);
     }
     //endregion
 
@@ -192,7 +212,7 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
     public function save(array $options = [])
     {
         $this->assets->compile();
-        
+
         if (parent::save($options)) {
             $this->frontend_build = $this->prepareFrontendBuild();
 

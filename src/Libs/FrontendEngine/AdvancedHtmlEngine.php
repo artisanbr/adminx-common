@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Libs\FrontendEngine;
 
-use Adminx\Common\Models\Interfaces\HtmlModel;
+use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Widgets\SiteWidget;
@@ -41,9 +41,9 @@ class AdvancedHtmlEngine
     protected mixed $menus;
 
     public function __construct(
-        public Site             $site,
-        public HtmlModel $model,
-        public string           $viewTemporaryName
+        public Site          $site,
+        public FrontendModel $model,
+        public string        $viewTemporaryName
     ) {
         $this->widgeteables = $this->site->widgeteables;
         $this->menus = $this->site->menus;
@@ -51,7 +51,7 @@ class AdvancedHtmlEngine
 
     }
 
-    public static function start(Site $site, HtmlModel $model, string $viewTemporaryName = "temp-html"): self
+    public static function start(Site $site, FrontendModel $model, string $viewTemporaryName = "temp-html"): self
     {
         $site->load(['theme','widgeteables','menus']);
         return (new self($site, $model, $viewTemporaryName));

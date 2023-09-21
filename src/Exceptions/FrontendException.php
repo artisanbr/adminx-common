@@ -6,16 +6,18 @@
 
 namespace Adminx\Common\Exceptions;
 
-use Butschster\Head\Facades\Meta;
+use Adminx\Common\Facades\Frontend\FrontendTwig;
 use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class FrontendException extends Exception
 {
-    public function __construct($message = 'Página não encontrada', $code = 404, \Throwable $previous = null)
+
+
+    public function __construct(protected string $title = 'Página não encontrada', $message = 'Desculpe, não encontramos o que procura.', $code = 404, \Throwable $previous = null)
     {
-        {{ Meta::setTitle($message); }}
+
         parent::__construct($message, $code, $previous);
     }
 
@@ -24,15 +26,12 @@ class FrontendException extends Exception
      *
      * @return void
      */
-    public function report()
-    {
-
-    }
+    public function report() {}
 
     /**
      * Render the exception into an HTTP response.
      *
-     * @param Request   $request
+     * @param Request $request
      *
      * @return Response
      */
@@ -42,18 +41,27 @@ class FrontendException extends Exception
         if ($request->expectsJson()) {
             return response()->json([
                                         'message' => $this->getMessage(),
-                                        'error' => [
+                                        'error'   => [
                                             'code' => $this->getCode(),
-                                            'file' => $this->getFile(),
-                                            'line' => $this->getLine(),
-                                            'trace' => $this->getTrace(),
-                                        ]
+                                                                                                                    'file' => $this->getFile(),
+                                                                                                                    'line' => $this->getLine(),
+                                                                                                                    'trace' => $this->getTrace(),
+                                        ],
                                     ], $this->getCode());
         }
 
-        return response()->view(['common-frontend::errors.'.$this->getCode(), 'common-frontend::errors.error'], [
+        return response()->make(FrontendTwig::error($this), $this->getCode());
+
+        /*return response()->view(['common-frontend::errors.' . $this->getCode(), 'common-frontend::errors.error'], [
             'exception' => $this,
-            'message' => $this->getMessage()
-        ], $this->getCode())->withException($this);
+            'code'      => $this->getCode(),
+            'error'     => [
+                'code'  => $this->getCode(),
+                'file'  => $this->getFile(),
+                'line'  => $this->getLine(),
+                'trace' => $this->getTrace(),
+            ],
+            'message'   => $this->getMessage(),
+        ],                      $this->getCode())->withException($this);*/
     }
 }

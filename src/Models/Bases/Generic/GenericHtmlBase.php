@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Bases\Generic;
 
 use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
-use Adminx\Common\Models\Interfaces\HtmlModel;
+use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Sites\Site;
 use ArtisanLabs\GModel\GenericModel;
 
@@ -35,12 +35,12 @@ abstract class GenericHtmlBase extends GenericModel
     ];
 
     //region HELPERS
-    public function builtHtml(Site $site, HtmlModel $model, $viewTemporaryName = 'element-html'): string
+    public function builtHtml(Site $site, FrontendModel $model, $viewTemporaryName = 'element-html'): string
     {
         return AdvancedHtmlEngine::start($site, $model, $viewTemporaryName)->html($this->raw)->buildHtml();
     }
 
-    public function flushHtmlCache(Site $site, HtmlModel $model, $viewTemporaryName = 'element-html')
+    public function flushHtmlCache(Site $site, FrontendModel $model, $viewTemporaryName = 'element-html')
     {
         $this->attributes['html'] = $this->builtHtml($site, $model, $viewTemporaryName);
 

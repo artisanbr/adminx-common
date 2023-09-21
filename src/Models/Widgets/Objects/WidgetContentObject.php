@@ -8,7 +8,6 @@ namespace Adminx\Common\Models\Widgets\Objects;
 
 
 use Adminx\Common\Models\Objects\Abstract\AbstractHtmlObject;
-use Adminx\Common\Models\Sites\Site;
 
 class WidgetContentObject extends AbstractHtmlObject
 {
@@ -44,7 +43,7 @@ class WidgetContentObject extends AbstractHtmlObject
     ];*/
 
     //region HELPERS
-    /*public function builtHtml(Site $site, HtmlModel $model, $viewTemporaryName = 'element-html'): string
+    /*public function builtHtml(Site $site, FrontendModel $model, $viewTemporaryName = 'element-html'): string
     {
         return AdvancedHtmlEngine::start($site, $model, $viewTemporaryName)->html($this->html)->buildHtml();
     }*/

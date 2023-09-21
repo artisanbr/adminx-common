@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models;
 
@@ -42,8 +46,9 @@ class Comment extends EloquentModelBase
 
 
     //region VALIDATIONS
-    public static function createRules(FormRequest $request = null): array {
+    public static function createRules(?FormRequest $request = null): array {
         return [
+            'public_id' => ['required'],
             'name' => ['required'],
             'email' => ['required', 'email'],
             'comment' => ['required'],

@@ -17,6 +17,7 @@ use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
+use Adminx\Common\Models\Traits\Relations\BelongsToPage;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
@@ -30,12 +31,13 @@ use Illuminate\Validation\Rule;
 
 class Category extends EloquentModelBase implements OwneredModel
 {
-    use HasSelect2, HasUriAttributes, ScopeOrganize, HasUriAttributes, HasMorphAssigns, HasValidation, BelongsToSite, BelongsToAccount, HasParent, BelongsToUser, HasOwners;
+    use HasSelect2, HasUriAttributes, ScopeOrganize, HasUriAttributes, HasMorphAssigns, HasValidation, BelongsToSite, BelongsToAccount, HasParent, BelongsToUser, HasOwners, BelongsToPage;
 
     protected $fillable = [
         'site_id',
         'account_id',
         'user_id',
+        'page_id',
         'title',
         'slug',
         'description',
@@ -88,9 +90,16 @@ class Category extends EloquentModelBase implements OwneredModel
     //region GETS
     protected function getUrlAttribute()
     {
+        $url = "/category/{$this->slug}";
+
+        if ($this->page_id && $this->page) {
+            return $this->page->urlTo($url);
+        }
+
+        //Get by currentPage our relatedPage / todo: remove later
+
         $currentPage = @FrontendPage::current() ?? null;
 
-        $url = "/category/{$this->slug}";
 
         if (!$currentPage && @$this->pivot->pivotParent) {
             $model = $this->pivot->pivotParent;
@@ -113,7 +122,13 @@ class Category extends EloquentModelBase implements OwneredModel
     //endregion
 
     //region SCOPES
-    protected array $defaultOrganizeColumns = ['title', 'parent_id'];
+    public function scopeWhereUrl(Builder $query, string $url): Builder
+    {
+        return $query->where(static function (Builder $q) use ($url) {
+            $q->where('slug', $url);
+            $q->orWhere('id', $url);
+        });
+    }
 
     public function scopeRoot(Builder $query): Builder
     {
@@ -170,10 +185,10 @@ class Category extends EloquentModelBase implements OwneredModel
         return $this->morphedByMany(Article::class, 'categorizable');
     }
 
-    public function pages()
+    /*public function pages()
     {
         return $this->morphedByMany(Page::class, 'categorizable');
-    }
+    }*/
 
     public function menu_items()
     {

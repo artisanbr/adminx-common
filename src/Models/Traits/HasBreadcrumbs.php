@@ -21,12 +21,12 @@ trait HasBreadcrumbs
 
     public ?PageBreadcrumb $breadcrumbCache = null;
 
-    public function breadcrumb(?array $mergeItems = null, ?BreadcrumbConfig $config = null): PageBreadcrumb
+    public function breadcrumb(array $mergeItems = [], ?BreadcrumbConfig $config = null): PageBreadcrumb
     {
 
         if (!$this->breadcrumbCache) {
             $breadcrumbConfig = $config ?? $this->breadcrumb_config;
-            $breadcrumbItems = [@$this->breadcrumb_items, ...($mergeItems ?? []), ...$this->getSelfBreadcrumbItem()];
+            $breadcrumbItems = [@$this->breadcrumb_items, ...$this->getSelfBreadcrumbItem(), ...$mergeItems];
 
             $this->setBreadcrumb(collect($breadcrumbItems)->filter()->toArray(), $breadcrumbConfig);
         }

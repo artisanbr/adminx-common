@@ -8,17 +8,14 @@ if (!isset($site)) {
     $site = FrontendSite::current();
 }
 
-if(!isset($page)){
+if (!isset($page)) {
     $page = FrontendPage::current();
 }
 
-$includeData = [
-    'site'        => $site,
-    'page' => $page
-];
+$includeData = compact('site', 'page');
 
 ?>
-    <!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     {{--Tags--}}
@@ -37,8 +34,8 @@ $includeData = [
     {!! $page->assets->js->head_html ?? '' !!}
     {!! $page->assets->head_script->html ?? '' !!}
 </head>
-<body id="page-{{ $page->is_home ? 'home' : $page->slug }}"
-      class="page-{{ $page->is_home ?? false ? 'home' : $page->slug }} page-{{ $page->public_id }}">
+<body id="page-{{ $page?->is_home ? 'home' : ($page?->slug ?? 'error') }}"
+      class="page-{{ $page?->is_home ? 'home' : ($page?->slug ?? 'error') }} page-{{ $page?->public_id ?? 'exception' }}">
 {!! $site->theme->js->after_body_js_html ?? '' !!}
 {!! $page->assets->js->before_body_html ?? '' !!}
 @stack('body-js')

@@ -146,8 +146,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         return $this;
     }
 
-    public
-    function initFrontendBuild(): static
+    public function initFrontendBuild(): static
     {
         $this->frontendBuild->meta->initialize();
         $this->frontendBuild->meta->addCsrfToken();
@@ -162,8 +161,7 @@ class FrontendTwigEngine extends FrontendEngineBase
     /**
      * @throws FrontendException
      */
-    public
-    function applyTheme(Theme $theme): static
+    public function applyTheme(Theme $theme): static
     {
         $themeBuild = $theme->build;
 
@@ -198,8 +196,7 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws LoaderError
      * @throws LoaderError
      */
-    protected
-    function prepareTwig(): static
+    protected function prepareTwig(): static
     {
 
         $arrayTemplates = [];
@@ -283,14 +280,12 @@ class FrontendTwigEngine extends FrontendEngineBase
         return $this;
     }
 
-    protected
-    function getTemplatesToTwig()
+    protected function getTemplatesToTwig()
     {
         return $this->templates->mapWithKeys(fn($template, $name) => [$this->getTemplateName($name) => $template])->toArray();
     }
 
-    protected
-    function getTemplateName($template): string
+    protected function getTemplateName($template): string
     {
         return $this->templateNamePrefix . '-' . $template;
     }
@@ -301,8 +296,7 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws LoaderError
      * @throws Exception
      */
-    public
-    function renderTwig(string $template): string
+    public function renderTwig(string $template): string
     {
         $this->prepareTwig();
 
@@ -324,8 +318,7 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public
-    function html($rawHtml = '', $viewData = null, $templateName = null, ?Theme $theme = null): string
+    public function html($rawHtml = '', $viewData = null, $templateName = null, ?Theme $theme = null): string
     {
         if ($viewData) {
             $this->addViewData($viewData);
@@ -344,8 +337,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         return $this->renderTwig($templateName);
     }
 
-    public
-    function content($rawHtml = '', $viewData = null, $templateName = null, ?Theme $theme = null): string
+    public function content($rawHtml = '', $viewData = null, $templateName = null, ?Theme $theme = null): string
     {
         if ($viewData) {
             $this->addViewData($viewData);
@@ -362,8 +354,30 @@ class FrontendTwigEngine extends FrontendEngineBase
         return $this->renderTwig($templateName);
     }
 
-    public
-    function getPageBaseTemplate(string $content): string
+
+    /**
+     * @throws FrontendException
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function error(Exception $exception, $title = 'Página não encontrada', ?Theme $theme = null): string
+    {
+        if ($theme ?? FrontendSite::current()->theme) {
+            $this->applyTheme($theme ?? FrontendSite::current()->theme);
+        }
+
+
+        $templateName = 'error-' . time();
+
+        $this->templates->put($templateName, $this->getPageBaseTemplate($this->getErrorTemplate($exception, $title)));
+
+        $this->prepareTwig();
+
+        return $this->renderTwig($templateName);
+    }
+
+    public function getPageBaseTemplate(string $content): string
     {
 
         $this->initFrontendBuild();
@@ -394,21 +408,57 @@ class FrontendTwigEngine extends FrontendEngineBase
 
     }
 
+    public function getErrorTemplate(Exception $exception, $title = 'Página não encontrada'): string
+    {
+
+        $previousUrl = url()->previous();
+
+        return <<<html
+                <div class="error-{$exception->getCode()}-area py-150">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-5 align-self-center">
+                                <div class="error-404-content">
+                                    <h1 class="tit0e mb-4">{$exception->getCode()}</h1>
+                                    <h2 class="sub-title mb-3">{$title}</h2>
+                                    <p class="short-desc">{$exception->getMessage()}</p>
+                                    <div class="button-wrap py-50">
+                                        <a class="btn btn-custom-size lg-size btn-primary btn-secondary-hover rounded-0 me-2"
+                                           href="{$previousUrl}">Voltar</a>
+                                        <a class="btn btn-custom-size lg-size btn-primary btn-secondary-hover rounded-0 me-2"
+                                           href="/">Página Inicial</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-7">
+                                <div class="error-404-img">
+                                    <div class="scene fill">
+                                        <div class="layer expand-width" data-depth="0.2">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                html;
+
+    }
+
     /**
      * @throws FrontendException
      * @throws SyntaxError
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public
-    function page(Page $page): string
+    public function page(Page $page, $mergeData = []): string
     {
         /**
          * @var ?Category $category
          */
         $this->templateNamePrefix = 'page-' . $page->public_id;
 
-        $this->setViewData($page->getBuildViewData());
+        $this->setViewData($page->getBuildViewData($mergeData));
 
         $this->registerFrontendBuild($page->frontend_build);
 
@@ -438,6 +488,11 @@ class FrontendTwigEngine extends FrontendEngineBase
                                            'title'        => $category->title,
                                            'title_prefix' => '{{ site.getTitle() }} - {{ page.getTitle() }}',
                                        ]);
+
+            /*if($this->viewData['breadcrumb'] ?? false){
+                $this->viewData['breadcrumb']->items->add('')
+            }*/
+
         }
 
 
@@ -464,8 +519,7 @@ class FrontendTwigEngine extends FrontendEngineBase
     /**
      * @throws FrontendException
      */
-    public
-    function article(Article $article): string
+    public function article(Article $article): string
     {
         $page = $article->page;
         $this->templateNamePrefix = 'article-' . $article->public_id;
@@ -521,8 +575,7 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public
-    function pageInternal(PageInternal $pageInternal, $modelItem): string
+    public function pageInternal(PageInternal $pageInternal, $modelItem): string
     {
         /**
          * @var EloquentModelBase|CustomListItemAbstract|CustomListItemHtml $modelItem

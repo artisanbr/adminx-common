@@ -7,13 +7,12 @@
 namespace Adminx\Common\Observers;
 
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Interfaces\HtmlModel;
-use Adminx\Common\Models\Sites\Site;
+use Adminx\Common\Models\Interfaces\FrontendModel;
 use Illuminate\Database\Eloquent\Model;
 
 class HtmlModelObserver
 {
-    public function saved(Model|HtmlModel $model): void
+    public function saved(Model|FrontendModel $model): void
     {
         //Armazenar HTML e Advanced HTML em banco
         $newAdvanced = $model->builtHtml();
