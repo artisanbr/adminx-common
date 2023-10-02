@@ -1,10 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Repositories\Base;
 
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Themes\Theme;
-use Adminx\Common\Models\Users\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -13,28 +15,31 @@ use Throwable;
 abstract class Repository implements RepositoryInterface
 {
 
-    public array $data = [];
-    protected ?Model $model = null;
-    protected string $idKey = 'id';
+    public array     $data           = [];
+    protected ?Model $model          = null;
+    protected string $idKey          = 'id';
     protected string $uploadPathBase = '';
     protected string $uploadableType = '';
 
     protected string $modelClass = EloquentModelBase::class;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->setModel(new $this->modelClass());
     }
 
-    protected function getDataId(){
+    protected function getDataId()
+    {
         return $this->data[$this->idKey] ?? null;
     }
 
 
     public function setModel(EloquentModelBase|int $model): void
     {
-        if(is_int($model) && $this->modelClass !== EloquentModelBase::class && is_subclass_of(new $this->modelClass(), Model::class)){
+        if (is_int($model) && $this->modelClass !== EloquentModelBase::class && is_subclass_of(new $this->modelClass(), Model::class)) {
             $this->setModel($this->modelClass::findOrNew($model));
-        }else{
+        }
+        else {
             $this->model = $model;
         }
 
@@ -53,6 +58,7 @@ abstract class Repository implements RepositoryInterface
     public function update(int $id, array|Request $data, string $idKey = 'id')
     {
         $this->idKey = $idKey;
+
         return $this->save($this->traitData($data, [$idKey => $id]));
     }
 
@@ -70,6 +76,7 @@ abstract class Repository implements RepositoryInterface
     {
         $this->idKey = $idKey;
         $this->traitData($data, [$idKey => $id]);
+
         return DB::transaction(fn() => $this->deleteTransaction());
     }
 
@@ -84,7 +91,7 @@ abstract class Repository implements RepositoryInterface
     {
         $this->idKey = $idKey;
 
-        if(!$this->model && $this->modelClass !== EloquentModelBase::class){
+        if (!$this->model && $this->modelClass !== EloquentModelBase::class) {
             $this->setModel(new $this->modelClass());
         }
 
@@ -101,19 +108,24 @@ abstract class Repository implements RepositoryInterface
      */
     public function traitData(array|Request $data, array $mergeData = []): array
     {
-        if(!is_array($data) && is_object($data)){
+        if (!is_array($data) && is_object($data)) {
             $data = $data->all();
         }
 
-        $this->data = array_merge_recursive($data, $mergeData);
+        $this->data = [
+            ...$data,
+            ...$mergeData,
+        ];
 
-        if($mergeData[$this->idKey] ?? false){
+        if ($mergeData[$this->idKey] ?? false) {
             $this->data[$this->idKey] = $mergeData[$this->idKey] ?? null;
         }
 
-        if($this->getDataId()){
+
+        if ($this->getDataId()) {
             $this->setModel($this->getDataId());
-        }else{
+        }
+        else {
             $this->setModel(new $this->modelClass());
         }
 
@@ -136,6 +148,7 @@ abstract class Repository implements RepositoryInterface
 
     /**
      * Executar as operações no banco ao salvar
+     *
      * @return mixed
      */
     protected function saveTransaction(): mixed
@@ -145,6 +158,7 @@ abstract class Repository implements RepositoryInterface
 
     /**
      * Executar as operações no banco ao excluir
+     *
      * @return bool
      */
     protected function deleteTransaction(): bool

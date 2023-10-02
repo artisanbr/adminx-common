@@ -358,6 +358,7 @@ class Page extends EloquentModelBase implements BuildableModel,
     public function prepareFrontendBuild($buildMeta = false): FrontendBuildObject
     {
 
+
         $frontendBuild = $this->site->frontendBuild();
 
         $frontendBuild->head->gtag_script = $this->getGTagScript();

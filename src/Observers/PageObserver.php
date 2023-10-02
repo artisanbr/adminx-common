@@ -25,6 +25,10 @@ class PageObserver
             $model->config = $model->type?->config ?? new PageConfig();
         }
 
+        if (empty($model->published_at)) {
+            $model->published_at = $model->created_at ?? Carbon::now();
+        }
+
         if ($model->id) {
 
             //Comprimir CSS e JS personalizado da Página
@@ -42,24 +46,21 @@ class PageObserver
             if (empty($model->seo->title)) {
                 $model->seo->title = $model->title;
             }*/
+            //$frontendBuild = $model->prepareFrontendBuild();
+
+            $model->frontend_build = $model->prepareFrontendBuild(true);
+            $model->seo->html = $model->frontend_build->seo->html;
+            /*$model->frontend_build->seo = $model->seo;
+            $model->frontend_build->seo->fill([
+                                                  'title'       => $model->getTitle(),
+                                                  'description' => $model->getDescription(),
+                                                  'keywords'    => $model->getKeywords(),
+                                                  'image_url'   => $model->seoImage(),
+                                              ]);*/
             //endregion
+
+
         }
-
-        if (empty($model->published_at)) {
-            $model->published_at = $model->created_at ?? Carbon::now();
-        }
-
-        //$frontendBuild = $model->prepareFrontendBuild();
-
-        $model->frontend_build = $model->prepareFrontendBuild(true);
-        $model->seo->html = $model->frontend_build->seo->html;
-        /*$model->frontend_build->seo = $model->seo;
-        $model->frontend_build->seo->fill([
-                                              'title'       => $model->getTitle(),
-                                              'description' => $model->getDescription(),
-                                              'keywords'    => $model->getKeywords(),
-                                              'image_url'   => $model->seoImage(),
-                                          ]);*/
     }
 
     public function saved(Page $model): void
