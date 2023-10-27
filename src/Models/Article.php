@@ -87,9 +87,10 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         'updated_at'     => 'datetime:d/m/Y H:i:s',
         'content'        => 'string',
         'is_published'   => 'bool',
+        
         'is_unpublished' => 'bool',
+        'description'    => 'string',
         //'html'     => 'string',
-        //'description'    => 'string',
     ];
 
     protected $appends = [
@@ -98,7 +99,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     protected $touches = ['page'];
 
-    protected $with = ['page', 'site'];
+    //protected $with = ['page', 'site'];
 
     protected $hidden = ['account_id', 'site_id', 'user_id'];
 

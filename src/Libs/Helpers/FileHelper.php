@@ -18,7 +18,8 @@ class FileHelper
 {
 
 
-    public static function saveRequestToSite(Site $site, UploadedFile $requestFile, $path = 'images', $fileName = null, File|null $fileModel = null): ?File
+    public static function
+    saveRequestToSite(Site $site, UploadedFile $requestFile, $path = 'images', $fileName = null, File|null $fileModel = null): ?File
     {
         if (!$fileModel) {
             $fileModel = new File();

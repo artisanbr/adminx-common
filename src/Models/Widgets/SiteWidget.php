@@ -399,6 +399,8 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
 
     protected function variables(): Attribute
     {
+        //dd($this->widget?->config, $this->widget?->config->variables);
+
         return new Attribute(
             get: fn() => collect($this->widget?->config ? $this->widget?->config->variables->pluck('default_value', 'slug') : [])->merge($this->config ? $this->config->variables->pluck('value', 'slug') : [])->toArray(),
         );

@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Casts;
 
@@ -22,6 +26,10 @@ class AsCollectionOf extends AsCollection
             public function get($model, $key, $value, $attributes)
             {
 
+                /*if($key == 'variables'){
+                    dd($model, $key, $value, $attributes);
+                }*/
+
                 if (!isset($attributes[$key])) {
                     return collect();
                 }
@@ -33,13 +41,13 @@ class AsCollectionOf extends AsCollection
 
             public function set($model, $key, $value, $attributes): array
             {
-                /*if($value) {
-                    dd(GenericCollection::wrap($value ?? [])->map(fn($item) => ($item instanceof GenericModel) ? $item : new
-                    $this->collectionClass($item))->toJson());
-                }*/
-
                 $json_value = is_string($value) ? $value : GenericCollection::wrap($value ?? [])->map(fn($item) => ($item instanceof GenericModel) ? $item : new
                 $this->itemClass($item))->toJson();
+
+                /*if($key == 'variables'){
+                    dd($model, $key, $value, $attributes);
+                }*/
+
 
                 return [$key => $json_value];
             }

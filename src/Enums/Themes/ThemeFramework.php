@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Enums\Themes;
 
@@ -9,19 +13,19 @@ enum ThemeFramework: string
     use EnumToArray;
 
     //FIELDS
-    case Bootstrap5 = 'boostrap:5';
-    case Bootstrap5_JS = 'boostrap:5-js';
-    case Bootstrap5_CSS = 'boostrap:5-css';
-    case Bootstrap4 = 'boostrap:4';
-    case Bootstrap4_JS = 'boostrap:4-js';
-    case Bootstrap4_CSS = 'boostrap:4-css';
+    case Bootstrap5 = 'bootstrap:5';
+    case Bootstrap5_JS = 'bootstrap:5-js';
+    case Bootstrap5_CSS = 'bootstrap:5-css';
+    case Bootstrap4 = 'bootstrap:4';
+    case Bootstrap4_JS = 'bootstrap:4-js';
+    case Bootstrap4_CSS = 'bootstrap:4-css';
 
-    public function isBoostrap(){
-        return str_contains($this->value, 'boostrap');
+    public function isBootstrap(){
+        return str_contains($this->value, 'bootstrap');
     }
 
-    public function boostrapVersion(){
-        return $this->isBoostrap() ? (str_contains($this->value, '5') ? 5 : 4) : false;
+    public function bootstrapVersion(){
+        return $this->isBootstrap() ? (str_contains($this->value, '5') ? 5 : 4) : false;
     }
 
     public function title(): string
@@ -32,12 +36,12 @@ enum ThemeFramework: string
     public static function getTitleTo($type): string
     {
         return match ($type) {
-            self::Bootstrap5 => 'Boostrap 5',
-            self::Bootstrap5_JS => 'Boostrap 5 - Apenas o Javascript',
-            self::Bootstrap5_CSS => 'Boostrap 5 - Apenas o Estilo CSS',
-            self::Bootstrap4 => 'Boostrap 4',
-            self::Bootstrap4_JS => 'Boostrap 4 - Apenas o Javascript',
-            self::Bootstrap4_CSS => 'Boostrap 4 - Apenas o Estilo CSS',
+            self::Bootstrap5 => 'Bootstrap 5',
+            self::Bootstrap5_JS => 'Bootstrap 5 - Apenas o Javascript',
+            self::Bootstrap5_CSS => 'Bootstrap 5 - Apenas o Estilo CSS',
+            self::Bootstrap4 => 'Bootstrap 4',
+            self::Bootstrap4_JS => 'Bootstrap 4 - Apenas o Javascript',
+            self::Bootstrap4_CSS => 'Bootstrap 4 - Apenas o Estilo CSS',
             default => "Nenhum",
         };
     }

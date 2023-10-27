@@ -1,21 +1,18 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Repositories;
 
-use Adminx\Common\Enums\FileType;
 use Adminx\Common\Facades\FileManager\FileUpload;
-use Adminx\Common\Libs\Helpers\FileHelper;
-use Adminx\Common\Libs\Helpers\MorphHelper;
-use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Generics\Elements\Themes\ThemeMediaElement;
-use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Repositories\Base\Repository;
 use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\DB;
 
 /**
  * @property  array{media?: ThemeMediaElement, seo: array{image_file?: UploadedFile}} $data
@@ -37,10 +34,9 @@ class ThemeRepository extends Repository
         //$this->model->header->is_html_advanced = $this->data['header']['is_html_advanced'];
         //$this->model->footer->is_html_advanced = $this->data['footer']['is_html_advanced'] ?? false;
 
-
         $this->model->fill($this->data);
 
-        //dd($this->data, $this->model->footer, $this->model->footer->is_html_advanced, $this->model->footer->raw);
+        //dd($this->model->media);
 
         if(!$this->model->config->breadcrumb){
             $this->model->config->breadcrumb = new BreadcrumbConfig();

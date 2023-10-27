@@ -6,6 +6,7 @@
 
 namespace Adminx\Common\Models\Themes;
 
+use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
@@ -27,6 +28,7 @@ use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
+use App\Libs\Utils\FrontendUtils;
 use App\Providers\AppMetaTagsServiceProvider;
 use Butschster\Head\Contracts\Packages\ManagerInterface;
 use Butschster\Head\Facades\Meta;
@@ -188,30 +190,126 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
         return $retorno;
     }
 
-    public function registerMetaPackage()
+    public function registerMetaPackage(): void
     {
         PackageManager::create($this->meta_pkg_name, function (Package $package) {
 
-            $packagesInclude = [];
-
-            //Frameworks
-            if ($this) {
-
-                if ($this->config->jquery) {
-                    $packagesInclude[] = 'jquery';
-                }
-
-                if (!$this->config->no_framework) {
-                    $packagesInclude[] = $this->config->framework->value;
-                }
-
-                $packagesInclude = [...$packagesInclude, ...($this->config->plugins->toArray() ?? [])];
+            if ($this->config->jquery_enable) {
+                $package->addScript('jquery.js', "https://code.jquery.com/jquery-{$this->config->jquery_version}.min.js");
             }
 
-            $packagesInclude[] = 'frontend.pre';
 
-            $package->requires($packagesInclude);
+            if ($this->config->jquery_ui_enable) {
 
+                $juVersion = $this->config->jquery_ui_version;
+                $juStrict = $this->config->jquery_ui_strict;
+                //dd($juVersion, $juStrict, "https://code.jquery.com/ui/{$juVersion}/jquery-ui.min.js");
+
+                //JQuery Ui Js
+                if (!$juStrict || $juStrict === 'js') {
+                    $package->addScript('jquery-ui-core.js', "https://code.jquery.com/ui/{$juVersion}/jquery-ui.min.js");
+                }
+
+
+                //JQuery Ui Css
+                if (!$juStrict || $juStrict === 'css') {
+                    //dd("https://code.jquery.com/ui/{$juVersion}/themes/base/jquery-ui.min.css");
+                    $package->addStyle('jquery-ui-core.css', "https://code.jquery.com/ui/{$juVersion}/themes/base/jquery-ui.min.css");
+                }
+
+            }
+
+            //Frameworks
+            //if ($this) {
+
+
+            //region Boostrap]
+            if ($this->config->bootstrap_enable) {
+
+                $bsVersion = $this->config->bootstrap_version ?? collect(config('adminx.themes.versions.bootstrap'))->first();
+
+                $bsStrict = $this->config->bootstrap_strict;
+
+                //Bs Js
+                if (!$bsStrict || $bsStrict === 'js') {
+                    $package->addScript('bootstrap.bundle.js', "https://cdn.jsdelivr.net/npm/bootstrap@{$bsVersion}/dist/js/bootstrap.bundle.min.js", [
+                        'crossorigin'    => 'anonymous',
+                        'referrerpolicy' => 'no-referrer',
+
+                    ]);
+                }
+
+
+                //Bs Css
+                if (!$bsStrict || $bsStrict === 'css') {
+                    $package->addStyle('bootstrap.css', "https://cdn.jsdelivr.net/npm/bootstrap@{$bsVersion}/dist/css/bootstrap.min.css", [
+                        'crossorigin'    => 'anonymous',
+                        'referrerpolicy' => 'no-referrer',
+
+                    ]);
+                }
+
+
+                //Theme js
+
+                if (Str::startsWith($bsVersion, '5')) {
+                    $package->addScript('theme.bs5.js', FrontendUtils::asset('js/theme.main.bs5.js'));
+                }
+                else if (Str::startsWith($bsVersion, '4')) {
+                    $package->addScript('theme.bs4.js', FrontendUtils::asset('js/theme.main.bs4.js'));
+                }
+            }
+
+            //endregion
+
+            //region Theme Plugins
+
+            $plataformPlugins = config('adminx.themes.plugins');
+            $themePlugins = $this->config->plugins->toArray();
+
+            foreach ($themePlugins as $pluginName) {
+
+                $plugin = $plataformPlugins[$pluginName] ?? null;
+
+                if ($plugin) {
+                    if (isset($plugin['css'])) {
+                        foreach ($plugin['css'] as $nameCSS => $pluginCSS) {
+                            $package->addStyle($nameCSS, $pluginCSS['src'], $pluginCSS['attributes'] ?? []);
+                        }
+                    }
+
+                    if (isset($plugin['js'])) {
+                        foreach ($plugin['js'] as $nameJS => $pluginJS) {
+                            $package->addScript($nameJS, $pluginJS['src'], $pluginJS['attributes'] ?? []);
+                        }
+
+                    }
+                }
+
+
+                //dd($pluginName, $plugin);
+
+                /*PackageManager::create($name, function (Package $package) use ($plugin) {
+
+                    if (isset($plugin['css'])) {
+                        foreach ($plugin['css'] as $nameCSS => $pluginCSS) {
+                            $package->addStyle($nameCSS, $pluginCSS['src'], $pluginCSS['attributes'] ?? []);
+                        }
+                    }
+
+                    if (isset($plugin['js'])) {
+                        foreach ($plugin['js'] as $nameJS => $pluginJS) {
+                            $package->addScript($nameJS, $pluginJS['src'], $pluginJS['attributes'] ?? []);
+                        }
+
+                    }
+                });*/
+            }
+
+            //endregion
+            //}
+
+            //region Theme Files
             /**
              * @var File $file
              */
@@ -232,6 +330,62 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
                     $package->addScript($file->name, $file->url, ['defer']);
                 }
             }
+            //endregion
+
+            //region Pos
+            $package
+                //CSS
+                ->addStyle('pace-theme-minimal.css',
+                           'https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css')
+                ->addStyle('font-awesome',
+                           'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css',
+                           [
+                               'integrity'      => 'sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A==',
+                               'crossorigin'    => 'anonymous',
+                               'referrerpolicy' => 'no-referrer',
+                               'rel'            => 'stylesheet',
+                               'media'          => 'print',
+                               'onload'         => "this.media='all'",
+
+                           ])
+                /*->addStyle('all.min.css',
+                           frontendThemeAsset('css/all.min.css'),
+                )
+                ->addStyle('main.c64b6eb2.css',
+                           frontendThemeAsset('static/css/main.c64b6eb2.css'))*/
+
+                //JS
+                ->addScript('functions.js',
+                            appAsset('js/functions.js'))
+                ->addScript('pace.js',
+                            'https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js')
+                ->addScript('jquery.formHelper.js',
+                            appAsset('js/plugins/jquery/jquery.formHelper.js'), ['defer'])
+                ->addScript('modules.bundle.js', FrontendUtils::asset('js/modules.bundle.js'), ['defer'])
+                ->addScript('theme.main.js',
+                            FrontendUtils::asset('js/theme.main.js'), ['defer'])/* ->addScript('slick.min.js',
+                             '//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js')*/
+            ;
+
+            $package
+                //CSS
+                ->addStyle('theme.main.css',
+                           FrontendUtils::asset('css/theme.main.css'), [
+                               'rel'    => 'stylesheet',
+                               'media'  => 'print',
+                               'onload' => "this.media='all'",
+
+                           ])
+                ->addStyle('theme.custom.css',
+                           FrontendUtils::asset('css/theme.custom.css'), [
+                               'rel'    => 'stylesheet',
+                               'media'  => 'print',
+                               'onload' => "this.media='all'",
+
+                           ]);
+            //endregion
+
+
         });
     }
 
@@ -244,6 +398,13 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
     //endregion
 
     //region ATTRIBUTES
+    protected function isMain(): Attribute
+    {
+        $isMain = $this->id && $this->site && (int)$this->site?->theme_id === $this->id;
+
+        return Attribute::make(get: fn() => $isMain);
+    }
+
     protected function metaPkgName(): Attribute
     {
         return Attribute::make(get: fn() => "theme_meta_pkg_{$this->id}");
@@ -269,6 +430,21 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
     {
         //return Attribute::make(get: fn() => $this->header->raw);
         return Attribute::make(get: fn() => preg_replace('/[^\@]{{/m', "@{{", $this->header->raw));
+    }
+
+    protected function logo(): Attribute
+    {
+        return Attribute::make(get: fn() => $this->media->logo->url);
+    }
+
+    protected function logoSecondary(): Attribute
+    {
+        return Attribute::make(get: fn() => $this->media->logo_secondary->url);
+    }
+
+    protected function favicon(): Attribute
+    {
+        return Attribute::make(get: fn() => $this->media->favicon->url);
     }
 
 

@@ -1,13 +1,27 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 return [
     'versions' => [
         'jquery'      => '3.6.3',
         'bootstrap:5' => '5.2.3',
         'bootstrap:4' => '4.6.2',
+        'bootstrap' => [
+            '5.3.2',
+            '5.2.3',
+            '5.1.3',
+            '5.0.2',
+            '4.6.2',
+            '4.5.3',
+            '4.4.1',
+            '4.3.1',
+        ],
     ],
     'plugins'  => [
-        'jquery-ui' => [
+        /*'jquery-ui' => [
             'title' => 'jQuery UI',
             'css'   => [
                 'jquery-ui.css' => [
@@ -31,10 +45,12 @@ return [
                     ],
                 ],
             ],
-        ],
+        ],*/
 
         'modernizr' => [
             'title' => 'Modernizr',
+            'description' => 'Modernizr é uma biblioteca JavaScript que permite a detecção de recursos do navegador, auxiliando no desenvolvimento de sites compatíveis com diferentes tecnologias e navegadores.',
+            'version' => '3.6.0',
             'js'    => [
                 'modernizr.js' => [
                     'src' => '/assets/vendor/modernizr/modernizr-3.6.0.min.js',
@@ -44,6 +60,8 @@ return [
 
         'lazy-load' => [
             'title' => 'Lazy Load',
+            'description' => 'O Lazy Load JS é uma biblioteca JavaScript que adia o carregamento de imagens e conteúdo, acelerando o carregamento de páginas da web e economizando largura de banda.',
+            'version' => '1.7.9',
             'js'    => [
                 'jquery.lazy.js' => [
                     'src' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js',
@@ -57,7 +75,9 @@ return [
 
         'magnific-popup' => [
             'title'       => 'Magnific Popup',
-            'description' => 'Popup/Modal em Jquery',
+            'dependencies' => ['jQuery'],
+            'description' => 'O Magnific Popup é uma biblioteca jQuery que cria pop-ups responsivos e personalizáveis, amplamente usados para exibir imagens e conteúdo de forma elegante em sites.',
+            'version' => '1.1.0',
             'css'         => [
                 'magnific-popup.css' => [
                     'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css',
@@ -86,7 +106,8 @@ return [
 
         'animations' => [
             'title'       => 'Animações (Animate.css + WOW.js)',
-            'description' => 'Animações em CSS e ao rolar a página',
+            'description' => 'Combo dos plugins para construir Animações em CSS e ao rolar a página',
+            'version' => '4.1.1 + 1.1.2',
             'css'         => [
                 'animate.css' => [
                     'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css',
@@ -112,9 +133,56 @@ return [
             ],
         ],
 
+        'animate' => [
+            'title'       => 'Animate.css',
+            'description' => 'O Animate.css é uma biblioteca de CSS que oferece uma variedade de animações pré-construídas para elementos HTML, facilitando a adição de animações a sites e aplicativos.',
+            'version' => '4.1.1',
+            'css'         => [
+                'animate.css' => [
+                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css',
+                    'attributes' => [
+                        'integrity'      => 'sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw==',
+                        'crossorigin'    => 'anonymous',
+                        'referrerpolicy' => 'no-referrer',
+                        'rel'    => 'stylesheet',
+                        'media'  => 'print',
+                        'onload' => "this.media='all'",
+                    ],
+                ],
+            ],
+            'js'          => [
+                'wow.js' => [
+                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js',
+                    'attributes' => [
+                        'integrity'      => 'sha512-Eak/29OTpb36LLo2r47IpVzPBLXnAMPAVypbSZiZ4Qkf8p/7S/XRG5xp7OKWPPYfJT6metI+IORkR5G8F900+g==',
+                        'crossorigin'    => 'anonymous',
+                        'referrerpolicy' => 'no-referrer',
+                    ],
+                ],
+            ],
+        ],
+
+        'wow' => [
+            'title'       => 'WOW.js',
+            'description' => 'O WOW.js é uma biblioteca JavaScript que permite adicionar animações de scroll a elementos HTML, tornando a interatividade do site mais envolvente e atraente.',
+            'version' => '1.1.2',
+            'js'          => [
+                'wow.js' => [
+                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js',
+                    'attributes' => [
+                        'integrity'      => 'sha512-Eak/29OTpb36LLo2r47IpVzPBLXnAMPAVypbSZiZ4Qkf8p/7S/XRG5xp7OKWPPYfJT6metI+IORkR5G8F900+g==',
+                        'crossorigin'    => 'anonymous',
+                        'referrerpolicy' => 'no-referrer',
+                    ],
+                ],
+            ],
+        ],
+
         'slick' => [
             'title'       => 'Slick Carousel',
-            'description' => 'Slide e Carrosel em Javascript',
+            'dependencies' => ['jQuery'],
+            'description' => 'O Slick Carousel é um plugin jQuery que simplifica a criação de carrosséis interativos, tornando a exibição de conteúdo deslizante em sites mais fácil e flexível.',
+            'version' => '1.8.1',
             'css'         => [
                 'slick.css'       => [
                     'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.css',
@@ -150,7 +218,8 @@ return [
 
         'swiper' => [
             'title'       => 'Swiper Slider',
-            'description' => 'Slide e Carrosel em Javascript',
+            'description' => 'O Swiper Slider é uma biblioteca JavaScript de slide/touch/swipe altamente personalizável, usada para criar carrosséis e galerias responsivas em páginas da web e aplicativos móveis.',
+            'version' => '8.4.5',
             'css'         => [
                 'swiper-bundle.css' => [
                     'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.4.5/swiper-bundle.css',
@@ -178,7 +247,9 @@ return [
 
         'owl-carousel' => [
             'title'       => 'Owl Carousel',
-            'description' => 'Carrosel em Javascript',
+            'dependencies' => ['jQuery'],
+            'description' => 'O Owl Carousel é um plugin jQuery que facilita a criação de carrosséis responsivos e personalizáveis para exibir conteúdo deslizante em sites e aplicativos.',
+            'version' => '2.3.4',
             'css'         => [
                 'owl.carousel.css'      => [
                     'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css',
