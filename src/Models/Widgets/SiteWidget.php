@@ -24,7 +24,6 @@ use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Widget;
 use Adminx\Common\Models\Widgets\Objects\WidgetConfigObject;
 use Adminx\Common\Models\Widgets\Objects\WidgetContentObject;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -166,15 +165,15 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
     {
         if(!count($this->viewRenderData)){
             $site = FrontendSite::current() ?? $this->site;
-            Debugbar::startMeasure('start view data');
+            //Debugbar::startMeasure('start view data');
             $viewData = [
                 'site'      => $site,
                 'variables' => $this->variables,
                 'widget'    => $this,
             ];
-            Debugbar::stopMeasure('start view data');
+            //Debugbar::stopMeasure('start view data');
 
-            Debugbar::startMeasure('require source');
+            //Debugbar::startMeasure('require source');
             //Debugbar::debug($this->source->type);
             if ($this->config->require_source) {
                 switch (true) {
@@ -225,7 +224,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
                 }
             }
 
-            Debugbar::stopMeasure('require source');
+            //Debugbar::stopMeasure('require source');
 
             $this->viewRenderData = !empty($merge_data) ? [...$viewData, ...$merge_data] : $viewData;
         }

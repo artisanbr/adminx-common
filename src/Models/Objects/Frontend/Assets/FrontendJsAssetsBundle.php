@@ -1,7 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Objects\Frontend\Assets;
 
-use Adminx\Common\Models\Objects\Frontend\FrontendHtmlObject;
+use Adminx\Common\Models\Objects\Frontend\Assets\Code\FrontendJsAssetsCode;
 use ArtisanLabs\GModel\GenericModel;
 
 class FrontendJsAssetsBundle extends GenericModel
@@ -14,9 +19,9 @@ class FrontendJsAssetsBundle extends GenericModel
     ];
 
     protected $casts = [
-        'head' => FrontendJsAssets::class,
-        'before_body' => FrontendJsAssets::class,
-        'after_body' => FrontendJsAssets::class,
+        'head' => FrontendJsAssetsCode::class,
+        'before_body' => FrontendJsAssetsCode::class,
+        'after_body' => FrontendJsAssetsCode::class,
     ];
 
     /*protected $attributes = [

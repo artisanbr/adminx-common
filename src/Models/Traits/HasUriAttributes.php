@@ -95,9 +95,13 @@ trait HasUriAttributes
     protected function traitPath(string $path, $endWithDash = true, $comparesWithAttr = 'url'): string
     {
         //$path = (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, 1) : $path;
-        $path = collect(explode('/', $path))->filter()->implode('/');
+        $pathCollection = collect(explode('/', $path))->filter();
+        $path = $pathCollection->implode('/');
 
-        if(!empty($path) && $endWithDash){
+        //Check if is file
+        $lastPath = $pathCollection->last();
+
+        if(!empty($path) && ($endWithDash || !Str::contains($lastPath,'.'))){
             //$path .= !Str::endsWith($this->{$path}, '/') ? '/' : '';
             $path .= '/';
         }

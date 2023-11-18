@@ -4,8 +4,6 @@
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
-use Adminx\Common\Models\Sites\Site;
-
 return [
     'adminx_domain' => env('ADMINX_DOMAIN'),
     'frontend_domain' => env('FRONTEND_DOMAIN'),
@@ -165,14 +163,14 @@ return [
 
     'medias' => [
         'logo'    => [
-            'light' => env('APP_LOGO_LIGHT', 'assets/media/images/logo-light.png'),
-            'dark'  => env('APP_LOGO_DARK', 'assets/media/images/logo-dark.png'),
+            'light' => env('APP_LOGO_LIGHT', 'assets/media/images/providers/artisan/logo-light-medium.webp'),
+            'dark'  => env('APP_LOGO_DARK', 'assets/media/images/providers/artisan/logo-dark-medium.webp'),
 
             'small' => [
-                'light' => env('APP_LOGO_SMALL_LIGHT', 'assets/media/images/logo-light-small.png'),
-                'dark'  => env('APP_LOGO_SMALL_DARK', 'assets/media/images/logo-dark-small.png'),
+                'light' => env('APP_LOGO_SMALL_LIGHT', 'assets/media/images/providers/artisan/logo-light-small.webp'),
+                'dark'  => env('APP_LOGO_SMALL_DARK', 'assets/media/images/providers/artisan/logo-dark-small.webp'),
             ],
         ],
-        'favicon' => env('APP_FAVICON', 'assets/media/images/favicon.png'),
+        'favicon' => env('APP_FAVICON', 'assets/media/images/providers/artisan/icon.webp'),
     ],
 ];

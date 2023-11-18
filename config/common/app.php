@@ -17,13 +17,13 @@ return [
         'keywords' =>
             'adminx, painel, criação de sites, cms, painel administrativo, gerenciador de conteúdo, content manager',
 
-        'version' => '0.7.5-alpha',
+        'version' => '0.8.0',
     ],
 
     'provider' => [
         'name'      => env('ADMINX_PROVIDER_NAME', 'Artisan Digital'),
         'url'       => env('ADMINX_PROVIDER_URL', 'https://artisan.dev.br'),
-        'logo'      => env('ADMINX_PROVIDER_LOGO', 'media/images/providers/artisan/logo-micro.webp'),
+        'logo'      => env('ADMINX_PROVIDER_LOGO', 'media/images/providers/artisan/logo-dark-micro.webp'),
         'since'     => env('ADMINX_PROVIDER_SINCE', 2022),
         'copyright' => env('ADMINX_PROVIDER_COPYRIGHT', "Desenvolvido com ❤️ com o apoio de"),
     ],

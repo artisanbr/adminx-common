@@ -4,7 +4,7 @@
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
-namespace Adminx\Common\Repositories;
+namespace Adminx\Common\Repositories\Themes;
 
 use Adminx\Common\Facades\FileManager\FileUpload;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
@@ -73,7 +73,7 @@ class ThemeRepository extends Repository
 
         $this->model->refresh();
 
-        $this->uploadPathBase = $this->model->uploadPathTo('media');
+        $this->uploadPathBase = $this->model->storagePathTo('media');
 
         //$this->uploadPathBase = "themes/{$this->model->public_id}";
         //$this->uploadableType = MorphHelper::resolveMorphType($this->model);

@@ -4,8 +4,6 @@
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
-use Adminx\Common\Models\Sites\Site;
-
 return [
     'mime_types' => [
         'images' => [
@@ -54,6 +52,7 @@ return [
                 'zip',
                 'css',
                 'js',
+                'json',
                 'pdf',
                 'eot',
                 'woff',

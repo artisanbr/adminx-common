@@ -36,13 +36,13 @@ class AsCollectionOf extends AsCollection
 
                 $data = !is_string($attributes[$key]) ? $attributes[$key] : json_decode($attributes[$key], true);
 
-                return GenericCollection::wrap($data ?? [])->mapInto($this->itemClass);
+                return GenericCollection::wrap($data ?? [])->mapInto($this->itemClass)->values();
             }
 
             public function set($model, $key, $value, $attributes): array
             {
                 $json_value = is_string($value) ? $value : GenericCollection::wrap($value ?? [])->map(fn($item) => ($item instanceof GenericModel) ? $item : new
-                $this->itemClass($item))->toJson();
+                $this->itemClass($item))->values()->toJson();
 
                 /*if($key == 'variables'){
                     dd($model, $key, $value, $attributes);

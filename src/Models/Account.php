@@ -1,11 +1,16 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Ramsey\Uuid\Uuid;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Users\User;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Ramsey\Uuid\Uuid;
 
 class Account extends EloquentModelBase
 {
@@ -20,9 +25,10 @@ class Account extends EloquentModelBase
 
     public function save(array $options = [])
     {
-        if(!$this->id || !$this->public_id){
+        if (!$this->id || !$this->public_id) {
             $this->public_id = Uuid::uuid1();
         }
+
         return parent::save($options);
     }
 
@@ -45,11 +51,13 @@ class Account extends EloquentModelBase
         return $this->hasMany(Site::class, 'account_id', 'id');
     }
 
-    public function categories(){
+    public function categories()
+    {
         return $this->hasMany(Category::class, 'account_id', 'id');
     }
 
-    public function tags(){
+    public function tags()
+    {
         return $this->hasMany(Tag::class, 'account_id', 'id');
     }
 

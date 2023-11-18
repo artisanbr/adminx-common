@@ -8,12 +8,11 @@ namespace Adminx\Common\Models\Themes;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
-use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
+use Adminx\Common\Models\File;
 use Adminx\Common\Models\Generics\Configs\ThemeConfig;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
-use Adminx\Common\Models\Interfaces\UploadModel;
+use Adminx\Common\Models\Objects\Frontend\Assets\Abstract\AbstractFrontendAssetsResourceScript;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Themes\Objects\ThemeCopyrightObject;
 use Adminx\Common\Models\Themes\Objects\ThemeFooterObject;
@@ -31,8 +30,9 @@ use Adminx\Common\Models\Traits\Relations\HasParent;
 use App\Libs\Utils\FrontendUtils;
 use App\Providers\AppMetaTagsServiceProvider;
 use Butschster\Head\Contracts\Packages\ManagerInterface;
-use Butschster\Head\Facades\Meta;
+use Butschster\Head\Facades\Meta as MetaTags;
 use Butschster\Head\Facades\PackageManager;
+use Butschster\Head\MetaTags\Meta;
 use Butschster\Head\Packages\Package;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -41,7 +41,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\View;
 use voku\helper\HtmlMin;
 
-class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
+class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
     use SoftDeletes, HasUriAttributes, BelongsToSite, BelongsToUser, HasSelect2, HasParent, HasValidation, HasOwners, HasFiles, HasPublicIdAttribute;
 
@@ -71,8 +71,8 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
         'config'      => ThemeConfig::class,
         'media'       => ThemeMediaBundleObject::class,
         'assets'      => FrontendAssetsBundle::class,
-        'css'         => GenericAssetElementCSS::class,
-        'js'          => GenericAssetElementJS::class,
+        //'css'         => GenericAssetElementCSS::class,
+        //'js'          => GenericAssetElementJS::class,
         'header'      => ThemeHeaderObject::class,
         'header_html' => 'string',
         'footer'      => ThemeFooterObject::class,
@@ -91,9 +91,13 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
     public static function createRules(FormRequest $request = null): array
     {
         return [
-            'title'               => ['required'],
-            'media.*.file_upload' => ['nullable', 'image'],
-            'parent_id'           => ['nullable', 'integer', 'exists:themes,id'],
+            'title'                     => ['required'],
+            'media.*.file_upload'       => ['nullable', 'mimetypes:image/png,image/jpeg,image/webp,image/svg+xml'],
+            'media.favicon.file_upload' => [
+                'nullable',
+                'mimetypes:image/png,image/jpeg,image/webp,image/x-icon,image/svg+xml',
+            ],
+            'parent_id'                 => ['nullable', 'integer', 'exists:themes,id'],
         ];
     }
     //endregion
@@ -101,9 +105,61 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
     //region HELPERS
     public function uploadPathTo(?string $path = null): string
     {
+        return $this->storagePathTo('upload' . ($path ? "/{$path}" : ''));
+    }
+
+    public function storagePathTo(?string $path = null): string
+    {
         $uploadPath = "themes/{$this->public_id}";
 
         return ($this->site ? $this->site->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
+    }
+
+    public function traitCdnPath(string $path): string
+    {
+        if (Str::startsWith($path, $this->site->cdn_proxy_url)) {
+            $path = Str::remove($this->site->cdn_proxy_url, $path);
+        }
+
+        if (Str::startsWith($path, $this->site->upload_path)) {
+            $path = Str::remove($this->site->upload_path . "/", $path);
+        }
+
+        //dd($path, $this->storage_relative_path);
+
+        if (!Str::startsWith($path, $this->storage_relative_path)) {
+            $path = $this->storage_relative_path . "/" . $path;
+        }
+
+        return $path;
+    }
+
+
+    public function assetResourceUrl(AbstractFrontendAssetsResourceScript $assetScript): string
+    {
+        return $assetScript->external ? $assetScript->url : $this->cdnUrlTo("upload/{$assetScript->url}");
+    }
+
+    public function cdnUrlTo(string $path = ''): string
+    {
+
+        return $this->site->cdnUrlTo($this->traitCdnPath($path));
+
+    }
+
+    public function cdnUriTo(string $path = ''): string
+    {
+        return $this->site->cdnUriTo($this->traitCdnPath($path));
+    }
+
+    public function cdnProxyUrlTo(string $path = ''): string
+    {
+        return $this->site->cdnProxyUrlTo($this->traitCdnPath($path));
+    }
+
+    public function cdnProxyUriTo(string $path = ''): string
+    {
+        return $this->site->cdnProxyUriTo($this->traitCdnPath($path));
     }
 
     public function compile()
@@ -116,7 +172,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
         AppMetaTagsServiceProvider::registerFrontendPackages();
 
 
-        $themeMeta = new \Butschster\Head\MetaTags\Meta(
+        $themeMeta = new Meta(
             app(ManagerInterface::class),
             app('config')
         );
@@ -310,26 +366,40 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
             //}
 
             //region Theme Files
+
+            foreach ($this->assets->resources->css->items as $assetItem) {
+                $optArray = $assetItem->defer ? [
+                    'rel'    => 'stylesheet',
+                    'media'  => 'print',
+                    'onload' => "this.media='all'",
+                ] : [];
+                //dd($assetItem->name, $assetItem->path, $assetItem->defer, $this->cdnUriTo($assetItem->path));
+                $package->addStyle($assetItem->name, $this->assetResourceUrl($assetItem), $optArray);
+            }
+
+            foreach ($this->assets->resources->js->items as $assetItem) {
+                $optArray = $assetItem->defer ? ['defer'] : [];
+                $package->addScript($assetItem->name, $this->assetResourceUrl($assetItem), $optArray);
+            }
+
+            foreach ($this->assets->resources->head_js->items as $assetItem) {
+                $optArray = $assetItem->defer ? ['defer'] : [];
+                $package->addScript($assetItem->name, $this->assetResourceUrl($assetItem), $optArray, Meta::PLACEMENT_HEAD);
+            }
+
             /**
+             * todo: remove
              * @var File $file
              */
-            foreach ($this->files()->themeBundleSortened()->values() as $file) {
+            /*foreach ($this->files()->themeBundleSortened()->values() as $file) {
 
                 if ($file->extension === 'css') {
-                    //Todo: habilitar DEFER
-
-                    /*[
-                        'rel'    => 'stylesheet',
-                        'media'  => 'print',
-                        'onload' => "this.media='all'",
-                    ]*/
-                    //dump($file->path);
                     $package->addStyle($file->name, $file->url);
                 }
                 if ($file->extension === 'js') {
                     $package->addScript($file->name, $file->url, ['defer']);
                 }
-            }
+            }*/
             //endregion
 
             //region Pos
@@ -391,9 +461,9 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
 
     public function unregisterMetaPackage()
     {
-        Meta::removePackage('frontend.pre');
-        Meta::removePackage($this->meta_pkg_name);
-        Meta::removePackage('frontend.pos');
+        MetaTags::removePackage('frontend.pre');
+        MetaTags::removePackage($this->meta_pkg_name);
+        MetaTags::removePackage('frontend.pos');
     }
     //endregion
 
@@ -417,7 +487,46 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel, Up
 
     protected function uploadPath(): Attribute
     {
-        return Attribute::make(get: fn() => "{$this->site->upload_path}/themes/{$this->public_id}");
+        return Attribute::make(get: fn() => "{$this->storage_path}/upload");
+    }
+
+    protected function uploadRelativePath(): Attribute
+    {
+        return Attribute::make(get: fn() => "{$this->storage_relative_path}/upload");
+    }
+
+    protected function storagePath(): Attribute
+    {
+        return Attribute::make(get: fn() => "{$this->site->upload_path}/{$this->storage_relative_path}");
+    }
+
+    protected function storageRelativePath(): Attribute
+    {
+        return Attribute::make(get: fn() => "themes/{$this->public_id}");
+    }
+
+    protected function cdnUri(): Attribute
+    {
+        $cdnDomain = config('common.app.cdn_domain');
+
+        return Attribute::make(get: fn() => "https://{$cdnDomain}/{$this->cdn_url}");
+    }
+
+    protected function cdnUrl(): Attribute
+    {
+        return Attribute::make(get: fn() => ($this->site?->cdn_url ?? '') . "/{$this->storage_relative_path}");
+    }
+
+    protected function cdnProxyUri(): Attribute
+    {
+        $cdnDomain = config('common.app.cdn_domain');
+
+        return Attribute::make(get: fn() => "https://{$cdnDomain}/{$this->cdn_proxy_url}");
+    }
+
+    protected function cdnProxyUrl(): Attribute
+    {
+        return Attribute::make(get: fn() => ($this->site?->cdn_proxy_url ?? '') . "/{$this->storage_relative_path}");
     }
 
     protected function footerTwigHtml(): Attribute

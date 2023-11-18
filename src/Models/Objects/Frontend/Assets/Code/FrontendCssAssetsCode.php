@@ -1,14 +1,15 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-namespace Adminx\Common\Models\Objects\Frontend\Assets;
+namespace Adminx\Common\Models\Objects\Frontend\Assets\Code;
 
-use Adminx\Common\Libs\Helpers\HtmlHelper;
-use Adminx\Common\Models\Objects\Frontend\Assets\Abstract\AbstractFrontendAssetObject;
-use Html;
+use Adminx\Common\Models\Objects\Frontend\Assets\Abstract\AbstractFrontendAssetCodeObject;
 use MatthiasMullie\Minify\CSS;
-use ScssPhp\ScssPhp\Exception\SassException;
 
-class FrontendCssAssets extends AbstractFrontendAssetObject
+class FrontendCssAssetsCode extends AbstractFrontendAssetCodeObject
 {
 
     protected $casts = [
@@ -36,12 +37,7 @@ class FrontendCssAssets extends AbstractFrontendAssetObject
 
     protected function getHtmlAttribute(): string
     {
-        return "{$this->resources_html} \n {$this->raw_html}";
-    }
-
-    protected function getResourcesHtmlAttribute(): string
-    {
-        return $this->resources->transform(fn($item) => Html::style($item))->join("\n");
+        return $this->raw_html;
     }
 
     protected function getRawHtmlAttribute(): string

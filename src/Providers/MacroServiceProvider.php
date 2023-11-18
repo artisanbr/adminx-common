@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Providers;
 
@@ -95,7 +99,7 @@ class MacroServiceProvider extends ServiceProvider
             });
         });
 
-        Collection::macro('whereLike', function (array|string  $attributes, array|string $searchTerm, callable $escape) {
+        Collection::macro('whereLike', function (array|string  $attributes, array|string $searchTerm, ?callable $escape = null) {
             return $this->filter(function($item) use($attributes, $searchTerm, $escape){
 
                 $attributes = Collection::wrap($attributes)->toArray();

@@ -111,6 +111,42 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         return "sites/{$this->public_id}" . ($path ? "/{$path}" : '');
     }
 
+    public function cdnProxyUrlTo(?string $path = ''): string
+    {
+        if (!Str::startsWith($path, '/')) {
+            $path = "/{$path}";
+        }
+
+        return $this->cdn_proxy_url . $path;
+    }
+
+    public function cdnProxyUriTo(?string $path = ''): string
+    {
+        if (!Str::startsWith($path, '/')) {
+            $path = "/{$path}";
+        }
+
+        return $this->cdn_proxy_uri . $path;
+    }
+
+    public function cdnUrlTo(?string $path = ''): string
+    {
+        if (!Str::startsWith($path, '/')) {
+            $path = "/{$path}";
+        }
+
+        return $this->cdn_url.$path;
+    }
+
+    public function cdnUriTo(?string $path = ''): string
+    {
+        if (!Str::startsWith($path, '' )) {
+            $path = "/{$path}";
+        }
+
+        return $this->cdn_uri.$path;
+    }
+
     public static function getFromPreviousDomain($public_id): EloquentModelBase|Builder|Site|null
     {
         $site = self::where('public_id', $public_id)->first();
@@ -131,9 +167,9 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         $this->load(['theme']);
 
         $viewData = [
-            'site'        => $this,
-            'theme'       => $this->theme,
-            'searchTerm'  => '',
+            'site'       => $this,
+            'theme'      => $this->theme,
+            'searchTerm' => '',
             'breadcrumb' => $this->theme->config->breadcrumb,
         ];
 
@@ -180,7 +216,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
                                                 "@context" => "https://schema.org",
                                                 "@type"    => "Organization",
                                                 "url"      => $this->uri,
-                                                "logo"     => $this->theme->media->logo->uri,
+                                                "logo"     => $this->theme->media->logo->uri ?? '',
                                             ]);
 
         return Attribute::make(
@@ -201,6 +237,30 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     protected function uploadPath(): Attribute
     {
         return Attribute::make(get: fn() => "sites/{$this->public_id}");
+    }
+
+    protected function cdnProxyUri(): Attribute
+    {
+        $cdnDomain = config('common.app.cdn_domain');
+
+        return Attribute::make(get: fn() => "https://{$cdnDomain}{$this->cdn_proxy_url}");
+    }
+
+
+    protected function cdnProxyUrl(): Attribute
+    {
+        return Attribute::make(get: fn() => "/storage/sites/{$this->public_id}");
+    }
+
+    protected function cdnUri(): Attribute
+    {
+        return Attribute::make(get: fn() => $this->uri . $this->cdn_url);
+    }
+
+
+    protected function cdnUrl(): Attribute
+    {
+        return Attribute::make(get: fn() => "/cdn");
     }
 
 

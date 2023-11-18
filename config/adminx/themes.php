@@ -98,7 +98,7 @@ return [
                         'integrity'      => 'sha512-IsNh5E3eYy3tr/JiX2Yx4vsCujtkhwl7SLqgnwLNgf04Hrt9BT9SXlLlZlWx+OK4ndzAoALhsMNcCmkggjZB1w==',
                         'crossorigin'    => 'anonymous',
                         'referrerpolicy' => 'no-referrer',
-                        'defer'
+                        //'defer'
                     ],
                 ],
             ],

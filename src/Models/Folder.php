@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models;
 
@@ -38,7 +42,6 @@ class Folder extends EloquentModelBase implements OwneredModel
 
     protected $casts = [
         'name' => 'string',
-        'path' => 'string',
         'path' => 'string',
         'type' => FileType::class,
     ];
