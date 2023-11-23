@@ -8,8 +8,9 @@
 {% set big = big ?? false %}
 {% set small = small ?? false %}
 {% set bottomMeta = bottomMeta ?? false %}
+{% set class = class ?? '' %}
 
-<article id="article-item-{{ article.id }}" class="article-item article-miniature article-miniature-one {{ (big ?? false) ? 'mb-5' : 'mb-4' }}">
+<article id="article-item-{{ article.id }}" class="article-item article-miniature article-miniature-one {{ (big ?? false) ? 'article-big mb-5' : 'mb-4' }} {{ class }}">
     {% if showCover and article.cover_url %}
         <div class="article-cover img-hover-effect mb-3 {% if showCover and article.cover_url %}mt-3{% endif %}">
             <a class="img-zoom-effect" href="{{ article.url }}">

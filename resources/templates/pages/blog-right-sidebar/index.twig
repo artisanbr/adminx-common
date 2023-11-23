@@ -1,19 +1,10 @@
-{#
-/**
- *                                                 site
- * @var \Adminx\Common\Models\Pages\Page                                            page
- * @var \Illuminate\Pagination\LengthAwarePaginator|\Adminx\Common\Models\Article[] articles
- * @var string|null                                                                 searchTerm
- */
-#}
-
 <div class="blog-area py-10">
     <div class="container">
         <div class="row g-8">
             <div class="col-lg-8 order-lg-1 order-1">
                 <div class="blog-item-wrap row">
                     {% if articles.count() %}
-                        <div class="col-12">
+                        <div class="col-12 first-article">
                             {{ include('@template/components/articles/article-miniature-1.twig', {article: articles.first(), big: true}) }}
                             {# <x-frontend::pages.Articles.article-miniature-1 :article="articles.first()" big/> #}
                             <hr class="mb-5"/>
@@ -24,7 +15,7 @@
                                     {% for article in articles.getCollection().forget(0).odd().values() %}
                                         <div class="row">
                                             <div class="col-12">
-                                                {{ include('@template/components/articles/article-miniature-1.twig', {article: article}) }}
+                                                {{ include('@template/components/articles/article-miniature-1.twig', {article: article, class: 'article-left-side'}) }}
 
                                                 {% if not loop.last %}
                                                     <hr class="mb-4"/>
@@ -37,7 +28,7 @@
                                     {% for article in articles.getCollection().forget(0).even().values() %}
                                         <div class="row">
                                             <div class="col-12">
-                                                {{ include('@template/components/articles/article-miniature-1.twig', {article: article}) }}
+                                                {{ include('@template/components/articles/article-miniature-1.twig', {article: article, class: 'article-right-side'}) }}
 
                                                 {% if not loop.last %}
                                                     <hr class="mb-4"/>
