@@ -387,6 +387,8 @@ class FrontendTwigEngine extends FrontendEngineBase
         $footerHtml = $this->themeBuild->footer;
         $seoHtml = $this->frontendBuild->seo->html;
 
+        /*<main class="main-content"></main>*/
+
         return <<<html
                 <html lang="pt-BR">
                     <head>
@@ -394,13 +396,12 @@ class FrontendTwigEngine extends FrontendEngineBase
                         {$headHtml}
                     </head>
                     <body id="{{ frontendBuild.body.id }}" class="{{ frontendBuild.body.class }}">
-                        {$headerHtml}
-                        <main class="main-content">
-                            {% if breadcrumb and breadcrumb.enabled %}
+                        {$headerHtml}                        
+                        {% if breadcrumb and breadcrumb.enabled %}
                                 {{ include('@base/components/breadcrumb.twig') }}
-                            {% endif %}
-                            {$content}
-                        </main>
+                        {% endif %}
+                        {$content}
+                        
                         {$footerHtml}
                     </body>
                 </html>
