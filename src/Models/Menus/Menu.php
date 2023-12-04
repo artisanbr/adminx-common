@@ -9,8 +9,9 @@ namespace Adminx\Common\Models\Menus;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Interfaces\OwneredModel;
-use Adminx\Common\Models\Menus\Objects\MenuConfig;
+use Adminx\Common\Models\Menus\Objects\Config\MenuConfig;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
@@ -78,6 +79,45 @@ class Menu extends EloquentModelBase implements OwneredModel
     //endregion
 
     //region HELPERS
+    public function buildTwig(): SpatieMenu|string
+    {
+
+        //$renderConfig = new MenuRenderConfig();
+
+        $menuBuilder = SpatieMenu::new()->addClass("{{ renderConfig.menu.class ?? '' }}");
+
+        $menuParentItems = $this->parent_items;
+
+
+        foreach ($menuParentItems as $menuItem) {
+            $menuBuilder = $menuItem->buildTwig($menuBuilder, $this);
+        }
+
+        return $menuBuilder->each(function (SpatieMenu $submenu){
+            $submenu->addParentClass("{{ renderConfig.parent_item.class ?? '' }}");
+
+            $submenu->addParentClass("{{ renderConfig.li.class ?? '' }}");
+
+            $submenu->each(function (Link $link){
+                /*$link->prepend($this->config->menu_item_prepend ?? '');
+
+                $link->append($this->config->menu_item_append ?? '');*/
+
+                $link->addParentClass("{{ renderConfig.child_item.class ?? '' }}");
+                $link->addClass("{{ renderConfig.child_link.class ?? '' }}");
+            });
+
+        })->each(function (Link $link){
+            $link->prepend("{{ renderConfig.a.prepend ?? '' }}");
+            $link->append("{{ renderConfig.a.append ?? '' }}");
+
+            $link->addParentClass("{{ renderConfig.li.class ?? '' }}");
+            $link->addClass("{{ renderConfig.a.class ?? '' }}");
+
+        });
+
+
+    }
     public function mount(callable $callback = null): SpatieMenu|string
     {
 
@@ -113,7 +153,7 @@ class Menu extends EloquentModelBase implements OwneredModel
 
             $link->addClass($this->config->render->item_link->class ?? '');
 
-        });;
+        });
 
 
     }
@@ -124,7 +164,7 @@ class Menu extends EloquentModelBase implements OwneredModel
     {
         $submenuItensWithLink = $this->items()->where('config->use_submenu_url', true)->count();
 
-        return $this->mount()->render() . ($submenuItensWithLink ? <<<html
+        return $this->buildTwig()->render() . ($submenuItensWithLink ? <<<html
 <script>
 document.addEventListener('DOMContentLoaded', (event) => {
     $('ul > li > a[href][data-toggle]').click(function(e) {

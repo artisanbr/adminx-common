@@ -4,21 +4,23 @@
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
-namespace Adminx\Common\Models\Generics\Configs;
+namespace Adminx\Common\Models\Themes\Objects\Config;
 
 use Adminx\Common\Enums\Themes\ThemeFramework;
+use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use ArtisanLabs\GModel\GenericModel;
 
 class ThemeConfig extends GenericModel
 {
 
     protected $fillable = [
-        'no_framework',
-        'framework',
+        //'no_framework',
+        //'framework',
 
         'bootstrap_enable',
         'bootstrap_version',
         'bootstrap_strict',
+
 
         'jquery',
 
@@ -28,13 +30,15 @@ class ThemeConfig extends GenericModel
         'jquery_ui_version',
         'jquery_ui_strict',
 
+
         'breadcrumb',
         'plugins',
+        'libs',
     ];
 
     protected $attributes = [
-        'no_framework' => false,
-        'framework' => 'bootstrap:5',
+        //'no_framework' => false,
+        //'framework' => 'bootstrap:5',
 
         'bootstrap_enable' => false,
         'bootstrap_strict' => false,
@@ -46,6 +50,7 @@ class ThemeConfig extends GenericModel
 
         'plugins' => ['modernizr','magnific-popup','animations'],
         'breadcrumb' => [],
+        'libs' => [],
     ];
 
     protected $casts = [
@@ -59,9 +64,10 @@ class ThemeConfig extends GenericModel
 
         'plugins' => 'collection',
         'breadcrumb' => BreadcrumbConfig::class,
+        'libs' => ThemeConfigLibrariesObject::class,
     ];
 
-    protected function setNoFrameworkAttribute($value): void
+    /*protected function setNoFrameworkAttribute($value): void
     {
         $this->attributes['bootstrap_enable'] = !$value;
     }
@@ -73,7 +79,7 @@ class ThemeConfig extends GenericModel
             $this->attributes['bootstrap_version'] = config("adminx.themes.versions.{$configVersion}", config('adminx.themes.versions.bootstrap:5'));
         }
 
-    }
+    }*/
 
     protected function setBootsrapVersionAttribute($value = null): void
     {

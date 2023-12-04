@@ -103,9 +103,9 @@ class FrontendPageEngine extends FrontendEngineBase
 
     /***
      *
-     * @param array|string|null $expectedTypes Filter pages by types
+     * @param string|null $pageUrl
      *
-     * Encontrar página através da URL (slug ou public_id)
+     * @return Page|null
      */
     public function getPageByUrl(?string $pageUrl = null): ?Page
     {

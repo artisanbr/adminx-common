@@ -13,6 +13,7 @@ use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Menus\Menu;
 use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Widgets\SiteWidget;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Twig\Environment;
@@ -35,7 +36,7 @@ class FrontendTwigExtension extends AbstractExtension
     protected array|Collection $forms;
 
     protected ?SiteWidget $currentSiteWidget = null;
-    protected ?Form $currentForm = null;
+    protected ?Form       $currentForm       = null;
 
     //protected Site $currentSite;
 
@@ -115,7 +116,7 @@ class FrontendTwigExtension extends AbstractExtension
             $this->currentSiteWidget->save();
         }*/
 
-        if($this->currentSiteWidget->config->ajax_render){
+        if ($this->currentSiteWidget->config->ajax_render) {
 
             return $this->currentSiteWidget->content->portal ?? $this->currentSiteWidget->content->html ?? '';
 
@@ -168,7 +169,7 @@ class FrontendTwigExtension extends AbstractExtension
 
     }*/
 
-    public function menu($context, $menuSlug)
+    public function menu($context, $menuSlug, $exibition = null)
     {
 
         //Verificar no cache
@@ -182,10 +183,34 @@ class FrontendTwigExtension extends AbstractExtension
                 $this->menus->add($menu);
             }
         }
+        //DebugBar::debug($menuSlug, $exibition, (string)$menu->buildTwig());
 
         //$menu = $this->menus->firstWhere('slug', $menuSlug);
+        if (!$menu) {
+            return 'Menu não encontrado';
+        }
 
-        return $menu->html ?? 'Menu não encontrado';
+        $template = $this->twig->createTemplate($menu->html, "menu-{$menu->id}");
+
+        $renderConfig = null;
+
+        if ($exibition) {
+            $renderConfig = $menu->config->renders->getBySlug($exibition) ?? $menu->config->renders->getByIndex($exibition);
+        }
+
+        if (!$renderConfig) {
+            $renderConfig = $menu->config->renders->getDefault();
+        }
+
+        DebugBar::debug($exibition, $renderConfig->toArray(), [
+            'html' => $menu->html
+        ]);
+
+        return $template->render([
+                                     'renderConfig' => $renderConfig->toArray(),
+                                 ]);
+
+        // return $menu->html ?? 'Menu não encontrado';
 
     }
 

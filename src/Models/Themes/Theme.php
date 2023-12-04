@@ -9,11 +9,11 @@ namespace Adminx\Common\Models\Themes;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\File;
-use Adminx\Common\Models\Generics\Configs\ThemeConfig;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Objects\Frontend\Assets\Abstract\AbstractFrontendAssetsResourceScript;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
+use Adminx\Common\Models\Themes\Objects\Config\ThemeConfig;
 use Adminx\Common\Models\Themes\Objects\ThemeCopyrightObject;
 use Adminx\Common\Models\Themes\Objects\ThemeFooterObject;
 use Adminx\Common\Models\Themes\Objects\ThemeHeaderObject;
@@ -250,10 +250,14 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
     {
         PackageManager::create($this->meta_pkg_name, function (Package $package) {
 
-            if ($this->config->jquery_enable) {
+            //Libraries
+            $this->config->libs->registerMetaPackage($package);
+
+
+            //Frameworks
+            /*if ($this->config->jquery_enable) {
                 $package->addScript('jquery.js', "https://code.jquery.com/jquery-{$this->config->jquery_version}.min.js");
             }
-
 
             if ($this->config->jquery_ui_enable) {
 
@@ -275,11 +279,6 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 
             }
 
-            //Frameworks
-            //if ($this) {
-
-
-            //region Boostrap]
             if ($this->config->bootstrap_enable) {
 
                 $bsVersion = $this->config->bootstrap_version ?? collect(config('adminx.themes.versions.bootstrap'))->first();
@@ -315,8 +314,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                     $package->addScript('theme.bs4.js', FrontendUtils::asset('js/theme.main.bs4.js'));
                 }
             }
-
-            //endregion
+            */
 
             //region Theme Plugins
 
@@ -407,7 +405,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                 //CSS
                 ->addStyle('pace-theme-minimal.css',
                            'https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css')
-                ->addStyle('font-awesome',
+                /*->addStyle('font-awesome',
                            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css',
                            [
                                'integrity'      => 'sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A==',
@@ -417,7 +415,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                                'media'          => 'print',
                                'onload'         => "this.media='all'",
 
-                           ])
+                           ])*/
                 /*->addStyle('all.min.css',
                            frontendThemeAsset('css/all.min.css'),
                 )

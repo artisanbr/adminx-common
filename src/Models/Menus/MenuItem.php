@@ -9,7 +9,7 @@ namespace Adminx\Common\Models\Menus;
 use Adminx\Common\Enums\MenuItemType;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Menus\Objects\MenuItemConfig;
+use Adminx\Common\Models\Menus\Objects\Config\MenuItemConfig;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasUriAttributes;
@@ -119,6 +119,128 @@ class MenuItem extends EloquentModelBase
         }
 
         return $this;
+    }
+
+    public function buildTwig(SpatieMenu $menuBuilder, ?Menu $menu = null): SpatieMenu
+    {
+        if (!$menu) {
+            $menu = $this->menu;
+        }
+
+        if ($this->type === MenuItemType::Submenu) {
+
+            /*$subMenu = SpatieMenu::new()
+                                 ->addClass($this->menu->config->submenu_class ?? '');*/
+
+
+            $useUrl = ($this->config->use_submenu_url && $this->url);
+
+            $itemLink = Link::to($useUrl ? $this->url : '#', $this->title)
+                            ->setAttributes([
+                                                'data-toggle' => 'dropdown',
+                                                ...(!$useUrl ? [
+                                                    'role' => 'button',
+                                                ] : []),
+                                            ])
+                            ->addParentClass("{{ renderConfig.parent_item.class ?? '' }}")
+                            ->addClass("{{ renderConfig.parent_link.class ?? '' }}");
+
+            if (!$this->parent_id) {
+                $itemLink->addParentClass("{{ renderConfig.top_link.class ?? '' }}");
+                $itemLink->addClass("{{ renderConfig.top_item.class ?? '' }}");
+                $itemLink->addParentClass("{{ renderConfig.parent_top_item.class ?? '' }}");
+                $itemLink->addClass("{{ renderConfig.parent_top_link.class ?? '' }}");
+            }
+            else {
+                $itemLink->addParentClass("{{ renderConfig.parent_child_item.class ?? '' }}");
+                $itemLink->addClass("{{ renderConfig.parent_child_link.class ?? '' }}");
+            }
+
+            $menuBuilder->submenu(
+                $itemLink,
+                function (SpatieMenu $subMenu) use ($menu) {
+
+                    $subMenu->addClass("{{ renderConfig.submenu.class ?? '' }}");
+
+                    if ($this->menuable_type === 'page_internal' && $this->menuable && $this->menuable->model && method_exists($this->menuable->model, 'items')) {
+
+
+                        $customList = $this->menuable->model;
+
+                        if (method_exists($customList, 'mountModel')) {
+                            $customList = $customList->mountModel();
+                        }
+
+                        /*if($menu->id == 7){
+
+                            dd($customList);
+                        }*/
+
+
+                        foreach ($customList->items as $modelItem) {
+                            $listItemLink = Link::to($modelItem->url, $modelItem->title)
+                                //->addParentClass("{{ renderConfig.li.class ?? '' }}")
+                                                ->addParentClass("{{ renderConfig.child_item.class ?? '' }}")
+                                                ->addClass("{{ renderConfig.child_link.class ?? '' }}");
+
+                            $subMenu->add($listItemLink);
+                        }
+
+                    }/*else if ($this->config->is_source_submenu && $this->config->submenu_source->data->id ?? false) {
+                        //Subitens de uma fonte de dados
+                        $sourceData = $this->config->submenu_source->data->mountModel();
+
+
+                        foreach ($sourceData->items as $dataItem) {
+                            $subMenu->add(Link::to($sourceData->itemUrl($dataItem), $dataItem->title)->addParentClass($menu->config->menu_item_class ?? ''));
+                        }
+
+                    }*/
+                    else if ($this->children->count()) {
+                        //Subitens cadastrados
+                        foreach ($this->children as $childMenuItem) {
+                            $subMenu = $childMenuItem->buildTwig($subMenu, $menu);
+                        }
+                    }
+                }
+            );
+
+
+            /* $menuBuilder->add($this->title, function (SpatieMenu $submenuBuilder) {
+
+                 foreach ($this->children->all() as $children) {
+                     $submenuBuilder->add($children->title, function (SpatieMenu $submenuBuilder, self $childItem) {
+                         $childItem->mount($submenuBuilder);
+                     }))
+                     //$submenuBuilder->add(Link::to($children->url, $children->title));
+
+                     $submenuBuilder = $children->mount($submenuBuilder);
+
+                 }
+
+                 return $submenuBuilder;
+
+             });*/
+
+        }
+        else {
+            $itemLink = Link::to($this->url, $this->title);
+            /*->addParentClass("{{ renderConfig.li.class ?? '' }}")
+            ->addClass("{{ renderConfig.a.class ?? '' }}")*/
+
+            if (!$this->parent_id) {
+                $itemLink->addParentClass("{{ renderConfig.top_item.class ?? '' }}");
+                $itemLink->addClass("{{ renderConfig.top_link.class ?? '' }}");
+            }
+            else {
+                $itemLink->addParentClass("{{ renderConfig.child_item.class ?? '' }}");
+                $itemLink->addClass("{{ renderConfig.child_link.class ?? '' }}");
+            }
+
+            $menuBuilder->add($itemLink);
+        }
+
+        return $menuBuilder;
     }
 
     public function mount(SpatieMenu $menuBuilder, ?Menu $menu = null): SpatieMenu

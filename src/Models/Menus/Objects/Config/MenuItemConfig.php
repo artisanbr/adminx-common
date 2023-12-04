@@ -4,7 +4,7 @@
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
-namespace Adminx\Common\Models\Menus\Objects;
+namespace Adminx\Common\Models\Menus\Objects\Config;
 
 use Adminx\Common\Models\Generics\DataSource;
 use ArtisanLabs\GModel\GenericModel;
