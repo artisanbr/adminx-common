@@ -228,6 +228,10 @@ class MenuItem extends EloquentModelBase
             /*->addParentClass("{{ renderConfig.li.class ?? '' }}")
             ->addClass("{{ renderConfig.a.class ?? '' }}")*/
 
+            if($this->external){
+                $itemLink->setAttributes(['target' => '_blank']);
+            }
+
             if (!$this->parent_id) {
                 $itemLink->addParentClass("{{ renderConfig.top_item.class ?? '' }}");
                 $itemLink->addClass("{{ renderConfig.top_link.class ?? '' }}");
