@@ -11,7 +11,7 @@
                     {% if breadcrumb.config.show_navigation %}
                         <nav id="breadcrumb" aria-label="breadcrumb"
                              style="{{ breadcrumb.config.separator.css() ?? '' }}">
-                            <ol class="breadcrumb">
+                            <ol class="breadcrumb d-flex flex-column flex-md-row">
                                 {% for url, title in breadcrumb.items.toArray() %}
                                     <li class="breadcrumb-item flex-row {{ loop.last ? 'active' : '' }}" {{ loop.last ? 'aria-current=page' : '' }}>
                                         <a {% if url is defined and (url is not iterable or url[0] is not defined) %}href="{{ url }}"{% else %}role="button"{% endif %}>{{ title }}</a>
