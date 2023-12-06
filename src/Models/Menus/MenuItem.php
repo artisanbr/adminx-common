@@ -393,7 +393,9 @@ class MenuItem extends EloquentModelBase
             return null;
         }
 
-        return (Str::of($this->attributes['url'])->startsWith('/') ? '' : '/') . $this->attributes['url'];
+        $url = Str::of($this->attributes['url']);
+
+        return ($url->startsWith(['/','http']) ? '' : '/') . $this->attributes['url'];
     }
     //endregion
 
@@ -442,13 +444,14 @@ class MenuItem extends EloquentModelBase
         return $this->belongsTo(Menu::class);
     }
 
-    public function parent()
+    /*public function parent()
     {
         return $this->belongsTo(__CLASS__);
-    }
+    }*/
 
     public function children()
     {
+
         return $this->hasMany(__CLASS__, 'parent_id', 'id')->with('children')->orderBy('position');
     }
     //endregion
