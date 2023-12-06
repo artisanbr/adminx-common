@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Generics\Contact;
 
 use ArtisanLabs\GModel\GenericModel;
@@ -48,7 +53,7 @@ class Email extends GenericModel
     }
 
     protected function getIconHtmlAttribute(){
-        return $this->address ?? false ? "<a href='{$this->uri}' class='d-inline-flex align-items-center' data-bs-toggle='tooltip' title='Email' target='_blank'><i class=\"fa-solid fa-envelope me-2\"></i>{$this->address}</a>" : '';
+        return $this->address ?? false ? "<a href='{$this->uri}' class='d-inline-flex align-items-center' data-bs-toggle='tooltip' title='Email' target='_blank'><i class=\"far fa-envelope me-2\"></i>{$this->address}</a>" : '';
     }
 
 
@@ -57,7 +62,7 @@ class Email extends GenericModel
     }
 
     protected function getIconTitleHtmlAttribute(){
-        return $this->address ?? false ? "<a href='{$this->uri}' class='d-inline-flex align-items-center' target='_blank' title='Email'><i class=\"fa-solid fa-envelope me-2\"></i>{$this->address}".(!empty($this->title) ? " - {$this->title}" : '')."</a>" : '';
+        return $this->address ?? false ? "<a href='{$this->uri}' class='d-inline-flex align-items-center' target='_blank' title='Email'><i class=\"far fa-envelope me-2\"></i>{$this->address}".(!empty($this->title) ? " - {$this->title}" : '')."</a>" : '';
     }
 
 

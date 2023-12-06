@@ -128,12 +128,12 @@ class Phone extends GenericModel
 
     protected function getPhoneIconAttribute(): string
     {
-        return 'fa fas fa-solid fa-phone';
+        return 'fa far fa-phone';
     }
 
     protected function getWhatsappIconAttribute(): string
     {
-        return 'fa fab fa-brands fa-whatsapp';
+        return 'fab fa-brands fa-whatsapp';
     }
 
 
