@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Generics\Contact;
 
 use Adminx\Common\Libs\Support\Str;
@@ -123,12 +128,12 @@ class Phone extends GenericModel
 
     protected function getPhoneIconAttribute(): string
     {
-        return 'fa-solid fa-phone';
+        return 'fa fas fa-solid fa-phone';
     }
 
     protected function getWhatsappIconAttribute(): string
     {
-        return 'fa-brands fa-whatsapp';
+        return 'fa fab fa-brands fa-whatsapp';
     }
 
 
