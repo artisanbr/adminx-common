@@ -21,7 +21,7 @@
                         {% endif %}
 
 
-                        <div class="blog-article-meta mb-2 mt-3 d-inline-row text-muted small">
+                        <div class="blog-article-meta mb-2 mt-3 d-flex align-items-center text-muted small">
                                 <span class="me-3 mr-3" data-toggle="tooltip"
                                       title="Postado {{ article.published_at_long }}">
                                         <i class="fa-solid fa-calendar-days me-1"></i>
@@ -29,9 +29,17 @@
                                                 datetime="{{ article.published_at.format('Y-m-d H:i:S') }}">{{ article.published_at.diffForHumans() }}</time>
                                     </span>
                             <span title="Comentários">
-                                        <i class="fa-solid fa-comments me-1"></i>
+                                        <i class="fas fa-solid fa-comments me-1"></i>
                                         {{ article.comments().count() }} Coment&aacute;rios
                                     </span>
+                            <div class="article-share-bar ms-auto ml-auto me-0 mr-0 d-flex align-items-center gap-2">
+                                <a class="article-share-btn ml-2 btn btn-outline-success rounded rounded-pill" href="https://api.whatsapp.com/send?text={{ "Confira esse artigo de *#{site.title}*: #{article.uri}" | url_encode }}" target="_blank" title="Compartilhar no Whatsapp" data-bs-toggle="tooltip">
+                                    <i class="fab fa-whatsapp h5 m-0"></i>
+                                </a>
+                                <a class="article-share-btn ml-2 btn btn-outline-info rounded rounded-pill" href="https://www.facebook.com/sharer/sharer.php?u={{ article.uri }}&t={{ "Confira esse artigo de *#{site.title}*" | url_encode }}" target="_blank" title="Compartilhar no Facebook" data-bs-toggle="tooltip">
+                                    <i class="fab fa-facebook h5 m-0"></i>
+                                </a>
+                            </div>
                         </div>
 
                         {% if article.categories.count() %}
