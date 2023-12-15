@@ -7,9 +7,9 @@
 {% set dateFormat = dateFormat ?? 'd/m/Y H:i:s' %}
 {% set shortComments = shortComments ?? true %}
 
-{% set authorIcon = authorIcon ?? '<i class="fa-solid fa-user me-1 mr-1"></i>' %}
+{% set authorIcon = authorIcon ?? '<i class="fas fa-solid fa-user me-1 mr-1"></i>' %}
 {% set dateIcon = dateIcon ?? '<i class="fas fa-solid fa-calendar me-1 mr-1"></i>' %}
-{% set commentsIcon = commentsIcon ?? '<i class="fa-solid fa-comments me-1 mr-1"></i>' %}
+{% set commentsIcon = commentsIcon ?? '<i class="fas fa-solid fa-comments me-1 mr-1"></i>' %}
 
 <div id="article-meta-{{ article.id }}" class="article-meta mb-2 d-inline-row small {{  class ?? 'text-muted' }}" style="{{  style ?? '' }}" >
     {% if showAuthor %}
