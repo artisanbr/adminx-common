@@ -13,6 +13,11 @@ use Carbon\Carbon;
 
 class PageObserver
 {
+
+    public function creating(Page $model){
+        $model->newPosition();
+    }
+
     public function saving(Page $model)
     {
         //Gerar slug se estiver em branco

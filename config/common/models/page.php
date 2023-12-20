@@ -9,6 +9,7 @@ use Adminx\Common\Models\Pages\Modules\CustomListsPageModule;
 use Adminx\Common\Models\Pages\Modules\FormsPageModule;
 use Adminx\Common\Models\Pages\Types\BlogPageType;
 use Adminx\Common\Models\Pages\Types\CustomPageType;
+use Adminx\Common\Models\Pages\Types\DynamicPageType;
 use Adminx\Common\Models\Pages\Types\FormPageType;
 
 return [
@@ -20,9 +21,10 @@ return [
     ],
 
     'types' => [
-        'custom' => CustomPageType::class,
-        'blog'   => BlogPageType::class,
-        'form'   => FormPageType::class,
+        'custom'  => CustomPageType::class,
+        'dynamic' => DynamicPageType::class,
+        'blog'    => BlogPageType::class,
+        'form'    => FormPageType::class,
     ],
 
     /*'templates' => [

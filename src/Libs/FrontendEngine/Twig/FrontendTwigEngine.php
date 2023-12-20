@@ -519,6 +519,79 @@ class FrontendTwigEngine extends FrontendEngineBase
 
     /**
      * @throws FrontendException
+     * @throws SyntaxError
+     * @throws RuntimeError
+     * @throws LoaderError
+     */
+    public function dynamicPage(Page $page, $modelItem): string
+    {
+        /**
+         * @var EloquentModelBase|CustomListItemAbstract|CustomListItemHtml $modelItem
+         */
+
+
+        $this->templateNamePrefix = 'page-dynamic-' . $page->public_id . '-' . (@$modelItem->public_id ?? @$modelItem->slug ?? time());
+
+        if($modelItem->data->image_url ?? false){
+            $page->breadcrumb_config->background_url = $modelItem->data->image_url;
+        }
+
+        $this->setViewData($page->getBuildViewData([
+                                                             //'pageInternal' => $page,
+                                                             'currentItem'  => $modelItem,
+                                                             'breadcrumb'   => $page->breadcrumb([
+                                                                                                     '#' => $modelItem->title,
+                                                                                                                 ]),
+                                                                 ]));
+
+        if ($page->frontend_build ?? false) {
+            $this->registerFrontendBuild($page->frontend_build);
+        }
+        if ($modelItem->data->frontend_build ?? false) {
+            $this->registerFrontendBuild($modelItem->data->frontend_build);
+        }
+
+        //$this->frontendBuild->meta->registerSeoForPage($page);
+
+        $this->currentSite = $page->site;
+
+        if ($this->currentSite->theme ?? false) {
+            $this->applyTheme($this->currentSite->theme);
+        }
+
+        //$pageTemplate = $pageInternal->page_template;
+
+        $pageContent = $page->content->html;
+
+        /* if ($pageTemplate) {
+             //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
+             $this->twigFileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
+             $pageContent .= "{{ include('@template/index.twig') }}";
+         }*/
+
+
+        //$pageContent = $page->page_template ? "{{ include('@template/index.twig') }}" : '';
+
+
+        $this->templates->put('page', $this->getPageBaseTemplate($pageContent));
+
+
+        $renderedTemplate = $this->renderTwig('page');
+
+
+        //$renderedBlade = Blade::render($rawBlade, $this->viewData);
+
+        if ($this->currentSite->config->enable_html_minify) {
+            $htmlMin = new HtmlMin();
+
+            $renderedTemplate = $htmlMin->minify($renderedTemplate);
+        }
+
+        return $renderedTemplate;
+    }
+
+    /**
+     * @throws FrontendException
      */
     public function article(Article $article): string
     {
@@ -576,7 +649,7 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function pageInternal(PageInternal $pageInternal, $modelItem): string
+    public function pageInternal2(PageInternal $pageInternal, $modelItem): string
     {
         /**
          * @var EloquentModelBase|CustomListItemAbstract|CustomListItemHtml $modelItem

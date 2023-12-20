@@ -358,7 +358,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
     public function pages()
     {
-        return $this->hasMany(Page::class)->orderByDesc('is_home')->orderBy('created_at');
+        return $this->hasMany(Page::class)->orderByDesc('is_home')->orderBy('position')->orderBy('created_at');
     }
 
     public function categories()

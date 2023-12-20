@@ -26,7 +26,12 @@ trait HasBreadcrumbs
 
         if (!$this->breadcrumbCache) {
             $breadcrumbConfig = $config ?? $this->breadcrumb_config;
-            $breadcrumbItems = [@$this->breadcrumb_items, ...$this->getSelfBreadcrumbItem(), ...$mergeItems];
+
+            $parentBreadcrumb = method_exists($this, 'parent') && $this->parent ? $this->parent->getSelfBreadcrumbItem() : [];
+
+            $selfItems = @$this->breadcrumb_items ?? [];
+
+            $breadcrumbItems = [...$parentBreadcrumb, ...$selfItems, ...$this->getSelfBreadcrumbItem(), ...$mergeItems];
 
             $this->setBreadcrumb(collect($breadcrumbItems)->filter()->toArray(), $breadcrumbConfig);
         }

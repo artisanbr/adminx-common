@@ -9,26 +9,27 @@ namespace Adminx\Common\Models\Pages\Objects;
 use Adminx\Common\Libs\Helpers\HtmlHelper;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Objects\Abstract\AbstractHtmlObject;
-use Adminx\Common\Models\Objects\Frontend\FrontendHtmlObject;
 use Illuminate\Support\Collection;
 
 class PageContent extends AbstractHtmlObject
 {
 
     protected $fillable = [
-        'main',
-        'internal',
+        //'main',
+        //'internal',
         'html',
     ];
 
     protected $casts = [
-        'main'        => FrontendHtmlObject::class,
-        'internal'    => FrontendHtmlObject::class,
+        //'main'        => FrontendHtmlObject::class,
+        //'internal'    => FrontendHtmlObject::class,
         'html'        => 'string',
         'plain_text'  => 'string',
         'short_text'  => 'string',
         'description' => 'string',
     ];
+
+    protected $temporary = ['main','internal'];
 
     protected $attributes = [
         //'main' => [],

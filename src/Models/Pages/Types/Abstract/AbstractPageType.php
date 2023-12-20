@@ -8,14 +8,16 @@ namespace Adminx\Common\Models\Pages\Types\Abstract;
 
 use Adminx\Common\Models\Pages\Modules\Traits\HasPageModulesManager;
 use Adminx\Common\Models\Pages\Objects\PageConfig;
-use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Traits\HasSelect2;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
 /**
- * @property array{slug: string, title: string, description: string, allowed_modules: Collection|string[],enabled_modules: Collection|string[] }|null $attributes
- * @param array{slug: string, title: string, description: string, allowed_modules: Collection|string[],enabled_modules: Collection|string[] }|null $attributes
+ * @param array{slug: string, title: string, description: string, allowed_modules: Collection|string[],enabled_modules:
+ *                            Collection|string[] }|null    $attributes
+ *
+ * @property array{slug: string, title: string, description: string, allowed_modules:
+ *           Collection|string[],enabled_modules: Collection|string[] }|null $attributes
  */
 abstract class AbstractPageType extends GenericModel
 {
@@ -57,6 +59,12 @@ abstract class AbstractPageType extends GenericModel
 
     //region Attributes
     //region GET's
+
+    protected function getTextAttribute()
+    {
+        return "<h4>{$this->title}</h4><small>{$this->description}</small>";
+    }
+
     protected function getConfigAttribute()
     {
         return new PageConfig([

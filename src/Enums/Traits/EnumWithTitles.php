@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Enums\Traits;
 
@@ -23,6 +27,11 @@ trait EnumWithTitles
             fn(self $item) => $item->title(),
             self::cases()
         ));
+    }
+
+    public function titlesArray(): array
+    {
+        return self::titles();
     }
 
 }

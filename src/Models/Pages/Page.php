@@ -27,6 +27,7 @@ use Adminx\Common\Models\Menus\MenuItem;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
+use Adminx\Common\Models\Pages\Enums\PageStatus;
 use Adminx\Common\Models\Pages\Objects\PageBreadcrumb;
 use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Pages\Objects\PageContent;
@@ -49,6 +50,7 @@ use Adminx\Common\Models\Traits\HasSiteRoutes;
 use Adminx\Common\Models\Traits\HasSlugAttribute;
 use Adminx\Common\Models\Traits\HasTemplates;
 use Adminx\Common\Models\Traits\HasUriAttributes;
+use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\HasVisitCounter;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
@@ -63,12 +65,14 @@ use Butschster\Head\Facades\Meta;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
+use Illuminate\Validation\Rule;
 
 /**
  * @property Collection|CustomList[]|CustomListHtml[] $data_sources
@@ -104,6 +108,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         HasUriAttributes,
         HasVisitCounter,
         HasSiteRoutes,
+        HasValidation,
         SoftDeletes;
 
     protected $connection = 'mysql';
@@ -113,21 +118,28 @@ class Page extends EloquentModelBase implements BuildableModel,
         'user_id',
         'account_id',
         'parent_id',
+
+        'model_type',
+        'model_id',
+
+
         //'type_id',
         'type_name',
-        'model_id',
         'template_name',
         //'form_id',
         'title',
         'slug',
+        'public_id',
+        'position',
+        'status',
 
         'content',
         'assets',
 
 
         'html',
-        'html_raw',
-        'internal_html',
+        //'html_raw',
+        //'internal_html',
         'css',
         'js',
 
@@ -141,14 +153,17 @@ class Page extends EloquentModelBase implements BuildableModel,
     ];
 
     protected $casts = [
-        'text'  => 'string',
-        'title' => 'string',
-        'slug'  => 'string',
+        'display_title' => 'string',
+        'text'          => 'string',
+        'title'         => 'string',
+        'slug'          => 'string',
+        'position'      => 'integer',
+        'status'        => PageStatus::class,
 
 
-        'content'    => PageContent::class,
-        'assets_old' => 'object',
-        'assets'     => FrontendAssetsBundle::class,
+        'content' => PageContent::class,
+        //'assets_old' => 'object',
+        'assets'  => FrontendAssetsBundle::class,
 
 
         'config'         => PageConfig::class,
@@ -158,7 +173,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         'frontend_build' => FrontendBuildObject::class,
         //'elements' => PageElements::class,
         'html'           => 'string',
-        'html_raw'       => 'string',
+        //'html_raw'       => 'string',
 
 
         'is_home'         => 'boolean',
@@ -178,7 +193,9 @@ class Page extends EloquentModelBase implements BuildableModel,
     ];
 
     protected $attributes = [
-        'is_home' => 0,
+        'is_home'   => 0,
+        'type_name' => 'custom',
+        'status'    => 'published',
         //'content' => [],
         //'assets' => [],
     ];
@@ -191,10 +208,21 @@ class Page extends EloquentModelBase implements BuildableModel,
     //region VALIDATIONS
     public static function createRules(?FormRequest $request = null): array
     {
+        //dd($request->all());
         return [
             'type_name' => ['required'],
             //'model_id' => ['required'],
-            'title'     => ['required'],
+            'title'     => ['nullable'],
+            'is_child'  => ['nullable', 'boolean'],
+            'parent_id' => ['required_if:is_child,1'],
+            'slug'      => [
+                'nullable',
+                Rule::unique('pages')->where(function ($query) use ($request) {
+                    return $query
+                        ->where('site_id', $request->site_id ?? auth()->user()->site_id)
+                        ->where('parent_id', $request->parent_id ?? null);
+                })->ignore($request->id),
+            ],
         ];
     }
 
@@ -202,14 +230,29 @@ class Page extends EloquentModelBase implements BuildableModel,
     public static function createMessages(): array
     {
         return [
-            'title.required'     => 'O título da página é obrigatório',
-            'type_name.required' => 'Selecione o tipo da página',
-            //'model_id.required' => 'Selecione o modelo da página',
+            'title.required'        => 'O título da página é obrigatório',
+            'type_name.required'    => 'Selecione o tipo da página',
+            'slug.unique'           => 'Essa URL já esta em uso.',
+            'parent_id.required_if' => 'É necessário selecionar uma Página Principal para criar uma Página Interna',
         ];
     }
     //endregion
 
     //region HELPERS
+    public function newPosition(): void
+    {
+        if (is_null($this->attributes['position'] ?? null) || !$this->id) {
+
+            if ($this->parent_id) {
+                $this->load(['parent']);
+                $this->position = $this->parent->children()->count();
+            }
+            else {
+                $this->position = $this->site->pages()->count();
+            }
+
+        }
+    }
 
     public function uploadPathTo(?string $path = null): string
     {
@@ -280,10 +323,10 @@ class Page extends EloquentModelBase implements BuildableModel,
         //$errors = $errors->getBag('default');
         $viewData = [
             ...$this->site->getBuildViewData(),
-            'page'       => $this,
-            'recaptcha'  => '<div class="g-recaptcha mb-3" data-sitekey="' . $this->site->config->recaptcha_site_key . '"></div>',
+            'page'      => $this,
+            'recaptcha' => '<div class="g-recaptcha mb-3" data-sitekey="' . $this->site->config->recaptcha_site_key . '"></div>',
             //Blade::render('<x-common::recaptcha :site="$page->site" no-ajax/>', ['page' => $this]),
-            'errors'     => $errors,
+            'errors'    => $errors,
             //'breadcrumb' => $this->show_breadcrumb ? $this->breadcrumb() : false,
         ];
 
@@ -408,20 +451,10 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     //region ATTRIBUTES
 
-    protected function getShowBreadcrumbAttribute(): bool
-    {
-        return $this->is_home ? false : ($this->breadcrumb_config->enable ?? false);
-    }
-
-    protected function getBreadcrumbConfigAttribute()
-    {
-        return $this->config->breadcrumb ?? $this->site->theme->config->breadcrumb ?? new BreadcrumbConfig();
-    }
-
     protected function type(): Attribute
     {
         return Attribute::make(
-            get: fn() => PageTypeManager::getType($this->type_name)
+            get: fn() => PageTypeManager::getType($this->getTypeNameAttribute())
         );
     }
 
@@ -457,7 +490,7 @@ class Page extends EloquentModelBase implements BuildableModel,
     protected function canUseForms(): Attribute
     {
         return Attribute::make(
-            get: fn() => @$this->config->canUseModule('forms') ?: @$this->model->can_use_forms ?: false);
+            get: fn() => @$this->config->canUseModule('forms') || @$this->type?->canUseModule('forms') || false);
     }
 
     protected function usingArticles(): Attribute
@@ -486,10 +519,46 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     //endregion
 
+    protected function displayTitle(): Attribute
+    {
+        $title = $this->attributes['title'] ?? null;
+
+        if (!$title) {
+            $title = 'Página';
+
+            if ($this->parent_id) {
+                $title .= ' Interna';
+            }
+
+            if ($this->type_name === 'dynamic') {
+                $title .= ' Dinâmica';
+            }
+
+            $title .= ' Sem Título';
+        }
+
+        /*if($this->parent_id && $this->parent){
+            $title = "{$this->parent->display_title} &raquo; {$title}";
+        }*/
+
+
+        return Attribute::make(
+            get: fn() => $title,
+        );
+    }
+
     protected function text(): Attribute
     {
+        $title = $this->display_title;
+
+        if ($this->parent_id && $this->parent) {
+            $title = "{$this->parent->display_title} &raquo; {$title}";
+        }
+
         return Attribute::make(
-            get: fn() => "<h4>" . ($this->title ?? 'Página sem Título') . "</h4><div class=\"d-flex align-items-center\"><small class=\"ms-0 me-2 w-100\">{$this->type?->title}</small><small class=\"ms-auto me-0\">{$this->created_at?->shortRelativeToNowDiffForHumans()}</small></div>",
+            get: fn() => <<<html
+<h3 class="d-flex align-items-center">{$title} <small class="ms-3 badge badge-light-info badge-sm fs-6">{$this->type->title}</small></h3><div class="d-flex align-items-center"><small class="ms-0 me-auto text-nowrap text-muted">Criado {$this->created_at?->shortRelativeToNowDiffForHumans()}, ultima atualização {$this->updated_at?->shortRelativeToNowDiffForHumans()}</small></div>
+html,
         );
     }
 
@@ -517,27 +586,25 @@ class Page extends EloquentModelBase implements BuildableModel,
         );
     }
 
-    protected function dataSources(): Attribute
-    {
-
-        $sources = collect();
-
-        //CustomLists
-        /*if ($this->custom_lists->count()) {
-            $sources = $this->custom_lists->keyBy(fn($customList, $key) => Str::camel($customList->slug))
-                                          ->map(fn($customList) => $customList->mountModel());
-        }*/
-
-        return Attribute::make(
-            get: fn() => $sources,
-        );
-    }
-
 
     //region GETS
-    public function getInternalHtmlAttribute()
+    /*public function getInternalHtmlAttribute()
     {
         return $this->content->internal->html ?? '';
+    }*/
+    protected function getShowBreadcrumbAttribute(): bool
+    {
+        return $this->is_home ? false : ($this->breadcrumb_config->enable ?? false);
+    }
+
+    protected function getBreadcrumbConfigAttribute()
+    {
+        return $this->config->breadcrumb ?? $this->site->theme->config->breadcrumb ?? new BreadcrumbConfig();
+    }
+
+    protected function getTypeNameAttribute()
+    {
+        return !empty($this->attributes['type_name']) ? $this->attributes['type_name'] : 'custom';
     }
 
     protected function getHtmlAttribute()
@@ -577,12 +644,6 @@ class Page extends EloquentModelBase implements BuildableModel,
     {
         $this->content->html = $value;
     }
-
-    /*protected function setInternalHtmlAttribute($value): void
-    {
-        $this->content->internal->html = $value;
-    }*/
-
     //endregion
 
     //endregion
@@ -641,6 +702,13 @@ class Page extends EloquentModelBase implements BuildableModel,
     //endregion
 
     //region RELATIONS
+
+    public function children()
+    {
+
+        return $this->hasMany(__CLASS__, 'parent_id', 'id')->orderBy('position');
+    }
+
     public function page_template()
     {
         return $this->modelTemplate();
@@ -677,27 +745,6 @@ class Page extends EloquentModelBase implements BuildableModel,
         return $this->morphMany(MenuItem::class, 'menuable');
     }
 
-    /*public function form()
-    {
-        return $this->hasOneThrough(Form::class,
-                                    Formulable::class,
-                                    'formulable_id',
-                                    'id',
-                                    'id',
-                                    'form_id',
-        )->where('formulable_type', MorphHelper::getMorphTypeTo(self::class));
-    }
-
-    public function formulable()
-    {
-        return $this->hasOne(Formulable::class, 'formulable_id', 'id')->where('formulable_type', MorphHelper::getMorphTypeTo(self::class));
-    }
-
-    public function form_answers()
-    {
-        return $this->morphMany(FormAnswer::class, 'formulable');
-    }*/
-
     public function categories()
     {
         return $this->hasMany(Category::class);
@@ -709,6 +756,11 @@ class Page extends EloquentModelBase implements BuildableModel,
     public function page_internals(): HasMany
     {
         return $this->hasMany(PageInternal::class);
+    }
+
+    public function model(): MorphTo
+    {
+        return $this->morphTo();
     }
 
     //endregion

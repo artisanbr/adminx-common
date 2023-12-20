@@ -7,7 +7,6 @@
 namespace Adminx\Common\Providers;
 
 use Adminx\Common\Libs\Support\Str;
-use Adminx\Common\Models\Pages\Page;
 use App\View\Components\Icon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Request;
@@ -41,7 +40,9 @@ class MenusServiceProvider extends ServiceProvider
                 ->setActiveClassOnLink()
                 ->setActiveClass('')
                 ->setExactActiveClass('active')
-                ->setActive(Request::url());
+                ->setActive(Request::url())
+                ->setWrapperTag('div')
+                ->setParentTag('div');
         });
 
         //region General
@@ -51,7 +52,7 @@ class MenusServiceProvider extends ServiceProvider
             $size = 2;
             $kicon = true;
 
-            if(is_array($icon)){
+            if (is_array($icon)) {
 
                 $iconArray = $icon;
 
@@ -65,11 +66,12 @@ class MenusServiceProvider extends ServiceProvider
             if (!is_null($icon)) {
                 $html = "<span class='menu-icon'>";
 
-                if($kicon){
+                if ($kicon) {
                     $html .= Blade::render(<<<blade
 <x-kicon i="{$icon}" class="{$class}" paths="{$paths}" size="{$size}" />
 blade, compact('icon', 'class', 'paths', 'size'));
-                }else{
+                }
+                else {
                     $html .= <<<html
 <i class="{$icon} {$class}"></i>
 html;
@@ -149,13 +151,16 @@ html;
         Menu::macro('subItem', function ($title, $to = '#', $icon = true) {
             $link = Link::item($title, $to, $icon);
 
-            if ($this->add($link)->isActive() && !isset($this->parentAttributes()['data-menu-hover'])) {
+            $this->add($link);
+
+            if ($link->isActive() && !isset($this->parentAttributes()['data-menu-hover'])) {
                 $this->setAttributes([
                                          'class' => ['here', 'show'],
                                      ]);
                 $this->setParentAttributes([
                                                'class' => ['here', 'show'],
                                            ]);
+
 
 
             }
@@ -246,39 +251,6 @@ html;
 
         //region Menus
 
-        //region Pages
-        Menu::macro('pages',
-            function ($pages) {
-                /**
-                 * @var Page $page
-                 */
-
-                foreach ($pages as $page) {
-
-                    if ($page->using_articles) {
-                        //Posts
-                        $this->itemSubmenu($page->title, function (Menu $submenu) use ($page) {
-                            $submenu->subItem("Configurar Página", route('app.pages.cadastro', $page->public_id));
-
-                            $submenu->subItem('Gerenciar Artigos', route('app.pages.articles.index', $page->id))
-                                    ->subItem('Novo Artigo', route('app.pages.articles.cadastro', $page->id));
-
-
-                            return $submenu;
-                        },                 $page->is_home ? 'home' : 'blog');
-
-                    }
-                    else {
-                        //Default
-                        $this->item($page->title, route('app.pages.cadastro', $page->public_id), $page->is_home ? 'home' : 'page');
-                    }
-
-                }
-
-                return $this;
-
-            });
-        //endregion
 
         //endregion
 

@@ -116,9 +116,19 @@ class FrontendPageEngine extends FrontendEngineBase
             return $this->currentSite->home_page;
         }
 
-        //Se não for informada URL e a pagina atual não existir, ou não for a home, definir e retornar a home
+        if($this->currentPage){
+            return $this->currentPage->children()->whereUrl($pageUrl)->first();
+        }
 
-        return $this->currentSite->pages()->whereUrl($pageUrl)->first();
+        //Verificar antes nas páginas top-level
+        $topLevelPage = $this->currentSite->pages()->whereDoesntHave('parent')->whereUrl($pageUrl)->first();
+
+        if($topLevelPage){
+            return $topLevelPage;
+        }
+
+        //Se não for informada URL e a pagina atual não existir, ou não for a home, definir e retornar a home
+        return $this->currentSite->pages()->whereHas('parent')->whereUrl($pageUrl)->first();
     }
 
     public function getPageByUrlByTypes(?string $pageUrl = null, array|string|null $expectedTypes = null): ?Page
@@ -176,7 +186,7 @@ class FrontendPageEngine extends FrontendEngineBase
         return $this->currentPage?->page_internals()->whereUrl('slug', $url)->first() ?? $this->currentPage?->page_internals()->whereNot('slug')->first();
     }
 
-    public function getFirstInternalUrl($url): Article|PageInternal|null
+    public function getFirstInternalUrl($url): Article|Page|null
     {
 
         //Validar pelo tipo da página
@@ -184,7 +194,7 @@ class FrontendPageEngine extends FrontendEngineBase
 
             return $this->getInternalModel($url, $this->currentPage);
 
-            if ($this->currentPage->can_use_articles) {
+            /*if ($this->currentPage->can_use_articles) {
                 $article = $this->getArticleByUrl($url);
 
                 if ($article) {
@@ -205,25 +215,26 @@ class FrontendPageEngine extends FrontendEngineBase
                 }
 
 
-            }
+            }*/
         }
 
         return null;
     }
 
-    public function getInternalModel($url, Article|PageInternal|FrontendModel|EloquentModelBase|Page $mainModel): Article|PageInternal|FrontendModel|CustomListItemAbstract|null
+    public function getInternalModel($url, Article|FrontendModel|EloquentModelBase|Page $mainModel): Article|Page|FrontendModel|CustomListItemAbstract|null
     {
 
         //Validar pelo tipo da página
 
+        //Article
         if ((@$mainModel->can_use_articles ?? false) && method_exists($mainModel, 'articles') && ($article = $mainModel->articles()->whereUrl($url)->first()) && $article?->id) {
             $this->firstModel = $article;
 
             return $article;
         }
 
-        //Custom List Item
-        if (get_class($mainModel) === PageInternal::class && method_exists($mainModel->model, 'items')) {
+        //Sub-page - Custom List Item
+        if (get_class($mainModel) === Page::class && $mainModel->model && method_exists($mainModel->model, 'items')) {
 
             if (method_exists($mainModel->model, 'mountModel')) {
                 $customList = $mainModel->model->mountModel();
@@ -235,11 +246,26 @@ class FrontendPageEngine extends FrontendEngineBase
             return $customList->items()->where('slug', $url)->orWhere('public_id', $url)->first();
         }
 
-        //$pageInternal = $mainModel->page_internals()->whereUrl($url)->first();
-        if (get_class($mainModel) === Page::class && ($pageInternal = $mainModel->page_internals()->whereUrl($url)->first() ?? $mainModel->page_internals()->whereNot('slug')->first()) && $pageInternal?->id) {
-            $this->firstModel = $pageInternal;
+        //Custom List Item
+        /*if (get_class($mainModel) === PageInternal::class && method_exists($mainModel->model, 'items')) {
 
-            return $pageInternal;
+            if (method_exists($mainModel->model, 'mountModel')) {
+                $customList = $mainModel->model->mountModel();
+            }
+            else {
+                $customList = $mainModel->model;
+            }
+
+            return $customList->items()->where('slug', $url)->orWhere('public_id', $url)->first();
+        }*/
+
+        //$pageInternal = $mainModel->page_internals()->whereUrl($url)->first();
+
+        //SubPage
+        if (get_class($mainModel) === Page::class && ($subPage = $mainModel->children()->whereUrl($url)->first() ?? $mainModel->children()->whereNot('slug')->first()) && $subPage?->id) {
+            $this->firstModel = $subPage;
+
+            return $subPage;
         }
 
         return null;

@@ -162,7 +162,7 @@ class MenuItem extends EloquentModelBase
 
                     $subMenu->addClass("{{ renderConfig.submenu.class ?? '' }}");
 
-                    if ($this->menuable_type === 'page_internal' && $this->menuable && $this->menuable->model && method_exists($this->menuable->model, 'items')) {
+                    if ($this->menuable_type === 'page' && $this->menuable && $this->menuable->model && method_exists($this->menuable->model, 'items')) {
 
 
                         $customList = $this->menuable->model;
