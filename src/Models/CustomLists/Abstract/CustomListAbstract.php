@@ -8,6 +8,7 @@ namespace Adminx\Common\Models\CustomLists\Abstract;
 
 use Adminx\Common\Enums\CustomLists\CustomListType;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
@@ -26,6 +27,7 @@ use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
+use Adminx\Common\Models\Traits\Relations\HasCategoriesMorph;
 use Adminx\Common\Observers\OwneredModelObserver;
 use Adminx\Common\Observers\PublicIdModelObserver;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -42,7 +44,7 @@ abstract class CustomListAbstract extends EloquentModelBase implements PublicIdM
         HasPublicIdUriAttributes,
         HasSelect2,
         HasUriAttributes,
-        HasValidation;
+        HasValidation, HasCategoriesMorph;
 
     protected $table = 'custom_lists';
 
@@ -217,6 +219,17 @@ abstract class CustomListAbstract extends EloquentModelBase implements PublicIdM
 
     public function pages(){
         return $this->hasManyThrough(Page::class,PageInternal::class, 'model_id', 'id', 'id', 'page_id')->where('model_type', 'list');
+    }
+
+    public function getCategoriesAttribute()
+    {
+        return CustomList::find($this->id)->categoriesMorph()->get();
+    }
+
+    public function categoriesMorph()
+    {
+        //return $this->morphToMany(Category::class, 'categorizable');
+        return $this->morphToMany(Category::class, 'categorizable', 'categorizables');
     }
     //endregion
 }

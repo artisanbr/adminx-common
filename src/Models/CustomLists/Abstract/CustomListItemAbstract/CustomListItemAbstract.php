@@ -8,6 +8,7 @@ namespace Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract;
 
 use Adminx\Common\Enums\CustomLists\CustomListItemType;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
 use Adminx\Common\Models\CustomLists\Object\Configs\CustomListItems\CustomListItemConfig;
@@ -168,6 +169,17 @@ abstract class CustomListItemAbstract extends EloquentModelBase implements Owner
     public function listable()
     {
         return $this->morphTo(__FUNCTION__, __FUNCTION__ . '_type', __FUNCTION__ . '_id');
+    }
+
+    public function getCategoriesAttribute()
+    {
+        return CustomListItem::find($this->id)->categoriesMorph()->get();
+    }
+
+    public function categoriesMorph()
+    {
+        //return $this->morphToMany(Category::class, 'categorizable');
+        return $this->morphToMany(Category::class, 'categorizable', 'categorizables');
     }
     //endregion
 }

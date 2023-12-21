@@ -55,6 +55,14 @@ class CustomListItemRepository extends Repository
 
         $this->model->save();
 
+        //Categories
+        if ($this->data['categories'] ?? false) {
+            $coreListItem = CustomListItem::find($this->model->id);
+
+            $coreListItem->categories()->sync($this->data['categories']);
+        }
+
+
         return $this->model;
     }
 

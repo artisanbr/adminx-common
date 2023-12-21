@@ -203,7 +203,7 @@ class FrontendTwigExtension extends AbstractExtension
         }
 
         DebugBar::debug($exibition, $renderConfig->toArray(), [
-            'html' => $menu->html
+            'html' => $menu->html,
         ]);
 
         return $template->render([
@@ -217,6 +217,7 @@ class FrontendTwigExtension extends AbstractExtension
     public function customList($context, $public_id)
     {
 
+
         //Verificar no cache
         $customList = $this->customLists->firstWhere('public_id', $public_id) ?? $this->customLists->firstWhere('slug', $public_id);
 
@@ -226,7 +227,27 @@ class FrontendTwigExtension extends AbstractExtension
             $customList = $this->currentSite->lists()->where('public_id', $public_id)->orWhere('slug', $public_id)->first();
 
             if ($customList) {
+                /**
+                 * @var CustomListAbstract $customList
+                 */
                 $customList = $customList->mountModel();
+
+
+                $customList->append('categories');
+                //$customList->append('categories');
+
+                /*$customList['items'] = $customListModel->items;
+
+                $customList['categories'] = CustomList::find($customListModel->id)->categories->toArray();
+
+                foreach ($customList['items'] as &$listItem) {
+
+                    $listItem['categories'] = CustomListItem::find($listItem->id)->categories->toArray();
+
+                }
+                unset($listItem);*/
+
+
                 $this->customLists->add($customList);
             }
         }
