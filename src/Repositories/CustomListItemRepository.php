@@ -59,7 +59,7 @@ class CustomListItemRepository extends Repository
         if ($this->data['categories'] ?? false) {
             $coreListItem = CustomListItem::find($this->model->id);
 
-            $coreListItem->categories()->sync($this->data['categories']);
+            $coreListItem->categoriesMorph()->sync($this->data['categories']);
         }
 
 
