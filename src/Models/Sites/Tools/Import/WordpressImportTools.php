@@ -644,7 +644,7 @@ class WordpressImportTools
         $wordpressItemsUrl = $wordpressUrl . '?p=';
         $wordpressMediaUrl = $wordpressUrl . 'wp-content/uploads/';
         $wordpressRelativeMediaUrl = "{$newUrlStarts}wp-content/uploads/";
-        $newMediaUrl = "{$newUrlStarts}storage/{$this->site->uploadPathTo('wp/')}";
+        $newMediaUrl = $this->site->cdnUrlTo('wp/');
         $newItemsUrl = "{$newUrlStarts}wp/page/";
 
         $content = (string)Str::replace($wordpressItemsUrl, $newItemsUrl, $content);
