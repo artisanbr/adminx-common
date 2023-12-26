@@ -105,6 +105,10 @@ class FrontendTwigEngine extends FrontendEngineBase
             $this->frontendBuild->head->gtag_script = $frontendBuild->head->gtag_script;
         }
 
+        if (!empty($frontendBuild->body->gtag_script)) {
+            $this->frontendBuild->body->gtag_script = $frontendBuild->body->gtag_script;
+        }
+
         if (!empty($frontendBuild->head->css)) {
             $this->frontendBuild->head->css .= $frontendBuild->head->css;
         }
@@ -396,6 +400,7 @@ class FrontendTwigEngine extends FrontendEngineBase
                         {$headHtml}
                     </head>
                     <body id="{{ frontendBuild.body.id }}" class="{{ frontendBuild.body.class }}">
+                        {$this->frontendBuild->body->gtag_script}
                         {$headerHtml}                        
                         {% if breadcrumb and breadcrumb.enabled %}
                                 {{ include('@base/components/breadcrumb.twig') }}
@@ -461,7 +466,8 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $this->setViewData($page->getBuildViewData($mergeData));
 
-        $this->registerFrontendBuild($page->frontend_build);
+        //$this->registerFrontendBuild($page->frontend_build);
+        $this->registerFrontendBuild($page->prepareFrontendBuild());
 
         //$this->frontendBuild->meta->registerSeoForPage($page);
 
@@ -534,7 +540,8 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //dd($this->themeBuild);
 
-        $this->registerFrontendBuild($article->meta->frontend_build);
+        //$this->registerFrontendBuild($article->meta->frontend_build);
+        $this->registerFrontendBuild($article->prepareFrontendBuild());
 
         //$this->frontendBuild->meta->registerSeoForArticle($article);
 

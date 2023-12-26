@@ -184,7 +184,9 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         $frontendBuild = new FrontendBuildObject();
 
         //Gtag
-        $frontendBuild->head->gtag_script = $this->getGTagScript();
+        $frontendBuild->head->gtag_script = $this->getGTagHeadScript();
+        $frontendBuild->body->gtag_script = $this->getGTagBodyScript();
+
 
         //Antes inicio da tag head
         //$frontendBuild->head->addBefore(Meta::toHtml());

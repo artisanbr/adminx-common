@@ -125,7 +125,7 @@ trait HasSEO
         return $this->seo->robots ?? 'noindex, nofollow';
     }
 
-    public function getGTagScript(): string
+    public function getGTagHeadScript(): string
     {
         $gtag = $this->seo->gtag ?? $this->site->seo->gtag ?? false;
 
@@ -139,6 +139,19 @@ trait HasSEO
 
   gtag('config', '{$gtag}');
 </script>
+html;
+
+    }
+
+    public function getGTagBodyScript(): string
+    {
+        $gtag = $this->seo->gtag ?? $this->site->seo->gtag ?? false;
+
+        return !$gtag ? '' : <<<html
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id={$gtag}"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 html;
 
     }

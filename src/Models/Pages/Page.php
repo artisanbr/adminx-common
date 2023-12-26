@@ -361,7 +361,9 @@ class Page extends EloquentModelBase implements BuildableModel,
 
         $frontendBuild = $this->site->frontendBuild();
 
-        $frontendBuild->head->gtag_script = $this->getGTagScript();
+        $frontendBuild->head->gtag_script = $this->getGTagHeadScript();
+        $frontendBuild->body->gtag_script = $this->getGTagBodyScript();
+
         //$frontendBuild->head->addBefore($meta ? $meta->toHtml() : Meta::toHtml());
         $frontendBuild->head->css = $this->assets->css_bundle_html;
         $frontendBuild->head->addAfter($this->assets->js->head->html ?? '');
