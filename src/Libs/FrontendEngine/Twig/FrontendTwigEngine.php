@@ -367,12 +367,22 @@ class FrontendTwigEngine extends FrontendEngineBase
      */
     public function error(Exception $exception, $title = 'Página não encontrada', ?Theme $theme = null): string
     {
-        if ($theme ?? FrontendSite::current()->theme) {
-            $this->applyTheme($theme ?? FrontendSite::current()->theme);
-        }
+        $this->currentSite = FrontendSite::current();
+
+        $this->setViewData($this->currentSite->getBuildViewData());
+
+        $this->registerFrontendBuild($this->currentSite->frontendBuild());
+
+        //$this->frontendBuild->meta->registerSeoForPage($page);
+
+        $theme = $theme ?? $this->currentSite->theme;
+
+        $this->applyTheme($theme);
 
 
         $templateName = 'error-' . time();
+
+        //dd($this->getPageBaseTemplate($this->getErrorTemplate($exception, $title)));
 
         $this->templates->put($templateName, $this->getPageBaseTemplate($this->getErrorTemplate($exception, $title)));
 
