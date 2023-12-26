@@ -191,6 +191,15 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         //JSON-LD
         $frontendBuild->head->addAfter($this->ld_json_script);
 
+        //SEO
+        $frontendBuild->seo->fill([
+                                      //'title'         => "{{ page.getTitle() }}",
+                                      'title_prefix'  => "{{ site.getTitle() }}",
+                                      'description'   => $this->getDescription(),
+                                      'keywords'      => $this->getKeywords(),
+                                      'image_url'     => $this->seoImage(),
+                                  ]);
+
         return $frontendBuild;
     }
 
