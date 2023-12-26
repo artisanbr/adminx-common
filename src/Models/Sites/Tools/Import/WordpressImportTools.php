@@ -131,7 +131,7 @@ class WordpressImportTools
 
     public function wpPostQuery(): PostBuilder
     {
-        return WpPost::published()->type('post');
+        return WpPost::whereIn('post_status', ['publish','future'])->type('post');
     }
 
     public function wpPageQuery(): PostBuilder
@@ -507,9 +507,9 @@ class WordpressImportTools
                                         'slug'         => $importPost->slug,
                                         'cover_url'    => $this->convertUrls($importPost->image),
                                         'content'      => $this->traitContent($importPost->content),
-                                        'created_at'   => $importPost->created_at,
-                                        'updated_at'   => $importPost->updated_at,
-                                        'published_at' => $importPost->created_at,
+                                        'created_at'   => $importPost->post_modified,
+                                        'updated_at'   => $importPost->post_modified,
+                                        'published_at' => $importPost->post_date,
                                     ]);
 
                 $localArticle->seo = $this->getSeoFromPost($importPost, $localArticle->seo);
