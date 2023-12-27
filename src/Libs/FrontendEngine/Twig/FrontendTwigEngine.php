@@ -404,6 +404,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         /*<main class="main-content"></main>*/
 
         return <<<html
+                <!DOCTYPE html>
                 <html lang="pt-BR">
                     <head>
                         {$seoHtml}
