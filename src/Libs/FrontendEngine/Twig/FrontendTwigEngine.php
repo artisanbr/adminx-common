@@ -462,6 +462,27 @@ class FrontendTwigEngine extends FrontendEngineBase
 
     }
 
+    public function getCDNDirListTemplate(): string
+    {
+
+        return <<<html
+                <!DOCTYPE html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Listagem de Diretório</title>
+                </head>
+                <body>
+                    <h1>Listagem de Diretório</h1>
+                    <p>Este diretório não possui uma listagem de arquivos, por favor refira-se a um arquivo específico.</p>
+                </body>
+                </html>
+                html;
+
+    }
+
     /**
      * @throws FrontendException
      * @throws SyntaxError
