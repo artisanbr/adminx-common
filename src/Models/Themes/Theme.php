@@ -365,23 +365,34 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 
             //region Theme Files
 
-            foreach ($this->assets->resources->css->items as $assetItem) {
-                $optArray = $assetItem->defer ? [
-                    'rel'    => 'stylesheet',
-                    'media'  => 'print',
-                    'onload' => "this.media='all'",
+            foreach ($this->assets->resources->css->listToOrder() as $assetItem) {
+                $optArray = $assetItem->load_mode == 'preload' ? [
+                    'rel'    => 'preload',
+                    'as'    => 'style',
+                    //'media'  => 'print',
+                    'onload' => "this.onload=null;this.rel='stylesheet'",
                 ] : [];
+
+
                 //dd($assetItem->name, $assetItem->path, $assetItem->defer, $this->cdnUriTo($assetItem->path));
                 $package->addStyle($assetItem->name, $this->assetResourceUrl($assetItem), $optArray);
             }
 
-            foreach ($this->assets->resources->js->items as $assetItem) {
-                $optArray = $assetItem->defer ? ['defer'] : [];
+            foreach ($this->assets->resources->js->listToOrder() as $assetItem) {
+                $optArray = match ($assetItem->load_mode) {
+                    'defer' => ['defer'],
+                    'async' => ['async'],
+                    default => []
+                };
                 $package->addScript($assetItem->name, $this->assetResourceUrl($assetItem), $optArray);
             }
 
-            foreach ($this->assets->resources->head_js->items as $assetItem) {
-                $optArray = $assetItem->defer ? ['defer'] : [];
+            foreach ($this->assets->resources->head_js->listToOrder() as $assetItem) {
+                $optArray = match ($assetItem->load_mode) {
+                    'defer' => ['defer'],
+                    'async' => ['async'],
+                    default => []
+                };
                 $package->addScript($assetItem->name, $this->assetResourceUrl($assetItem), $optArray, Meta::PLACEMENT_HEAD);
             }
 
@@ -403,8 +414,8 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
             //region Pos
             $package
                 //CSS
-                ->addStyle('pace-theme-minimal.css',
-                           'https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css')
+                /*->addStyle('pace-theme-minimal.css',
+                           'https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css')*/
                 /*->addStyle('font-awesome',
                            'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css',
                            [
@@ -425,8 +436,8 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                 //JS
                 ->addScript('functions.js',
                             appAsset('js/functions.js'))
-                ->addScript('pace.js',
-                            'https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js')
+                /*->addScript('pace.js',
+                            'https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js')*/
                 ->addScript('jquery.formHelper.js',
                             appAsset('js/plugins/jquery/jquery.formHelper.js'), ['defer'])
                 ->addScript('modules.bundle.js', FrontendUtils::asset('js/modules.bundle.js'), ['defer'])
@@ -439,17 +450,17 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                 //CSS
                 ->addStyle('theme.main.css',
                            FrontendUtils::asset('css/theme.main.css'), [
-                               'rel'    => 'stylesheet',
-                               'media'  => 'print',
-                               'onload' => "this.media='all'",
-
+                               'rel'    => 'preload',
+                               'as'    => 'style',
+                               //'media'  => 'print',
+                               'onload' => "this.onload=null;this.rel='stylesheet'",
                            ])
                 ->addStyle('theme.custom.css',
                            FrontendUtils::asset('css/theme.custom.css'), [
-                               'rel'    => 'stylesheet',
-                               'media'  => 'print',
-                               'onload' => "this.media='all'",
-
+                               'rel'    => 'preload',
+                               'as'    => 'style',
+                               //'media'  => 'print',
+                               'onload' => "this.onload=null;this.rel='stylesheet'",
                            ]);
             //endregion
 

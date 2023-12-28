@@ -51,7 +51,7 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
         return $this->items->where('url', $file_path)->count() > 0;
     }
 
-    public function addFile(string|array $file_path)
+    public function addFile(string|array $file_path): static
     {
 
         $itemArray = is_string($file_path) ? ['url' => $file_path] : $file_path;
@@ -64,6 +64,14 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
             //$this->items = $this->items->add($itemArray);
             $this->items->add($itemArray);
         }
+
+        return $this;
+    }
+
+    public function setFiles(array $files): static
+    {
+
+       $this->items = $files;
 
         return $this;
     }
@@ -108,12 +116,12 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
         return $this;
     }
 
-    public function listToOrder()
+    public function listToOrder(): Collection
     {
         return $this->items->map(function (AbstractFrontendAssetsResourceScript $file) {
             $file->append('id');
             return $file;
-        })->sortBy('position')->values()->toArray();
+        })->unique('url')->sortBy('position')->values();
     }
     //endregion
 

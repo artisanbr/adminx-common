@@ -21,11 +21,26 @@ class ThemeFileBundleRepository
 
         //dump($data['defers']);
 
-        $theme->assets->resources->css->items = $this->traitRequestDataList($data, 'css');
-        $theme->assets->resources->js->items = $this->traitRequestDataList($data, 'js');
-        $theme->assets->resources->head_js->items = $this->traitRequestDataList($data, 'head_js');
+        foreach (['css','js','head_js'] as $collect) {
+            if($theme->assets->resources?->{$collect} ?? null){
+                $theme->assets->resources->{$collect}->fill([
+                                                                'items' => $this->traitRequestDataList($data, $collect)->toArray()
+                                                            ]);
 
-        //dd($theme->assets->resources->js->items->toArray());
+                //$theme->assets->resources->{$collect}->setFiles($this->traitRequestDataList($data, $collect)->toArray());
+
+                //$theme->assets->resources->{$collect}->items = $this->traitRequestDataList($data, $collect);
+            }
+
+        }
+
+
+
+        //$theme->assets->resources->css->items = $this->traitRequestDataList($data, 'css')->toArray();
+        //$theme->assets->resources->js->items = $this->traitRequestDataList($data, 'js')->toArray();
+        //$theme->assets->resources->head_js->items = $this->traitRequestDataList($data, 'head_js')->toArray();
+
+        //dd($theme->assets->resources->css->items->toArray());
 
         return $compile ? $theme->saveAndCompile() : $theme->save();
 
@@ -36,17 +51,20 @@ class ThemeFileBundleRepository
     protected function traitRequestDataList($data, $listName = 'css'): Collection
     {
 
-        $listItems = collect($data['items'][$listName] ?? []);
+        $listItems = collect($data['items'][$listName] ?? [])->unique();
 
-        $listDefers = collect($data['defers'][$listName] ?? []);
+        //dd($listItems);
 
-        return $listItems->map(function ($path, $position) use ($data, $listName, $listDefers) {
+        $listLoadModes = collect($data['load_modes'][$listName] ?? []);
+
+        return $listItems->map(function ($path, $position) use ($data, $listName, $listLoadModes) {
             return [
                 'path'     => $path,
                 'position' => $position,
-                'defer'    => $listDefers->contains($path),
+                'load_mode'    => $listLoadModes->get($path) ?? 'default',
+                //'defer'    => $listDefers->contains($path),
             ];
-        });
+        })->unique('path')->values();
 
     }
     //endregion

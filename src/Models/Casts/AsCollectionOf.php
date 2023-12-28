@@ -7,7 +7,6 @@
 namespace Adminx\Common\Models\Casts;
 
 use Adminx\Common\Models\Collections\GenericCollection;
-use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Casts\AsCollection;
 
@@ -41,12 +40,26 @@ class AsCollectionOf extends AsCollection
 
             public function set($model, $key, $value, $attributes): array
             {
-                $json_value = is_string($value) ? $value : GenericCollection::wrap($value ?? [])->map(fn($item) => ($item instanceof GenericModel) ? $item : new
-                $this->itemClass($item))->values()->toJson();
+                /*$json_value = is_string($value) ? $value : GenericCollection::wrap($value ?? [])->map(fn($item) => ($item instanceof GenericModel) ? $item : new
+                $this->itemClass($item))->values()->toJson();*/
 
-                /*if($key == 'variables'){
-                    dd($model, $key, $value, $attributes);
-                }*/
+                $json_value = is_string($value) ? $value : GenericCollection::wrap($value ?? [])->toJson();
+                //$json_value = is_string($value) ? $value : json_encode($value ?? []);
+
+                if($key == 'items'){
+                    /*dump([
+                             'type'              => 'set Collection',
+                             'key'               => $key,
+                             'value'             => $value,
+                             //'model'             => $model,
+                             //'attributes'             => $attributes,
+                             //'merge'             => $mergeResult,
+                             'result'            => [$key => $json_value],
+
+                             //'attributes_current' => $attributes[$key] ?? null,
+                             //'trace'      => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 25),
+                         ]);*/
+                }
 
 
                 return [$key => $json_value];

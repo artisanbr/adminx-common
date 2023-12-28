@@ -24,6 +24,7 @@ use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Themes\ThemeBuild;
 use Exception;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Cache;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -47,6 +48,7 @@ class FrontendTwigEngine extends FrontendEngineBase
     protected ChainLoader      $twigChainLoader;
     protected FilesystemLoader $twigFileLoader;
     protected ArrayLoader      $twigArrayLoader;
+
 
     protected Environment $twig;
 
@@ -429,7 +431,7 @@ class FrontendTwigEngine extends FrontendEngineBase
     {
 
         $previousUrl = url()->previous();
-
+        
         return <<<html
                 <div class="error-{$exception->getCode()}-area py-150">
                     <div class="container">
@@ -465,7 +467,8 @@ class FrontendTwigEngine extends FrontendEngineBase
     public function getCDNDirListTemplate(): string
     {
 
-        return <<<html
+        return  Cache::remember('cdn-dir-list', now()->addMonth(1), function() {
+            return <<<html
                 <!DOCTYPE html>
                 <html lang="pt-BR">
                 <head>
@@ -480,7 +483,21 @@ class FrontendTwigEngine extends FrontendEngineBase
                 </body>
                 </html>
                 html;
+        });
 
+    }
+
+    public function getFromCache($name){
+        return Cache::has("site-cache-{$name}") ? Cache::get("site-cache-{$name}") : false;
+    }
+
+    public function saveCache($name, $content){
+        return Cache::put("site-cache-{$name}", $content, now()->addDays($this->cacheDays));
+    }
+
+    public function purgeCache($name): bool
+    {
+        return Cache::forget("site-cache-{$name}");
     }
 
     /**
@@ -504,6 +521,18 @@ class FrontendTwigEngine extends FrontendEngineBase
         //$this->frontendBuild->meta->registerSeoForPage($page);
 
         $this->currentSite = $page->site;
+
+        $useCache = $this->currentSite->config->performance->enable_advanced_cache ?? false;
+
+        if($useCache){
+            $cache = $this->getFromCache($this->templateNamePrefix);
+
+            if($cache){
+                return $cache;
+            }
+        }else{
+            $this->purgeCache($this->templateNamePrefix);
+        }
 
         if ($this->currentSite->theme ?? false) {
             $this->applyTheme($this->currentSite->theme);
@@ -546,10 +575,14 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //$renderedBlade = Blade::render($rawBlade, $this->viewData);
 
-        if ($this->currentSite->config->enable_html_minify) {
+        if ($this->currentSite->config->performance->enable_html_minify) {
             $htmlMin = new HtmlMin();
 
             $renderedTemplate = $htmlMin->minify($renderedTemplate);
+        }
+
+        if($useCache){
+            $this->saveCache($this->templateNamePrefix, $renderedTemplate);
         }
 
         return $renderedTemplate;
@@ -562,6 +595,19 @@ class FrontendTwigEngine extends FrontendEngineBase
     {
         $page = $article->page;
         $this->templateNamePrefix = 'article-' . $article->public_id;
+
+
+        $useCache = $page->site->config->performance->enable_advanced_cache ?? false;
+
+        if($useCache){
+            $cache = $this->getFromCache($this->templateNamePrefix);
+
+            if($cache){
+                return $cache;
+            }
+        }else{
+            $this->purgeCache($this->templateNamePrefix);
+        }
 
         //$this->setCurrentSite($article->site, false);
 
@@ -600,10 +646,14 @@ class FrontendTwigEngine extends FrontendEngineBase
         $renderedTemplate = $this->renderTwig('article');
 
 
-        if ($page->site->config->enable_html_minify ?? false) {
+        if ($page->site->config->performance->enable_html_minify ?? false) {
             $htmlMin = new HtmlMin();
 
             $renderedTemplate = $htmlMin->minify($renderedTemplate);
+        }
+
+        if($useCache){
+            $this->saveCache($this->templateNamePrefix, $renderedTemplate);
         }
 
         return $renderedTemplate;
@@ -645,6 +695,19 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $this->currentSite = $pageInternal->page->site;
 
+
+        $useCache = $this->currentSite->config->performance->enable_advanced_cache ?? false;
+
+        if($useCache){
+            $cache = $this->getFromCache($this->templateNamePrefix);
+
+            if($cache){
+                return $cache;
+            }
+        }else{
+            $this->purgeCache($this->templateNamePrefix);
+        }
+
         if ($this->currentSite->theme ?? false) {
             $this->applyTheme($this->currentSite->theme);
         }
@@ -671,10 +734,14 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //$renderedBlade = Blade::render($rawBlade, $this->viewData);
 
-        if ($this->currentSite->config->enable_html_minify) {
+        if ($this->currentSite->config->performance->enable_html_minify) {
             $htmlMin = new HtmlMin();
 
             $renderedTemplate = $htmlMin->minify($renderedTemplate);
+        }
+
+        if($useCache){
+            $this->saveCache($this->templateNamePrefix, $renderedTemplate);
         }
 
         return $renderedTemplate;

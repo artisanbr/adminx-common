@@ -17,7 +17,7 @@ abstract class AbstractFrontendAssetsResourceScript extends GenericModel
         'external',
         //'theme_path',
         'position',
-        'defer',
+        'load_mode',
         'html_attributes',
     ];
 
@@ -27,7 +27,7 @@ abstract class AbstractFrontendAssetsResourceScript extends GenericModel
         'name'            => 'string',
         //'theme_path'      => 'string',
         'position'        => 'int',
-        'defer'           => 'boolean',
+        'load_mode'           => 'string',
         'external'        => 'boolean',
         'html_attributes' => 'collection',
         //Computed
@@ -36,7 +36,7 @@ abstract class AbstractFrontendAssetsResourceScript extends GenericModel
 
     protected $attributes = [
         'position' => 0,
-        //'defer'    => false,
+        'load_mode'    => 'default',
     ];
 
     abstract protected function getHtmlAttribute();
