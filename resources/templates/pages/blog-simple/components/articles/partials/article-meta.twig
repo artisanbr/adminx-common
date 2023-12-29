@@ -21,7 +21,7 @@
 
     {% if showDate %}
         <span class="me-3 mr-3 article-meta-date"
-              title="Postado {{ article.published_at_long }}">
+              title="Publicado {{ article.published_at_long }}">
             {{ showIcons ? dateIcon : '' }}
             <time datetime="{{ article.published_at.format('Y-m-d H:i:S') }}">
                 {{ dateHumanFormat ? article.published_at.diffForHumans() : article.published_at.format(dateFormat) }}
