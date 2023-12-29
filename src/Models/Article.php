@@ -351,7 +351,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     protected function publishedAtLong(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->updated_at->translatedFormat(config('location.formats.datetime.full'))
+            get: fn() => $this->published_at->translatedFormat(config('location.formats.datetime.full'))
         );
     }
 
