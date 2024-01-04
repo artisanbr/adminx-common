@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -303,8 +303,8 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
                         "author"        => [
                             [
                                 "@type" => "Organization",
-                                "name"  => $this->site->title,
-                                "url"   => $this->uri,
+                                "name"  => $this->site->title ?? '',
+                                "url"   => $this->uri ?? '',
                             ],
                         ],
                     ]
