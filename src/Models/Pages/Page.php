@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -381,7 +381,7 @@ class Page extends EloquentModelBase implements BuildableModel,
                                       'title_prefix'  => "{{ site.getTitle() }}",
                                       'description'   => $this->getDescription(),
                                       'keywords'      => $this->getKeywords(),
-                                      'image_url'     => $this->seoImage(),
+                                      'image_url'     => $this->seoImage($this->site?->seoImage()),
                                       'published_at'  => $this->published_at->toIso8601String(),
                                       'updated_at'    => $this->updated_at->toIso8601String(),
                                       'canonical_uri' => $this->uri,

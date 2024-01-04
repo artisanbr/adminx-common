@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -60,7 +60,7 @@ trait HasSEO
         return $this->seo->keywords ?? @$this->keywords ?? $default;
     }
 
-    public function seoImage(): ?string
+    public function seoImage(?string $default = null): ?string
     {
 
 
@@ -83,7 +83,7 @@ trait HasSEO
 
         //todo: Considerar imagens vinculadas
 
-        return null;
+        return $default;
     }
     //endregion
 
