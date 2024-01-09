@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -22,15 +22,9 @@ class ThemeFileBundleRepository
         //dump($data['defers']);
 
         foreach (['css','js','head_js'] as $collect) {
-            if($theme->assets->resources?->{$collect} ?? null){
-                $theme->assets->resources->{$collect}->fill([
-                                                                'items' => $this->traitRequestDataList($data, $collect)->toArray()
-                                                            ]);
-
-                //$theme->assets->resources->{$collect}->setFiles($this->traitRequestDataList($data, $collect)->toArray());
-
-                //$theme->assets->resources->{$collect}->items = $this->traitRequestDataList($data, $collect);
-            }
+            $theme->assets->resources->{$collect}->fill([
+                                                            'items' => $this->traitRequestDataList($data, $collect)->toArray()
+                                                        ]);
 
         }
 
