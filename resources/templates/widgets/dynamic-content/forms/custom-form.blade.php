@@ -31,7 +31,7 @@
                 </script>--}}
                 <x-common::recaptcha :site="$form->site" {{--:callback='"verifyCallback_{$form->id}"'--}}/>
             </div>
-            <div class="col-12 col-sm d-flex justify-content-end align-items-end">
+            <div class="col-12 d-flex justify-content-end align-items-end">
                 {{--<button type="submit"
                         class="primary_btn btn btn-primary btn-icon ml-0 ms-auto me-0">
                     <span><i class="fa-solid fa-paper-plane"></i></span> Enviar
