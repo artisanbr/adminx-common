@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -92,10 +92,10 @@ trait HasUriAttributes
         return $this->url . $this->traitPath($path, $endWithDash);
     }
 
-    protected function traitPath(string $path, $endWithDash = true, $comparesWithAttr = 'url'): string
+    protected function traitPath(?string $path, $endWithDash = true, $comparesWithAttr = 'url'): string
     {
         //$path = (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, 1) : $path;
-        $pathCollection = collect(explode('/', $path))->filter();
+        $pathCollection = collect(explode('/', (string) $path))->filter();
         $path = $pathCollection->implode('/');
 
         //Check if is file
