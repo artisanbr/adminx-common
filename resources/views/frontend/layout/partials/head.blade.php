@@ -4,6 +4,8 @@
  * @var \Adminx\Common\Models\Themes\Theme                                       $theme
  * @var \Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject $frontendBuild
  */
+
+$captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_key, $site->config->recaptcha_site_key);
 ?>
 {{--GTag--}}
 @{{ frontendBuild.head.gtag_script }}
@@ -30,3 +32,6 @@
 {!! $theme->assets->js->head->html ?? '' !!}
 {!! $theme->assets->head_script->html ?? '' !!}
 @{{ frontendBuild.head.after }}
+
+
+{!! $captcha->renderJs() !!}

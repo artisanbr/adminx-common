@@ -6,7 +6,7 @@
  * @var \Butschster\Head\MetaTags\Meta                                    $themeMeta
  */
 
-$captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_key, $site->config->recaptcha_site_key);
+/*$captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_key, $site->config->recaptcha_site_key);*/
 
 ?>
 
@@ -52,7 +52,7 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
 <script>
     moment.locale("pt-br");
     // Ajax calls should always have the CSRF token attached to them, otherwise they won't work
-    $.ajaxSetup({
+    /*$.ajaxSetup({
         // force ajax call on all browsers
         cache: false,
         // Enables cross domain requests
@@ -64,7 +64,7 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
         beforeSend: function (xhr) {
             xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         }
-    });
+    });*/
     //recaptcha
     /*window.onload = function() {
         const recaptchaDivs = document.getElementsByClassName('g-recaptcha');
@@ -77,7 +77,7 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
         });
     };*/
 </script>
-{!! $captcha->renderJs() !!}
+{{--{!! $captcha->renderJs() !!}--}}
 
 @include('common-frontend::layout.inc.alerts')
 

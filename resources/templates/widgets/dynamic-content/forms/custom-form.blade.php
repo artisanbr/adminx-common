@@ -128,21 +128,7 @@
                                 // Simulate ajax request
                                 //axios.post(url_action, $form.serializeObject())
                                 let formData = new FormData($form[0]);
-                                /*$.ajax({
-                                    url: url_action,
-                                    type: 'POST',
-                                    data: formData,
-                                    cache: false,
-                                    processData: false,
-                                    contentType: false,
-                                    dataType: "json",
-                                    accepts: {
-                                        json: "application/json"
-                                    },
-                                }).done*/
                                 axios.post(url_action, formData).then(function (response) {
-
-                                    console.log(response.data);
 
                                     @if($form->config->on_success ?? false)
                                             {{$form->config->on_success}}(response.data);
@@ -205,9 +191,6 @@
                             $submitButton = $form.find('button:submit');
                             $alert = $form.find('.alert');
                             $alertMsg = $form.find('.alert > span:first');
-
-                            console.log('iniciando formulário');
-                            console.log($form);
 
                             handleForm();
                         }
