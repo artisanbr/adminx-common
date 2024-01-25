@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -55,7 +55,9 @@ return [
                 'json',
                 'pdf',
                 'eot',
+                'otf',
                 'woff',
+                'woff2',
                 'ttf',
                 'mp4',
                 'webm',
