@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -42,7 +42,10 @@ class PageBreadcrumb extends GenericModel
 
     protected function getTitleAttribute()
     {
-        return $this->items->last() ?? false;
+        $lastItem = $this->items->last() ?? false;
+
+
+        return is_string($lastItem) ? $lastItem : (is_array($lastItem) ? array_values($lastItem)[0] : false) ?? false;
     }
 
     protected function getBackgroundAttribute()

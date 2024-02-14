@@ -331,7 +331,10 @@ class Page extends EloquentModelBase implements BuildableModel,
                 $viewData['searchQuery'] = $requestData['q'];
                 $articles = $articles->whereLike(['title', 'description', 'content', 'slug'], $requestData['q']);
 
-                $breadcrumbAdd->add('Buscando por: "' . $requestData['q'] .'"');
+
+                $breadcrumbAdd->put($this->uri.'?'.http_build_query([
+                    'q' => $requestData['q']
+                                                                      ]), 'Buscando por: "' . $requestData['q'] .'"');
             }
 
             $viewData['articles'] = $articles->paginate(9);

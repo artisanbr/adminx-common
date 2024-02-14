@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -26,7 +26,8 @@ trait HasBreadcrumbs
 
         if (!$this->breadcrumbCache) {
             $breadcrumbConfig = $config ?? $this->breadcrumb_config;
-            $breadcrumbItems = [@$this->breadcrumb_items, ...$this->getSelfBreadcrumbItem(), ...$mergeItems];
+            //$breadcrumbItems = [@$this->breadcrumb_items, ...$this->getSelfBreadcrumbItem(), ...$mergeItems];
+            $breadcrumbItems = array_replace($this->breadcrumb_items ?? [], $this->getSelfBreadcrumbItem(), $mergeItems);
 
             $this->setBreadcrumb(collect($breadcrumbItems)->filter()->toArray(), $breadcrumbConfig);
         }
