@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -13,7 +13,6 @@ use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Menus\Menu;
 use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Widgets\SiteWidget;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Twig\Environment;
@@ -202,9 +201,9 @@ class FrontendTwigExtension extends AbstractExtension
             $renderConfig = $menu->config->renders->getDefault();
         }
 
-        DebugBar::debug($exibition, $renderConfig->toArray(), [
+        /*DebugBar::debug($exibition, $renderConfig->toArray(), [
             'html' => $menu->html,
-        ]);
+        ]);*/
 
         return $template->render([
                                      'renderConfig' => $renderConfig->toArray(),

@@ -59,7 +59,6 @@ use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Butschster\Head\Contracts\MetaTags\RobotsTagsInterface;
 use Butschster\Head\Contracts\MetaTags\SeoMetaTagsInterface;
-use Butschster\Head\Facades\Meta;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -326,10 +325,13 @@ class Page extends EloquentModelBase implements BuildableModel,
             }
 
             //Busca
+            $viewData['search'] = false;
             if ($requestData['q'] ?? false) {
+                $viewData['search'] = true;
+                $viewData['searchQuery'] = $requestData['q'];
                 $articles = $articles->whereLike(['title', 'description', 'content', 'slug'], $requestData['q']);
 
-                Meta::setTitle('Resultados da pesquisa: ' . $requestData['q']);
+                $breadcrumbAdd->add('Buscando por: "' . $requestData['q'] .'"');
             }
 
             $viewData['articles'] = $articles->paginate(9);

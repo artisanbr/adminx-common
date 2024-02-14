@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -10,6 +10,7 @@ use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\FrontendEngine\FrontendEngineBase;
 use Adminx\Common\Libs\FrontendEngine\Twig\Extensions\FrontendTwigExtension;
+use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Category;
@@ -487,12 +488,26 @@ class FrontendTwigEngine extends FrontendEngineBase
 
     }
 
+    public function useCache(){
+
+        if($this->currentSite){
+            //Verifica se está ativo nas configurações
+            $useCacheConfig = $this->currentSite->config->performance->enable_advanced_cache ?? false;
+
+            if($useCacheConfig){
+                //Verifica se não está em uma página de busca
+            }
+        }
+
+        return false;
+    }
+
     public function getFromCache($name){
-        return Cache::has("site-cache-{$name}") ? Cache::get("site-cache-{$name}") : false;
+        return Cache::has("site-cache:{$name}") ? Cache::get("site-cache-:{$name}") : false;
     }
 
     public function saveCache($name, $content){
-        return Cache::put("site-cache-{$name}", $content, now()->addDays($this->cacheDays));
+        return Cache::put("site-cache:{$name}", $content, now()->addHours($this->cacheHours));
     }
 
     public function purgeCache($name): bool
@@ -511,7 +526,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         /**
          * @var ?Category $category
          */
-        $this->templateNamePrefix = 'page-' . $page->public_id;
+        $this->templateNamePrefix = "@page={$page->public_id}";
 
         $this->setViewData($page->getBuildViewData($mergeData));
 
@@ -522,12 +537,25 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $this->currentSite = $page->site;
 
+        //Template Name considerando busca, categoria, etc..
+        if(($this->viewData['search'] ?? false) && !empty($this->viewData['searchQuery'] ?? null)){
+            $this->templateNamePrefix .= '@search='.Str::slug($this->viewData['searchQuery']);
+        }
+
+        if( $this->viewData['category'] ?? null){
+            $this->templateNamePrefix .= '@category='.$this->viewData['category']->id;
+        }
+
+
+
         $useCache = $this->currentSite->config->performance->enable_advanced_cache ?? false;
+
+        //Debugbar::debug($this->templateNamePrefix, $useCache);
 
         if($useCache){
             $cache = $this->getFromCache($this->templateNamePrefix);
 
-            if($cache){
+            if(!empty($cache)){
                 return $cache;
             }
         }else{
@@ -594,15 +622,17 @@ class FrontendTwigEngine extends FrontendEngineBase
     public function article(Article $article): string
     {
         $page = $article->page;
-        $this->templateNamePrefix = 'article-' . $article->public_id;
+        $this->templateNamePrefix = "@page={$page->public_id}@article={$article->public_id}";
 
 
         $useCache = $page->site->config->performance->enable_advanced_cache ?? false;
 
+        //Debugbar::debug($this->templateNamePrefix, $useCache);
+
         if($useCache){
             $cache = $this->getFromCache($this->templateNamePrefix);
 
-            if($cache){
+            if(!empty($cache)){
                 return $cache;
             }
         }else{
@@ -665,13 +695,13 @@ class FrontendTwigEngine extends FrontendEngineBase
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function pageInternal(PageInternal $pageInternal, $modelItem): string
+    public function pageInternal(Page $page, PageInternal $pageInternal, $modelItem): string
     {
         /**
          * @var EloquentModelBase|CustomListItemAbstract|CustomListItemHtml $modelItem
          */
 
-        $this->templateNamePrefix = 'page-internal-' . $pageInternal->public_id . '-' . (@$modelItem->public_id ?? @$modelItem->slug ?? time());
+        $this->templateNamePrefix = "@page={$page->public_id}@internal={$pageInternal->public_id}@model=" . (@$modelItem->public_id ?? @$modelItem->slug ?? Str::slug($modelItem?->title ?? ''));
 
         $pageInternal->breadcrumb_config->background_url = $modelItem->data->image_url;
 
@@ -698,10 +728,12 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $useCache = $this->currentSite->config->performance->enable_advanced_cache ?? false;
 
+        //Debugbar::debug($this->templateNamePrefix, $useCache);
+
         if($useCache){
             $cache = $this->getFromCache($this->templateNamePrefix);
 
-            if($cache){
+            if(!empty($cache)){
                 return $cache;
             }
         }else{
