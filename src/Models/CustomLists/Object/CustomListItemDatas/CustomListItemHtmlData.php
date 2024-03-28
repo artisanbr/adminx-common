@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -9,7 +9,6 @@ namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
-use ArtisanLabs\GModel\GenericModel;
 
 class CustomListItemHtmlData extends GenericModel
 {

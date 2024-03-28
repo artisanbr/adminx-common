@@ -1,9 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Generics\Configs;
 
 use Adminx\Common\Models\Generics\Forms\FormSendButton;
-use Illuminate\Support\Facades\Auth;
-use ArtisanLabs\GModel\GenericModel;
 
 class FormConfig extends GenericModel
 {

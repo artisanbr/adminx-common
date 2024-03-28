@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -9,7 +9,6 @@ namespace Adminx\Common\Models\Objects\Frontend\Assets;
 use Adminx\Common\Models\Objects\Frontend\Assets\Code\FrontendCssAssetsCode;
 use Adminx\Common\Models\Objects\Frontend\Assets\Code\FrontendScssAssetsCode;
 use Adminx\Common\Models\Objects\Frontend\FrontendHtmlObject;
-use ArtisanLabs\GModel\GenericModel;
 
 /**
  * @property string $css_bundle_html

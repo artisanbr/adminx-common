@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -10,7 +10,6 @@ namespace Adminx\Common\Models\Objects;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
-use ArtisanLabs\GModel\GenericModel;
 
 
 class ArticleMetaObject extends GenericModel

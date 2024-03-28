@@ -1,14 +1,12 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Pages\Modules\Abstract;
 
-use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Traits\HasSelect2;
-use ArtisanLabs\GModel\GenericModel;
 
 
 abstract class AbstractPageModule extends GenericModel

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -9,7 +9,7 @@ namespace Adminx\Common\Models\Templates\Global\Abstract;
 use Adminx\Common\Models\Templates\Objects\TemplateConfig;
 use Adminx\Common\Models\Templates\Template;
 use Adminx\Common\Models\Traits\HasSelect2;
-use ArtisanLabs\GModel\GenericModel;
+use ArtisanBR\GenericModel\GenericModel;
 
 /**
  * @property array{slug: string, description: string, title: string} $attributes

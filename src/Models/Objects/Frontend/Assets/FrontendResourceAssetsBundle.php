@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -9,7 +9,6 @@ namespace Adminx\Common\Models\Objects\Frontend\Assets;
 use Adminx\Common\Libs\FileManager\Helpers\FileHelper;
 use Adminx\Common\Models\Objects\Frontend\Assets\Resources\FrontendCssAssetsResources;
 use Adminx\Common\Models\Objects\Frontend\Assets\Resources\FrontendJsAssetsResources;
-use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
 class FrontendResourceAssetsBundle extends GenericModel

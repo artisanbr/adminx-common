@@ -1,13 +1,13 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Objects\Frontend\Assets\Abstract;
 
 use Adminx\Common\Libs\Helpers\HtmlHelper;
-use ArtisanLabs\GModel\GenericModel;
+use ArtisanBR\GenericModel\GenericModel;
 
 /**
  * @property string $raw

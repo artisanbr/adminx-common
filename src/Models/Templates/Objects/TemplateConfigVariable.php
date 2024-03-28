@@ -1,8 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Templates\Objects;
 
 use Adminx\Common\Enums\Widgets\WidgetConfigVariableType;
-use ArtisanLabs\GModel\GenericModel;
 
 class TemplateConfigVariable extends GenericModel
 {

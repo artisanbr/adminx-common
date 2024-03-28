@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -8,7 +8,6 @@ namespace Adminx\Common\Models\Menus\Objects\Config;
 
 use Adminx\Common\Models\Menus\Objects\Config\Render\MenuRenderRepository;
 use Adminx\Common\Models\Menus\Objects\MenuRenderConfigOld;
-use ArtisanLabs\GModel\GenericModel;
 
 class MenuConfig extends GenericModel
 {

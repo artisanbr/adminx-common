@@ -1,8 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Elements\Forms;
 
 use Adminx\Common\Enums\Forms\FormElementType;
-use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
 class FormElement extends GenericModel

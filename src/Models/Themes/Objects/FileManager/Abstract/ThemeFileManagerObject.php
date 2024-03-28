@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -8,7 +8,6 @@ namespace Adminx\Common\Models\Themes\Objects\FileManager\Abstract;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Themes\Theme;
-use ArtisanLabs\GModel\GenericModel;
 use Delight\Random\Random;
 use Illuminate\Support\Collection;
 

@@ -1,9 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Generics\Configs;
 
 use Adminx\Common\Enums\ContentEditorType;
-use ArtisanLabs\GModel\GenericModel;
 
 class UserConfig extends GenericModel
 {

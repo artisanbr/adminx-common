@@ -1,10 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Generics\Elements\Themes;
 
-use Adminx\Common\Models\Generics\Files\GenericFile;
 use Adminx\Common\Models\Generics\Files\GenericImageFile;
-use ArtisanLabs\GModel\GenericModel;
 
 class ThemeMediaElement extends GenericModel
 {

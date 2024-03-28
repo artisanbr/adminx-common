@@ -1,10 +1,13 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Traits;
 
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Facades\Auth;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -9,7 +9,6 @@ namespace Adminx\Common\Models\Bases\Generic;
 use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
 use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Sites\Site;
-use ArtisanLabs\GModel\GenericModel;
 
 abstract class GenericHtmlBase extends GenericModel
 {

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -118,7 +118,7 @@ class FileUploadManager
 
             $webp = Webp::make($requestFile);
 
-            if ($webp->save($webpTempPath, 90)) {
+            if ($webp->save($webpTempPath, 100)) {
 
                 //Save on CDN
                 $this->remoteStorage->put($imageRelativePath, file_get_contents($webpTempPath));

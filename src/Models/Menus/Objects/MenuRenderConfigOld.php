@@ -1,13 +1,12 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Menus\Objects;
 
 use Adminx\Common\Models\Menus\Objects\Config\Render\MenuRenderObject;
-use ArtisanLabs\GModel\GenericModel;
 
 class MenuRenderConfigOld extends GenericModel
 {

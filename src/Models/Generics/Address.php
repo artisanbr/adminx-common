@@ -1,11 +1,14 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Generics;
 
 use ArtisanLabs\LaravelGeoDatabase\Models\GeoCity;
-use ArtisanLabs\LaravelGeoDatabase\Models\GeoState;
 use ArtisanLabs\LaravelGeoDatabase\Models\GeoCountry;
-use ArtisanLabs\GModel\GenericModel;
+use ArtisanLabs\LaravelGeoDatabase\Models\GeoState;
 
 class Address extends GenericModel
 {

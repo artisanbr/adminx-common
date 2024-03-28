@@ -1,7 +1,10 @@
 <?php
-namespace Adminx\Common\Elements\Forms;
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-use ArtisanLabs\GModel\GenericModel;
+namespace Adminx\Common\Elements\Forms;
 
 class FormElementDefines extends GenericModel
 {

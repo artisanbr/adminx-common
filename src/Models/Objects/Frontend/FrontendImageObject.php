@@ -1,10 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Objects\Frontend;
 
-use Adminx\Common\Models\Bases\Generic\GenericFileBase;
 use Adminx\Common\Models\File;
-use ArtisanLabs\GModel\GenericModel;
 
 /**
  * @property File $file

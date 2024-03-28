@@ -1,8 +1,10 @@
 <?php
-namespace Adminx\Common\Models\Generics\Configs;
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-use Illuminate\Support\Facades\Auth;
-use ArtisanLabs\GModel\GenericModel;
+namespace Adminx\Common\Models\Generics\Configs;
 
 class FileConfig extends GenericModel
 {

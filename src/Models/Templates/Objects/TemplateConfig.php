@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -10,7 +10,6 @@ use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Pages\Modules\Traits\HasPageModulesManager;
 use Adminx\Common\Models\Templates\Enums\TemplateRenderEngine;
 use Adminx\Common\Models\Templates\Enums\TemplateRenderMode;
-use ArtisanLabs\GModel\GenericModel;
 
 
 class TemplateConfig extends GenericModel

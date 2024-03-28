@@ -1,8 +1,12 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Generics\Assets;
 
 use Adminx\Common\Libs\Helpers\HtmlHelper;
-use ArtisanLabs\GModel\GenericModel;
 
 class GenericAssetElementHtml extends GenericModel
 {

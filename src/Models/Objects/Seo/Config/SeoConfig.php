@@ -1,8 +1,10 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Objects\Seo\Config;
-
-use ArtisanLabs\GModel\GenericModel;
 
 class SeoConfig extends GenericModel
 {

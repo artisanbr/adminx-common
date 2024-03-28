@@ -1,12 +1,11 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Sites\Objects\Config;
 
-use ArtisanLabs\GModel\GenericModel;
 use Exception;
 use Illuminate\Support\Facades\Crypt;
 use PHPMailer\PHPMailer\PHPMailer;

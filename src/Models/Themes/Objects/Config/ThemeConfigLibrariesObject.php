@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -10,7 +10,6 @@ use Adminx\Common\Models\Themes\Objects\Config\Libraries\BoostrapLibrary;
 use Adminx\Common\Models\Themes\Objects\Config\Libraries\FontAwesomeLibrary;
 use Adminx\Common\Models\Themes\Objects\Config\Libraries\JQueryLibrary;
 use Adminx\Common\Models\Themes\Objects\Config\Libraries\JQueryUiLibrary;
-use ArtisanLabs\GModel\GenericModel;
 use Butschster\Head\Packages\Package;
 
 class ThemeConfigLibrariesObject extends GenericModel

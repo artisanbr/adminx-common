@@ -1,7 +1,10 @@
 <?php
-namespace Adminx\Common\Models\Templates\Objects;
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
-use ArtisanLabs\GModel\GenericModel;
+namespace Adminx\Common\Models\Templates\Objects;
 
 class TemplateConfigPaging extends GenericModel
 {

@@ -1,10 +1,14 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Generics\Contact;
 
 use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Address;
 use Adminx\Common\Models\Generics\Social\ContactSocials;
-use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -8,7 +8,6 @@ namespace Adminx\Common\Models\Sites\Objects\Config\Import;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Sites\Tools\Facades\WordpressImport;
-use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Facades\Crypt;
 
 class WordpressImportConfig extends GenericModel

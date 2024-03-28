@@ -1,13 +1,12 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Themes\Objects;
 
 use Adminx\Common\Models\Objects\Frontend\FrontendImageObject;
-use ArtisanLabs\GModel\GenericModel;
 
 class ThemeMediaBundleObject extends GenericModel
 {

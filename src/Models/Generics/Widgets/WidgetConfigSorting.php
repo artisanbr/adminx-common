@@ -1,7 +1,11 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
+
 namespace Adminx\Common\Models\Generics\Widgets;
 
-use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Contracts\Database\Query\Builder;
 
 class WidgetConfigSorting extends GenericModel
