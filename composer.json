@@ -34,7 +34,7 @@
         "laravel/framework": ">=10",
         "artisan-labs/laravel-breadcrumbs": "*",
         "artisan-labs/laravel-geo-database": "*",
-        "artisanbr/generic-model": "^1.0.0",
+        "artisanbr/generic-model": "^2.0",
         "artisan-labs/laravel-router": "*",
         "artisan-labs/laravel-ide-helper-plus": "*",
         "artisan-labs/laravel-bs-components": "*",
