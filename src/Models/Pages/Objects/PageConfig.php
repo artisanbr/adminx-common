@@ -12,6 +12,7 @@ use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Generics\DataSource;
 use Adminx\Common\Models\Pages\Modules\Traits\HasPageModulesManager;
 use Illuminate\Support\Collection;
+use ArtisanBR\GenericModel\GenericModel;
 
 /**
  * @property Collection|DataSource[] $sources

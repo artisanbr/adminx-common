@@ -17,6 +17,7 @@ use Adminx\Common\Models\Sites\Site;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use ArtisanBR\GenericModel\GenericModel;
 
 /**
  * @property Page|Form|Article|CustomListAbstract|null $data

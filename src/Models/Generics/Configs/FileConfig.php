@@ -6,6 +6,8 @@
 
 namespace Adminx\Common\Models\Generics\Configs;
 
+use ArtisanBR\GenericModel\GenericModel;
+
 class FileConfig extends GenericModel
 {
 

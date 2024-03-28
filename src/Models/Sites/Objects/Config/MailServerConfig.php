@@ -9,6 +9,7 @@ namespace Adminx\Common\Models\Sites\Objects\Config;
 use Exception;
 use Illuminate\Support\Facades\Crypt;
 use PHPMailer\PHPMailer\PHPMailer;
+use ArtisanBR\GenericModel\GenericModel;
 
 class MailServerConfig extends GenericModel
 {

@@ -9,6 +9,7 @@ namespace Adminx\Common\Models\Objects\Frontend\Assets;
 use Adminx\Common\Models\Objects\Frontend\Assets\Code\FrontendCssAssetsCode;
 use Adminx\Common\Models\Objects\Frontend\Assets\Code\FrontendScssAssetsCode;
 use Adminx\Common\Models\Objects\Frontend\FrontendHtmlObject;
+use ArtisanBR\GenericModel\GenericModel;
 
 /**
  * @property string $css_bundle_html

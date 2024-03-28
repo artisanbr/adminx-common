@@ -7,6 +7,7 @@
 namespace Adminx\Common\Models\Objects\Frontend\Assets\Abstract;
 
 use Adminx\Common\Libs\Helpers\HtmlHelper;
+use ArtisanBR\GenericModel\GenericModel;
 use Illuminate\Support\Collection;
 
 /**

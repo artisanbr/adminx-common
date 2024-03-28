@@ -10,6 +10,7 @@ use Adminx\Common\Enums\ElementType;
 use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
 use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Sites\Site;
+use ArtisanBR\GenericModel\GenericModel;
 
 abstract class GenericElement extends GenericModel
 {

@@ -8,6 +8,7 @@ namespace Adminx\Common\Models\Pages\Objects;
 
 use Adminx\Common\Enums\ContentEditorType;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
+use ArtisanBR\GenericModel\GenericModel;
 
 class PageInternalConfig extends GenericModel
 {

@@ -8,6 +8,7 @@ namespace Adminx\Common\Models\Themes\Objects\Config;
 
 use Adminx\Common\Enums\Themes\ThemeFramework;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
+use ArtisanBR\GenericModel\GenericModel;
 
 class ThemeConfig extends GenericModel
 {

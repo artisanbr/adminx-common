@@ -9,6 +9,7 @@ namespace Adminx\Common\Models\Traits;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Illuminate\Support\Facades\Auth;
+use ArtisanBR\GenericModel\GenericModel;
 
 /**
  * @var EloquentModelBase|GenericModel $this

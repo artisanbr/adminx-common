@@ -6,6 +6,8 @@
 
 namespace Adminx\Common\Models\Generics\Forms;
 
+use ArtisanBR\GenericModel\GenericModel;
+
 class FormSendButton extends GenericModel
 {
 

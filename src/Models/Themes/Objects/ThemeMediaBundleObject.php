@@ -7,6 +7,7 @@
 namespace Adminx\Common\Models\Themes\Objects;
 
 use Adminx\Common\Models\Objects\Frontend\FrontendImageObject;
+use ArtisanBR\GenericModel\GenericModel;
 
 class ThemeMediaBundleObject extends GenericModel
 {

@@ -9,6 +9,7 @@ namespace Adminx\Common\Models\Bases\Generic;
 use Adminx\Common\Libs\FrontendEngine\AdvancedHtmlEngine;
 use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Sites\Site;
+use ArtisanBR\GenericModel\GenericModel;
 
 abstract class GenericHtmlBase extends GenericModel
 {

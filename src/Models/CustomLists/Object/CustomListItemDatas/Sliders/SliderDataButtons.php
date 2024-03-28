@@ -6,6 +6,8 @@
 
 namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\Sliders;
 
+use ArtisanBR\GenericModel\GenericModel;
+
 class SliderDataButtons extends GenericModel
 {
 

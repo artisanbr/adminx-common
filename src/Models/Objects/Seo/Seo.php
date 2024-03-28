@@ -9,6 +9,7 @@ namespace Adminx\Common\Models\Objects\Seo;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Objects\Seo\Config\SeoConfig;
 use Illuminate\Support\Collection;
+use ArtisanBR\GenericModel\GenericModel;
 
 
 class Seo extends GenericModel

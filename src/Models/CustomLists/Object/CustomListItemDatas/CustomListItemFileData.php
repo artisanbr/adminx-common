@@ -6,6 +6,8 @@
 
 namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas;
 
+use ArtisanBR\GenericModel\GenericModel;
+
 class CustomListItemFileData extends GenericModel
 {
 

@@ -7,6 +7,7 @@
 namespace Adminx\Common\Models\Generics\Contact;
 
 use Adminx\Common\Libs\Support\Str;
+use ArtisanBR\GenericModel\GenericModel;
 
 class Phone extends GenericModel
 {

@@ -6,6 +6,8 @@
 
 namespace Adminx\Common\Models\Objects\Frontend\Builds\Common\Abstract;
 
+use ArtisanBR\GenericModel\GenericModel;
+
 /**
  * @property string $html
  * @property string $minify

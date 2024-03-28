@@ -8,6 +8,7 @@ namespace Adminx\Common\Models\Objects;
 
 
 use Adminx\Common\Libs\FileManager\Helpers\FileHelper;
+use ArtisanBR\GenericModel\GenericModel;
 
 
 /**

@@ -10,6 +10,7 @@ use Adminx\Common\Models\Pages\Modules\Traits\HasPageModulesManager;
 use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Illuminate\Support\Collection;
+use ArtisanBR\GenericModel\GenericModel;
 
 /**
  * @property array{slug: string, title: string, description: string, allowed_modules: Collection|string[],enabled_modules: Collection|string[] }|null $attributes

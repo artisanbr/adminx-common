@@ -7,6 +7,7 @@
 namespace Adminx\Common\Models\Generics\Configs;
 
 use Adminx\Common\Enums\ContentEditorType;
+use ArtisanBR\GenericModel\GenericModel;
 
 class UserConfig extends GenericModel
 {

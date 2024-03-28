@@ -10,6 +10,7 @@ namespace Adminx\Common\Models\Objects;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
+use ArtisanBR\GenericModel\GenericModel;
 
 
 class ArticleMetaObject extends GenericModel

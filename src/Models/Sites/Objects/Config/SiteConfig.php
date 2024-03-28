@@ -7,6 +7,7 @@
 namespace Adminx\Common\Models\Sites\Objects\Config;
 
 use Adminx\Common\Models\Sites\Objects\Config\Import\SiteImportConfig;
+use ArtisanBR\GenericModel\GenericModel;
 
 class SiteConfig extends GenericModel
 {

@@ -6,6 +6,8 @@
 
 namespace Adminx\Common\Models\Templates\Objects;
 
+use ArtisanBR\GenericModel\GenericModel;
+
 class TemplateConfigSorting extends GenericModel
 {
 
