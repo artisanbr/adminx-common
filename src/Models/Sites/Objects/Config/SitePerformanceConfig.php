@@ -5,6 +5,7 @@
  */
 
 namespace Adminx\Common\Models\Sites\Objects\Config;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class SitePerformanceConfig extends GenericModel
 {
