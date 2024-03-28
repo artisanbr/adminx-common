@@ -9,7 +9,7 @@ namespace Adminx\Common\Models\Generics\Social;
 use Adminx\Common\Enums\SocialLinkType;
 use Adminx\Common\Models\Casts\AsCollectionOf;
 use Illuminate\Support\Collection;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 /**
  * @property Collection|SocialNetwork[] $list

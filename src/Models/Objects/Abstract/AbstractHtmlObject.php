@@ -10,7 +10,7 @@ use Adminx\Common\Facades\Frontend\FrontendHtml;
 use Adminx\Common\Libs\Helpers\HtmlHelper;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Themes\Theme;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 /**
  * @property string $html

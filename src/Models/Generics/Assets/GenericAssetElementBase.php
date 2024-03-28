@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Generics\Assets;
 
 use Adminx\Common\Libs\Helpers\HtmlHelper;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 abstract class GenericAssetElementBase extends GenericModel
 {

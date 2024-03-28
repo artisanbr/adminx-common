@@ -9,7 +9,7 @@ namespace Adminx\Common\Models\Generics\Contact;
 use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Address;
 use Adminx\Common\Models\Generics\Social\ContactSocials;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 use Illuminate\Support\Collection;
 
 /**

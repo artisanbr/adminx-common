@@ -11,7 +11,7 @@ use Adminx\Common\Models\Themes\Objects\Config\Libraries\FontAwesomeLibrary;
 use Adminx\Common\Models\Themes\Objects\Config\Libraries\JQueryLibrary;
 use Adminx\Common\Models\Themes\Objects\Config\Libraries\JQueryUiLibrary;
 use Butschster\Head\Packages\Package;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class ThemeConfigLibrariesObject extends GenericModel
 {

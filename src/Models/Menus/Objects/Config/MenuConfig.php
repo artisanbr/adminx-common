@@ -8,7 +8,7 @@ namespace Adminx\Common\Models\Menus\Objects\Config;
 
 use Adminx\Common\Models\Menus\Objects\Config\Render\MenuRenderRepository;
 use Adminx\Common\Models\Menus\Objects\MenuRenderConfigOld;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class MenuConfig extends GenericModel
 {

@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Generics\Widgets;
 
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class WidgetConfigPaging extends GenericModel
 {

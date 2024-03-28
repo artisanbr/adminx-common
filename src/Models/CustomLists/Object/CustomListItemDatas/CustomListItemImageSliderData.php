@@ -8,7 +8,7 @@ namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas;
 
 use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\Sliders\SliderDataButtons;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class CustomListItemImageSliderData extends GenericModel
 {

@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Pages\Objects;
 
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class PageBreadcrumb extends GenericModel
 {

@@ -9,7 +9,7 @@ namespace Adminx\Common\Models\Templates\Global\Abstract;
 use Adminx\Common\Models\Templates\Objects\TemplateConfig;
 use Adminx\Common\Models\Templates\Template;
 use Adminx\Common\Models\Traits\HasSelect2;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 /**
  * @property array{slug: string, description: string, title: string} $attributes

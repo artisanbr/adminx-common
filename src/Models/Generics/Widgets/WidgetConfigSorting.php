@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Generics\Widgets;
 
 use Illuminate\Contracts\Database\Query\Builder;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class WidgetConfigSorting extends GenericModel
 {

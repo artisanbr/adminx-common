@@ -10,7 +10,7 @@ use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Themes\Theme;
 use Delight\Random\Random;
 use Illuminate\Support\Collection;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 abstract class ThemeFileManagerObject extends GenericModel
 {

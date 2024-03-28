@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Generics;
 
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 use ArtisanLabs\LaravelGeoDatabase\Models\GeoCity;
 use ArtisanLabs\LaravelGeoDatabase\Models\GeoCountry;
 use ArtisanLabs\LaravelGeoDatabase\Models\GeoState;

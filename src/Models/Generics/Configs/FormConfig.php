@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Generics\Configs;
 
 use Adminx\Common\Models\Generics\Forms\FormSendButton;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class FormConfig extends GenericModel
 {

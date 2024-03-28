@@ -8,7 +8,7 @@ namespace Adminx\Common\Models\Themes\Objects\Abstract;
 
 use Butschster\Head\Packages\Package;
 use Illuminate\Support\Collection;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 abstract class ThemeConfigLibraryAbstract extends GenericModel
 {

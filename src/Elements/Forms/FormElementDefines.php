@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Elements\Forms;
 
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class FormElementDefines extends GenericModel
 {

@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Traits;
 
 use Adminx\Common\Libs\Support\Str;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 use Illuminate\Database\Eloquent\Model;
 
 /**

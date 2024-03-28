@@ -5,7 +5,7 @@
  */
 
 namespace Adminx\Common\Models\Generics\Elements;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 
 

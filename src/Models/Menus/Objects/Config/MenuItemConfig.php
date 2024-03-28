@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Menus\Objects\Config;
 
 use Adminx\Common\Models\Generics\DataSource;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class MenuItemConfig extends GenericModel
 {

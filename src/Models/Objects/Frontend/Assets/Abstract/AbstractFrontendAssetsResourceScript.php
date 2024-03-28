@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Objects\Frontend\Assets\Abstract;
 
 use Adminx\Common\Libs\Support\Str;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 abstract class AbstractFrontendAssetsResourceScript extends GenericModel
 {

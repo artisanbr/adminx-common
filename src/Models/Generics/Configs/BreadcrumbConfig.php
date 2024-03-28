@@ -8,7 +8,7 @@ namespace Adminx\Common\Models\Generics\Configs;
 
 use Adminx\Common\Enums\Themes\BreadcrumbSeparator;
 use Adminx\Common\Models\Objects\BreadcrumbBackgroundObject;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class BreadcrumbConfig extends GenericModel
 {

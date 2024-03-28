@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Traits;
 
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 use Delight\Random\Random;
 use Illuminate\Database\Eloquent\Model;
 

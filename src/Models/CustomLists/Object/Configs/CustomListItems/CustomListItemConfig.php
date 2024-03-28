@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\CustomLists\Object\Configs\CustomListItems;
 
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class CustomListItemConfig extends GenericModel
 {

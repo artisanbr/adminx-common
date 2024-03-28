@@ -5,7 +5,7 @@
  */
 
 namespace Adminx\Common\Models\Menus\Objects\Config\Render;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class MenuRenderConfig extends GenericModel
 {

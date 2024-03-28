@@ -9,7 +9,7 @@ namespace Adminx\Common\Models\Objects\Frontend\Builds;
 use Adminx\Common\Models\Objects\Frontend\Builds\Common\FrontendBuildBodyObject;
 use Adminx\Common\Models\Objects\Frontend\Builds\Common\FrontendBuildHeadObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 use Butschster\Head\Contracts\Packages\ManagerInterface;
 use Butschster\Head\MetaTags\Meta;
 

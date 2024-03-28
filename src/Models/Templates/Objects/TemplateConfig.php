@@ -10,7 +10,7 @@ use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Pages\Modules\Traits\HasPageModulesManager;
 use Adminx\Common\Models\Templates\Enums\TemplateRenderEngine;
 use Adminx\Common\Models\Templates\Enums\TemplateRenderMode;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 
 class TemplateConfig extends GenericModel

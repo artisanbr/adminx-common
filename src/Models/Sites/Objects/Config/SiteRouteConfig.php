@@ -5,7 +5,7 @@
  */
 
 namespace Adminx\Common\Models\Sites\Objects\Config;
-use ArtisanBR\GenericModel\GenericModel;
+use ArtisanBR\GenericModel\Model as GenericModel;
 
 class SiteRouteConfig extends GenericModel
 {
