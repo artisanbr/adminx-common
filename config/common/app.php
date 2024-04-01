@@ -5,6 +5,7 @@
  */
 
 return [
+    'domain'   => env('APP_DOMAIN'),
     'adminx_domain'   => env('ADMINX_DOMAIN'),
     'frontend_domain' => env('FRONTEND_DOMAIN'),
     'cdn_domain'      => env('CDN_HOST'),
