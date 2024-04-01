@@ -7,7 +7,7 @@
     'site' => $formAnswer->site ?? Auth::user()->site ?? new \Adminx\Common\Models\Sites\Site()
 ])
 @section('subject', "Nova mensagem em \"{$formAnswer->form->title}\".")
-@section('description', 'Mensagem recebida às '.$formAnswer->created_at->format('d/m/Y \à\s H:i:s').', confira abaixo as respostas enviadas:')
+@section('description', 'Mensagem recebida às '.($formAnswer->created_at ?? now())->format('d/m/Y \à\s H:i:s').', confira abaixo as respostas enviadas:')
 @section('action_uri', '#')
 {{--@section('action_uri', route('app.elements.forms.answers', [$formAnswer->form->id))--}}
 @section('action_text', 'Ver Mais Respostas (em breve)')
@@ -18,7 +18,7 @@
 
     <x-common::mail.space/>
 
-    @if($formAnswer->form_elements ?? false)
+    @if($formAnswer->form_elements->count())
         <div class="row">
             @foreach($formAnswer->form_elements as $element)
 
@@ -63,7 +63,7 @@
     <p class="text-gray-700"
        style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;"
        align="left">
-        <small>Mensagem enviada em {{ $formAnswer->created_at->format('d/m/Y \à\s H:i:s') }}</small>
+        <small>Mensagem enviada em {{ ($formAnswer->created_at ?? now())->format('d/m/Y \à\s H:i:s') }}</small>
     </p>
     <p class="text-gray-700"
        style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;"

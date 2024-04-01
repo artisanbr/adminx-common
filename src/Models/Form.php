@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -10,8 +10,10 @@ use Adminx\Common\Elements\Forms\FormElement;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Configs\FormConfig;
+use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
+use Adminx\Common\Models\Traits\HasPublicIdAttribute;
 use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasSlugAttribute;
 use Adminx\Common\Models\Traits\HasValidation;
@@ -26,9 +28,9 @@ use Illuminate\Support\Facades\Auth;
 /**
  * @property Collection|FormElement[] $elements
  */
-class Form extends EloquentModelBase
+class Form extends EloquentModelBase implements PublicIdModel
 {
-    use HasValidation, HasSelect2, HasMorphAssigns, HasSlugAttribute, BelongsToUser, BelongsToSite;
+    use HasValidation, HasSelect2, HasMorphAssigns, HasSlugAttribute, BelongsToUser, BelongsToSite, HasPublicIdAttribute;
 
     protected $fillable = [
         'title',
@@ -77,6 +79,12 @@ class Form extends EloquentModelBase
     public function scopeAssignedTo(Builder $query, $formulable_type, $formulable_id = null): Builder
     {
         return $this->scopeAssignedToBy($query, 'formulables', 'formulable_type', 'formulable_id', $formulable_type, $formulable_id);
+    }
+    //endregion
+
+    //region Helpers
+    public function render(){
+
     }
     //endregion
 

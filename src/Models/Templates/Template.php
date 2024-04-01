@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -62,6 +62,26 @@ class Template extends EloquentModelBase
     }
 
     //endregion
+
+    /*protected function templateContent(): Attribute
+    {
+        if ($this->config->use_files) {
+
+            if ($this->config->render_engine === TemplateRenderEngine::Blade) {
+                $templateContent = View::make($this->blade_file, $this->getViewRenderData())->render();
+            }
+            else {
+                $templateContent = $this->file_contents;
+            }
+        }
+        else {
+            $templateContent = $this->content ?? $this->file_contents ?? null;
+        }
+
+        return new Attribute(
+            get: static fn() => $templateContent,
+        );
+    }*/
 
     public function getTemplateFile($file): string
     {

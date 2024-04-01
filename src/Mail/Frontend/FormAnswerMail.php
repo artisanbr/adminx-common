@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -105,7 +105,7 @@ class FormAnswerMail extends Mailable
         return new Envelope(
             from:    new Address($from['address'], $from['name']),
             //replyTo: $replyTo,
-            subject: "{$this->formAnswer->site->title} - Nova resposta de formulário recebida em " . $this->formAnswer->created_at->format('d/m/Y \à\s H:i'),
+            subject: "{$this->formAnswer->site->title} - Nova resposta de formulário recebida em " . ($this->formAnswer->created_at ?? now())->format('d/m/Y \à\s H:i'),
             tags:    ['contact', 'form']
         );
     }

@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Repositories;
 
@@ -26,6 +30,8 @@ class FormRepository
             $dataElements = collect($data['elements'])->values();
 
             $form = Form::findOrNew($data['id'] ?? null);
+
+            $data['config']['destinations'] = json_decode($data['config']['destinations'] ?? '[]', true);
 
             $form->fill($data);
 

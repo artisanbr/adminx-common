@@ -12,9 +12,12 @@ use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Menus\Menu;
 use Adminx\Common\Models\Sites\Site;
+use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
+use Adminx\Common\Models\Templates\Template;
 use Adminx\Common\Models\Widgets\SiteWidget;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\View;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
@@ -130,7 +133,7 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    /*public function form($context, string $form_slug): string
+    public function form($context, string $form_slug, bool $ajax = false): string
     {
 
         if (!$this->currentForm || ((string) $this->currentForm->public_id !== $form_slug && (string) $this->currentForm->slug !== $form_slug)) {
@@ -150,23 +153,45 @@ class FrontendTwigExtension extends AbstractExtension
             if (!$this->currentForm) {
                 return "Formulário '{$form_slug}' não encontrado";
             }
+
+            /*if ($ajax) {
+
+                $renderView = 'common::Elements.Widgets.renders.ajax-render';
+
+                $renderData = $this->config->ajax_render ? [
+                    'siteWidget' => $this,
+                ] : $this->getViewRenderData();
+
+                $widgetView = View::make($renderView, $renderData);
+
+                $this->content->portal = $widgetView->render();
+
+                return $this->currentSiteWidget->content->portal ?? $this->currentSiteWidget->content->html ?? '';
+
+            }*/
+
+            $templateBase = GlobalTemplateManager::getTemplate('custom-form');
+
+            $template = new Template($templateBase->toArray());
+
+            //Debugbar::debug($template->blade_file);
+
+            return View::make($template->blade_file, [
+                'form' => $this->currentForm,
+                'template' => $template
+            ])->render();
+;
+
         }
 
 
         //Se estiver sem content, compilar
 
-        if (!$this->currentForm->config->ajax_render) {
 
-            $templateContent = $this->currentSiteWidget->template?->id ? $this->currentSiteWidget->template_content : $this->currentSiteWidget->content->html;
-
-            $template = $this->twig->createTemplate($templateContent, "widget-{$this->currentSiteWidget->public_id}");
-
-            return $template->render($this->currentSiteWidget->getViewRenderData());
-        }
 
         return $this->currentSiteWidget->content->html;
 
-    }*/
+    }
 
     public function menu($context, $menuSlug, $exibition = null)
     {
