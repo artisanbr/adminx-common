@@ -35,6 +35,7 @@
         "artisan-labs/laravel-breadcrumbs": "*",
         "artisan-labs/laravel-geo-database": "*",
         "artisanbr/generic-model": "dev-main",
+        "artisanbr/goodies": "dev-main",
         "artisan-labs/laravel-router": "*",
         "artisan-labs/laravel-ide-helper-plus": "*",
         "artisan-labs/laravel-bs-components": "*",

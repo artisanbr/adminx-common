@@ -10,6 +10,7 @@ use Adminx\Common\Elements\Forms\FormElement;
 use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Formulable;
+use Adminx\Common\Models\Generics\Configs\FormConfig;
 use Illuminate\Support\Facades\DB;
 use Throwable;
 
@@ -31,20 +32,27 @@ class FormRepository
 
             $form = Form::findOrNew($data['id'] ?? null);
 
-            $data['config']['destinations'] = json_decode($data['config']['destinations'] ?? '[]', true);
+            if(isset($data['config']['recipients']) && is_string($data['config']['recipients'])) {
+                $data['config']['recipients'] = json_decode($data['config']['recipients'] ?? '[]', true);
+            }
+
+            $data['config']['destinations'] = [];
 
             $form->fill($data);
 
-            $form->save();
-            $form->refresh();
+            $form->config = new FormConfig($data['config']);
 
-            $form->elements = $form->elements->values()->map(function(FormElement $item, $i) use ($dataElements) {
+            $form->save();
+            //$form->refresh();
+
+            $form->elements = $form->elements->values()->map(function (FormElement $item, $i) use ($dataElements) {
                 $dataItem = $dataElements->get($i);
 
-                if($dataItem['custom_sizes'] !== 'true'){
+                if ($dataItem['custom_sizes'] !== 'true') {
                     $item->setSizes($dataItem['size']);
                 }
                 $item->position = $i;
+
                 return $item->toArray();
             })->sortBy('position')->all();
 
@@ -64,6 +72,7 @@ class FormRepository
 
     /**
      * Associar models
+     *
      * @param int $id
      * @param     $model_type
      * @param     $model_id
@@ -77,15 +86,16 @@ class FormRepository
 
         return DB::transaction(function () use ($id, $model_type, $model_id) {
             return Formulable::updateOrCreate([
-                'form_id'         => $id,
-                'formulable_id'   => $model_id,
-                'formulable_type' => $model_type,
-            ]);
+                                                  'form_id'         => $id,
+                                                  'formulable_id'   => $model_id,
+                                                  'formulable_type' => $model_type,
+                                              ]);
         });
     }
 
     /**
      * Desassociar models
+     *
      * @param int $id
      * @param     $model_type
      * @param     $model_id
@@ -99,10 +109,10 @@ class FormRepository
 
         return DB::transaction(function () use ($id, $model_type, $model_id) {
             return Formulable::where([
-                ['form_id', $id],
-                ['formulable_id', $model_id],
-                ['formulable_type', $model_type],
-            ])->delete();
+                                         ['form_id', $id],
+                                         ['formulable_id', $model_id],
+                                         ['formulable_type', $model_type],
+                                     ])->delete();
         });
     }
 

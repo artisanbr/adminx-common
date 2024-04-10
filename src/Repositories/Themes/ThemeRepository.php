@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -45,10 +45,10 @@ class ThemeRepository extends Repository
         $this->model->config->breadcrumb->default_items = $this->data['config']['breadcrumb']['default_items'] ?? [];
 
         $this->model->save();
-        $this->model->refresh();
+        //$this->model->refresh();
 
         if($this->data['is_main'] ?? false){
-            $this->model->refresh();
+            //$this->model->refresh();
             $this->model->site->theme_id = $this->model->id;
             $this->model->site->save();
         }
@@ -71,7 +71,7 @@ class ThemeRepository extends Repository
             abort(404);
         }
 
-        $this->model->refresh();
+        //$this->model->refresh();
 
         $this->uploadPathBase = $this->model->storagePathTo('media');
 
