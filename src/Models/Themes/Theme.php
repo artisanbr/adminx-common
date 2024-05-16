@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -8,11 +8,11 @@ namespace Adminx\Common\Models\Themes;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\File;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Objects\Frontend\Assets\Abstract\AbstractFrontendAssetsResourceScript;
 use Adminx\Common\Models\Objects\Frontend\Assets\FrontendAssetsBundle;
+use Adminx\Common\Models\Themes\Enums\ThemeBundleDefaults;
 use Adminx\Common\Models\Themes\Objects\Config\ThemeConfig;
 use Adminx\Common\Models\Themes\Objects\ThemeCopyrightObject;
 use Adminx\Common\Models\Themes\Objects\ThemeFooterObject;
@@ -137,8 +137,21 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     public function assetResourceUrl(AbstractFrontendAssetsResourceScript $assetScript): string
     {
-        return $assetScript->external ? $assetScript->url : $this->cdnUrlTo("upload/{$assetScript->url}");
+        return $assetScript->external ? $assetScript->url : $this->cdnUploadUrlTo($assetScript->url);
     }
+
+    public function cdnUploadUrlTo(string $path = ''): string
+    {
+
+        return $this->cdnUrlTo("upload/{$path}");
+
+    }
+
+    public function cdnUploadUriTo(string $path = ''): string
+    {
+        return $this->cdnUriTo("upload/{$path}");
+    }
+
 
     public function cdnUrlTo(string $path = ''): string
     {
@@ -152,6 +165,16 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         return $this->site->cdnUriTo($this->traitCdnPath($path));
     }
 
+    public function cdnProxyUploadUrlTo(string $path = ''): string
+    {
+        return $this->cdnProxyUrlTo("upload/{$path}");
+    }
+
+    public function cdnProxyUploadUriTo(string $path = ''): string
+    {
+        return $this->cdnProxyUriTo("upload/{$path}");
+    }
+
     public function cdnProxyUrlTo(string $path = ''): string
     {
         return $this->site->cdnProxyUrlTo($this->traitCdnPath($path));
@@ -162,7 +185,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         return $this->site->cdnProxyUriTo($this->traitCdnPath($path));
     }
 
-    public function compile()
+    public function generateBuild()
     {
         if (!$this->site) {
             $this->load(['site']);
@@ -187,12 +210,31 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         $meta->includePackages([$this->meta_pkg_name, 'frontend.pos']);*/
 
         $themeMeta->reset();
+        $themeMeta->addLink('preconnect-cloudflare', [
+            'rel'  => 'preconnect',
+            'href' => 'https://cdn.cloudflare.com',
+            'crossorigin',
+        ]);
+        $themeMeta->addLink('preconnect-jscloudflare', [
+            'rel'  => 'preconnect',
+            'href' => 'https://cdnjs.cloudflare.com',
+            'crossorigin',
+        ]);
+
+        $themeMeta->addLink('preconnect-self', [
+            'rel'  => 'preconnect',
+            'href' => $this->site->uri,
+        ]);
+
         $themeMeta->registerFromSiteTheme($this);
         $themeMeta->registerFromSite($this->site);
         $themeMeta->removeTag('description');
         $themeMeta->removeTag('keywords');
         $themeMeta->removeTag('viewport');
         $themeMeta->removeTag('charset');
+
+
+        //<link rel="preconnect" href="https://cdn.cloudflare.com" crossorigin>
 
         /*Meta::addCsrfToken();
         Meta::initialize();
@@ -246,75 +288,220 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         return $retorno;
     }
 
+
     public function registerMetaPackage(): void
     {
+        PackageManager::create($this->meta_pkg_name, function (Package $package) {
+
+            /*$optArray = $assetItem->load_mode == 'preload' ? [
+                'rel'    => 'preload',
+                'as'    => 'style',
+                //'media'  => 'print',
+                'onload' => "this.onload=null;this.rel='stylesheet'",
+            ] : [];
+
+            $optArray = match ($assetItem->load_mode) {
+                'defer' => ['defer'],
+                'async' => ['async'],
+                default => []
+
+            };*/
+
+            //dd($this->build);
+
+            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssMain->value)){
+                $this->build->main_css_bundle->registerMetaPackages($package);
+            }
+
+            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssDefer->value)){
+                $this->build->defer_css_bundle->registerMetaPackages($package);
+            }
+
+            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsMain->value)){
+                $this->build->main_body_js_bundle->registerMetaPackages($package);
+            }
+
+            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsDefer->value)){
+                $this->build->defer_body_js_bundle->registerMetaPackages($package);
+            }
+
+            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsMain->value)){
+                $this->build->main_head_js_bundle->registerMetaPackages($package);
+            }
+
+            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsDefer->value)){
+                $this->build->defer_head_js_bundle->registerMetaPackages($package);
+            }
+
+            /*if ($this->build->main_css_bundle->id && !blank($this->build->main_css_bundle->content)) {
+
+                $package->addStyle($this->build->main_css_bundle->file_name_minified,
+                                   $this->build->main_css_bundle->url_minified);
+
+            }
+            if ($this->build->defer_css_bundle->id && !blank($this->build->defer_css_bundle->content)) {
+
+                $package->addStyle($this->build->defer_css_bundle->file_name_minified,
+                                   $this->build->defer_css_bundle->url_minified, [
+                                       'rel'    => 'stylesheet',
+                                       'media'  => 'print',
+                                       'onload' => "this.onload=null;this.media='all'",
+                                   ]);
+            }
+
+
+
+            if ($this->build->main_body_js_bundle->id && !blank($this->build->main_body_js_bundle->content)) {
+                $package->addScript($this->build->main_body_js_bundle->file_name_minified,
+                                    $this->build->main_body_js_bundle->url_minified);
+            }
+
+            if ($this->build->defer_body_js_bundle->id && !blank($this->build->defer_body_js_bundle->content)) {
+
+                $package->addScript($this->build->defer_body_js_bundle->file_name_minified,
+                                    $this->build->defer_body_js_bundle->url_minified, ['defer']);
+            }
+
+
+            if ($this->build->main_head_js_bundle->id && !blank($this->build->main_head_js_bundle->content)) {
+                $package->addScript($this->build->main_head_js_bundle->file_name_minified,
+                                    $this->build->main_head_js_bundle->url_minified);
+            }
+
+            if ($this->build->defer_head_js_bundle->id && !blank($this->build->defer_head_js_bundle->content)) {
+
+                $package->addScript($this->build->defer_head_js_bundle->file_name_minified,
+                                    $this->build->defer_head_js_bundle->url_minified, ['defer']);
+            }*/
+
+            //$package->addScript('head-build.js', $this->cdnUrlTo('head-build.js'), ['defer'], Meta::PLACEMENT_HEAD);
+
+            //Libraries
+            //$this->config->libs->registerMetaPackage($package);
+
+            //region Theme Plugins
+
+            /*$plataformPlugins = config('adminx.themes.plugins');
+            $themePlugins = $this->config->plugins->toArray();
+
+            foreach ($themePlugins as $pluginName) {
+
+                $plugin = $plataformPlugins[$pluginName] ?? null;
+
+                if ($plugin) {
+                    if (isset($plugin['css']) && (isset($plugin['skip-compile']) && $plugin['skip-compile'])) {
+                        foreach ($plugin['css'] as $nameCSS => $pluginCSS) {
+                            $package->addStyle($nameCSS, $pluginCSS['src'], $pluginCSS['attributes'] ?? []);
+                        }
+                    }
+                    if (isset($plugin['js'])) {
+                        foreach ($plugin['js'] as $nameJS => $pluginJS) {
+                            $package->addScript($nameJS, $pluginJS['src'], $pluginJS['attributes'] ?? []);
+                        }
+
+                    }
+                }
+            }*/
+
+            //endregion
+
+            //Theme Resources
+            $cssIncludeResources = $this->assets->resources->css->listToOrder()->where('bundle', '!=', true)->map(fn(AbstractFrontendAssetsResourceScript $assetItem) => $assetItem->fill([
+                                                                                                                                                                                              'url' => $assetItem->external ? $assetItem->url : $this->cdnUploadUrlTo($assetItem->url),
+                                                                                                                                                                                          ]));
+
+            foreach ($cssIncludeResources as $cssFile) {
+                $package->addStyle(str($cssFile->url)->afterLast('/'), $cssFile->url, $cssFile->defer ? [
+                    'rel'    => 'preload',
+                    'as'     => 'style',
+                    //'media'  => 'print',
+                    'onload' => "this.onload=null;this.rel='stylesheet'",
+                ] : []);
+            }
+
+            $headJsResources = $this->assets->resources->head_js->listToOrder()->where('bundle', '!=', true)->map(fn(AbstractFrontendAssetsResourceScript $assetItem) => $assetItem->fill([
+                                                                                                                                                                                              'url' => $assetItem->external ? $assetItem->url : $this->cdnUploadUrlTo($assetItem->url),
+                                                                                                                                                                                          ]));
+
+            foreach ($headJsResources as $headFile) {
+                $package->addScript(str($headFile->url)->afterLast('/'), $headFile->url, $headFile->defer ? ['defer'] : [], Meta::PLACEMENT_HEAD);
+            }
+
+            $bodyJsResources = $this->assets->resources->js->listToOrder()->where('bundle', '!=', true)->map(fn(AbstractFrontendAssetsResourceScript $assetItem) => $assetItem->fill([
+                                                                                                                                                                                         'url' => $assetItem->external ? $assetItem->url : $this->cdnUploadUrlTo($assetItem->url),
+                                                                                                                                                                                     ]));
+
+            foreach ($bodyJsResources as $bodyFile) {
+                $package->addScript(str($bodyFile->url)->afterLast('/'), $bodyFile->url, $bodyFile->defer ? ['defer'] : []);
+            }
+
+            //region Pos
+
+
+            if($this->config->bundles_after?->contains(ThemeBundleDefaults::CssMain->value)){
+                $this->build->main_css_bundle->registerMetaPackages($package);
+            }
+
+            if($this->config->bundles_after?->contains(ThemeBundleDefaults::CssDefer->value)){
+                $this->build->defer_css_bundle->registerMetaPackages($package);
+            }
+
+            if($this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsMain->value)){
+                $this->build->main_body_js_bundle->registerMetaPackages($package);
+            }
+
+            if($this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsDefer->value)){
+                $this->build->defer_body_js_bundle->registerMetaPackages($package);
+            }
+
+            if($this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsMain->value)){
+                $this->build->main_head_js_bundle->registerMetaPackages($package);
+            }
+
+            if($this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsDefer->value)){
+                $this->build->defer_head_js_bundle->registerMetaPackages($package);
+            }
+
+            /* $package
+                 //CSS
+                 //JS
+                 ->addScript('functions.js',
+                             appAsset('js/functions.js'), ['defer'])
+                 ->addScript('jquery.formHelper.js',
+                             appAsset('js/plugins/jquery/jquery.formHelper.js'), ['defer'])
+                 ->addScript('modules.bundle.js', FrontendUtils::asset('js/modules.bundle.js'), ['defer'])
+                 ->addScript('theme.main.js',
+                             FrontendUtils::asset('js/theme.main.js'), ['defer']);*/
+
+            /* $package
+                 //CSS
+                 ->addStyle('theme.main.css',
+                            FrontendUtils::asset('css/theme.main.css'), [
+                                'rel'    => 'preload',
+                                'as'     => 'style',
+                                //'media'  => 'print',
+                                'onload' => "this.onload=null;this.rel='stylesheet'",
+                            ])
+                 ->addStyle('theme.custom.css',
+                            FrontendUtils::asset('css/theme.custom.css'), [
+                                'rel'    => 'preload',
+                                'as'     => 'style',
+                                //'media'  => 'print',
+                                'onload' => "this.onload=null;this.rel='stylesheet'",
+                            ]);*/
+            //endregion
+        });
+    }
+
+    public function registerMetaPackageBkp(): void
+    {
+
         PackageManager::create($this->meta_pkg_name, function (Package $package) {
 
             //Libraries
             $this->config->libs->registerMetaPackage($package);
 
-
             //Frameworks
-            /*if ($this->config->jquery_enable) {
-                $package->addScript('jquery.js', "https://code.jquery.com/jquery-{$this->config->jquery_version}.min.js");
-            }
-
-            if ($this->config->jquery_ui_enable) {
-
-                $juVersion = $this->config->jquery_ui_version;
-                $juStrict = $this->config->jquery_ui_strict;
-                //dd($juVersion, $juStrict, "https://code.jquery.com/ui/{$juVersion}/jquery-ui.min.js");
-
-                //JQuery Ui Js
-                if (!$juStrict || $juStrict === 'js') {
-                    $package->addScript('jquery-ui-core.js', "https://code.jquery.com/ui/{$juVersion}/jquery-ui.min.js");
-                }
-
-
-                //JQuery Ui Css
-                if (!$juStrict || $juStrict === 'css') {
-                    //dd("https://code.jquery.com/ui/{$juVersion}/themes/base/jquery-ui.min.css");
-                    $package->addStyle('jquery-ui-core.css', "https://code.jquery.com/ui/{$juVersion}/themes/base/jquery-ui.min.css");
-                }
-
-            }
-
-            if ($this->config->bootstrap_enable) {
-
-                $bsVersion = $this->config->bootstrap_version ?? collect(config('adminx.themes.versions.bootstrap'))->first();
-
-                $bsStrict = $this->config->bootstrap_strict;
-
-                //Bs Js
-                if (!$bsStrict || $bsStrict === 'js') {
-                    $package->addScript('bootstrap.bundle.js', "https://cdn.jsdelivr.net/npm/bootstrap@{$bsVersion}/dist/js/bootstrap.bundle.min.js", [
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-
-                    ]);
-                }
-
-
-                //Bs Css
-                if (!$bsStrict || $bsStrict === 'css') {
-                    $package->addStyle('bootstrap.css', "https://cdn.jsdelivr.net/npm/bootstrap@{$bsVersion}/dist/css/bootstrap.min.css", [
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-
-                    ]);
-                }
-
-
-                //Theme js
-
-                if (Str::startsWith($bsVersion, '5')) {
-                    $package->addScript('theme.bs5.js', FrontendUtils::asset('js/theme.main.bs5.js'));
-                }
-                else if (Str::startsWith($bsVersion, '4')) {
-                    $package->addScript('theme.bs4.js', FrontendUtils::asset('js/theme.main.bs4.js'));
-                }
-            }
-            */
 
             //region Theme Plugins
 
@@ -323,7 +510,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 
             foreach ($themePlugins as $pluginName) {
 
-                $plugin = $plataformPlugins[$pluginName] ?? null;
+                /*$plugin = $plataformPlugins[$pluginName] ?? null;
 
                 if ($plugin) {
                     if (isset($plugin['css'])) {
@@ -338,7 +525,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                         }
 
                     }
-                }
+                }*/
 
 
                 //dd($pluginName, $plugin);
@@ -361,14 +548,13 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
             }
 
             //endregion
-            //}
 
             //region Theme Files
 
             foreach ($this->assets->resources->css->listToOrder() as $assetItem) {
                 $optArray = $assetItem->load_mode == 'preload' ? [
                     'rel'    => 'preload',
-                    'as'    => 'style',
+                    'as'     => 'style',
                     //'media'  => 'print',
                     'onload' => "this.onload=null;this.rel='stylesheet'",
                 ] : [];
@@ -396,43 +582,11 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                 $package->addScript($assetItem->name, $this->assetResourceUrl($assetItem), $optArray, Meta::PLACEMENT_HEAD);
             }
 
-            /**
-             * todo: remove
-             * @var File $file
-             */
-            /*foreach ($this->files()->themeBundleSortened()->values() as $file) {
-
-                if ($file->extension === 'css') {
-                    $package->addStyle($file->name, $file->url);
-                }
-                if ($file->extension === 'js') {
-                    $package->addScript($file->name, $file->url, ['defer']);
-                }
-            }*/
             //endregion
 
             //region Pos
             $package
                 //CSS
-                /*->addStyle('pace-theme-minimal.css',
-                           'https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css')*/
-                /*->addStyle('font-awesome',
-                           'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css',
-                           [
-                               'integrity'      => 'sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A==',
-                               'crossorigin'    => 'anonymous',
-                               'referrerpolicy' => 'no-referrer',
-                               'rel'            => 'stylesheet',
-                               'media'          => 'print',
-                               'onload'         => "this.media='all'",
-
-                           ])*/
-                /*->addStyle('all.min.css',
-                           frontendThemeAsset('css/all.min.css'),
-                )
-                ->addStyle('main.c64b6eb2.css',
-                           frontendThemeAsset('static/css/main.c64b6eb2.css'))*/
-
                 //JS
                 ->addScript('functions.js',
                             appAsset('js/functions.js'))
@@ -451,14 +605,14 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                 ->addStyle('theme.main.css',
                            FrontendUtils::asset('css/theme.main.css'), [
                                'rel'    => 'preload',
-                               'as'    => 'style',
+                               'as'     => 'style',
                                //'media'  => 'print',
                                'onload' => "this.onload=null;this.rel='stylesheet'",
                            ])
                 ->addStyle('theme.custom.css',
                            FrontendUtils::asset('css/theme.custom.css'), [
                                'rel'    => 'preload',
-                               'as'    => 'style',
+                               'as'     => 'style',
                                //'media'  => 'print',
                                'onload' => "this.onload=null;this.rel='stylesheet'",
                            ]);
@@ -621,6 +775,11 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         return $this->hasOne(ThemeBuild::class, 'theme_id', 'id');
     }
 
+    public function bundles()
+    {
+        return $this->through('build')->has('bundles');
+    }
+
 
     /*public function menu()
         {
@@ -644,7 +803,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         return parent::save($options);
     }
 
-    public function saveAndCompile(array $options = []): bool
+    public function saveAndBuild(array $options = []): bool
     {
         $return = parent::save($options);
 
@@ -652,7 +811,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         if ($return) {
             sleep(1);
             $this->refresh();
-            $this->compile();
+            $this->generateBuild();
         }
 
         return $return;

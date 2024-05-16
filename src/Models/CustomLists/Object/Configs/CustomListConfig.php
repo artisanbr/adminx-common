@@ -5,7 +5,7 @@
  */
 
 namespace Adminx\Common\Models\CustomLists\Object\Configs;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 class CustomListConfig extends GenericModel
 {

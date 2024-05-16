@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Bases\Generic;
 
 use Adminx\Common\Models\File;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 /**
  * @property File $file

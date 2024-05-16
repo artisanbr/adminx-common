@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -25,54 +25,121 @@ return [
         ],
     ],
     'plugins'  => [
-        /*'jquery-ui' => [
+
+        'jquery' => [
+            'title' => 'jQuery Framework',
+            'default_version' => '3.6.3',
+            'js'    => [
+                'jquery.js' => [
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/jquery/{version}/jquery.min.js',
+                    'bundle' => true,
+                ],
+            ],
+        ],
+
+        'bootstrap' => [
+            'title' => 'Bootstrap Framework',
+            'default_version' => '5.3.2',
+            'recommended_versions' => [
+                '5.3.2',
+                '5.2.3',
+                '5.1.3',
+                '5.0.2',
+                '4.6.2',
+                '4.5.3',
+                '4.4.1',
+                '4.3.1',
+            ],
+            'js'    => [
+                'bootstrap.bundle.js' => [
+                    'url'        => 'https://cdn.jsdelivr.net/npm/bootstrap@{version}/dist/js/bootstrap.bundle.min.js',
+                    'bundle' => true,
+                ],
+            ],
+            'css'   => [
+                'bootstrap.css' => [
+                    'url'        => 'https://cdn.jsdelivr.net/npm/bootstrap@{version}/dist/css/bootstrap.min.css',
+                    'bundle' => true,
+                ],
+            ],
+        ],
+
+        'jquery-ui' => [
             'title' => 'jQuery UI',
+            'default_version' => '1.12.1',
             'css'   => [
                 'jquery-ui.css' => [
-                    'src'        => 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.min.css',
-                    'attributes' => [
-                        'rel'    => 'stylesheet',
-                        'media'  => 'print',
-                        'onload' => "this.media='all'",
-                    ],
-
+                    'url'        => 'https://code.jquery.com/ui/{version}/themes/base/jquery-ui.min.css',
+                    'defer' => true,
                     // rel="stylesheet" href="style.css" media="print" onload="this.media='all'"
                 ],
             ],
             'js'    => [
                 'jquery-ui.js' => [
-                    'src'        => 'https://code.jquery.com/ui/1.13.2/jquery-ui.min.js',
-                    'attributes' => [
-                        'integrity'   => 'sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=',
-                        'crossorigin' => 'anonymous',
-                        'async',
-                    ],
-                ],
-            ],
-        ],*/
-
-        'modernizr' => [
-            'title' => 'Modernizr',
-            'description' => 'Modernizr é uma biblioteca JavaScript que permite a detecção de recursos do navegador, auxiliando no desenvolvimento de sites compatíveis com diferentes tecnologias e navegadores.',
-            'version' => '3.6.0',
-            'js'    => [
-                'modernizr.js' => [
-                    'src' => '/assets/vendor/modernizr/modernizr-3.6.0.min.js',
+                    'url'        => 'https://code.jquery.com/ui/{version}/jquery-ui.min.js',
+                    'bundle' => true,
                 ],
             ],
         ],
 
-        'lazy-load' => [
+        'fontawesome' => [
+            'title' => 'FontAwesome',
+            'default_version' => '6.4.2',
+            'recommended_versions' => [
+                '6.4.2',
+                '5.15.4',
+            ],
+            'css'   => [
+                'all.min.css' => [
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/{version}/css/all.min.css',
+                    'bundle' => false,
+                    'defer' => true,
+                    // rel="stylesheet" href="style.css" media="print" onload="this.media='all'"
+                ],
+            ],
+        ],
+
+        'modernizr' => [
+            'title' => 'Modernizr',
+            'description' => 'Modernizr é uma biblioteca JavaScript que permite a detecção de recursos do navegador, auxiliando no desenvolvimento de sites compatíveis com diferentes tecnologias e navegadores.',
+            'disable_versions' => true,
+            'version' => '3.6.0',
+            'js'    => [
+                'modernizr.js' => [
+                    'url' => '/assets/vendor/modernizr/modernizr-3.6.0.min.js',
+                    'defer' => true,
+                    'bundle' => true,
+                ],
+            ],
+        ],
+
+        /*todo:'lazy-load' => [
             'title' => 'Lazy Load',
-            'description' => 'O Lazy Load JS é uma biblioteca JavaScript que adia o carregamento de imagens e conteúdo, acelerando o carregamento de páginas da web e economizando largura de banda.',
-            'version' => '1.7.9',
+            'description' => 'LazyLoad é um script leve e flexível que acelera o seu site, adiando o carregamento de imagens, planos de fundo, vídeos, iframes e scripts abaixo da dobra para quando eles entrarem na janela de visualização. Escrito em JavaScript "vanilla" simples, ele aproveita o IntersectionObserver, oferece suporte a imagens responsivas e permite carregamento lento nativo.',
+            'version' => '19.1',
+            'js'    => [
+                'lazyload.min.js' => [
+                    'url' => 'https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.min.js',
+                ],
+            ],
+        ],*/
+
+        'lazy-load' => [
+            'title' => 'jQuery Lazy Load',
+            'description' => 'O jQuery Lazy Load JS é uma biblioteca JavaScript que adia o carregamento de imagens e conteúdo, acelerando o carregamento de páginas da web e economizando largura de banda.',
+            'default_version' => '1.7.9',
+            'dependencies' => ['jQuery'],
             'js'    => [
                 'jquery.lazy.js' => [
-                    'src' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.min.js',
+                    'url' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/{version}/jquery.lazy.min.js',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
 
                 'jquery.lazy.plugins.js' => [
-                    'src' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/1.7.9/jquery.lazy.plugins.min.js',
+                    'url' => 'https://cdnjs.cloudflare.com/ajax/libs/jquery.lazy/{version}/jquery.lazy.plugins.min.js',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
         ],
@@ -81,29 +148,19 @@ return [
             'title'       => 'Magnific Popup',
             'dependencies' => ['jQuery'],
             'description' => 'O Magnific Popup é uma biblioteca jQuery que cria pop-ups responsivos e personalizáveis, amplamente usados para exibir imagens e conteúdo de forma elegante em sites.',
-            'version' => '1.1.0',
+            'default_version' => '1.1.0',
             'css'         => [
                 'magnific-popup.css' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css',
-                    'attributes' => [
-                        'integrity'      => 'sha512-+EoPw+Fiwh6eSeRK7zwIKG2MA8i3rV/DGa3tdttQGgWyatG/SkncT53KHQaS5Jh9MNOT3dmFL0FjTY08And/Cw==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                        'rel'    => 'stylesheet',
-                        'media'  => 'print',
-                        'onload' => "this.media='all'",
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/{version}/magnific-popup.min.css',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
             'js'          => [
                 'magnific-popup.js' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js',
-                    'attributes' => [
-                        'integrity'      => 'sha512-IsNh5E3eYy3tr/JiX2Yx4vsCujtkhwl7SLqgnwLNgf04Hrt9BT9SXlLlZlWx+OK4ndzAoALhsMNcCmkggjZB1w==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                        //'defer'
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/{version}/jquery.magnific-popup.min.js',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
         ],
@@ -111,28 +168,20 @@ return [
         'animations' => [
             'title'       => 'Animações (Animate.css + WOW.js)',
             'description' => 'Combo dos plugins para construir Animações em CSS e ao rolar a página',
+            'disable_versions' => true,
             'version' => '4.1.1 + 1.1.2',
             'css'         => [
                 'animate.css' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css',
-                    'attributes' => [
-                        'integrity'      => 'sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                        'rel'    => 'stylesheet',
-                        'media'  => 'print',
-                        'onload' => "this.media='all'",
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
             'js'          => [
                 'wow.js' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js',
-                    'attributes' => [
-                        'integrity'      => 'sha512-Eak/29OTpb36LLo2r47IpVzPBLXnAMPAVypbSZiZ4Qkf8p/7S/XRG5xp7OKWPPYfJT6metI+IORkR5G8F900+g==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
         ],
@@ -140,28 +189,12 @@ return [
         'animate' => [
             'title'       => 'Animate.css',
             'description' => 'O Animate.css é uma biblioteca de CSS que oferece uma variedade de animações pré-construídas para elementos HTML, facilitando a adição de animações a sites e aplicativos.',
-            'version' => '4.1.1',
+            'default_version' => '4.1.1',
             'css'         => [
                 'animate.css' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css',
-                    'attributes' => [
-                        'integrity'      => 'sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                        'rel'    => 'stylesheet',
-                        'media'  => 'print',
-                        'onload' => "this.media='all'",
-                    ],
-                ],
-            ],
-            'js'          => [
-                'wow.js' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js',
-                    'attributes' => [
-                        'integrity'      => 'sha512-Eak/29OTpb36LLo2r47IpVzPBLXnAMPAVypbSZiZ4Qkf8p/7S/XRG5xp7OKWPPYfJT6metI+IORkR5G8F900+g==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/animate.css/{version}/animate.min.css',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
         ],
@@ -169,15 +202,11 @@ return [
         'wow' => [
             'title'       => 'WOW.js',
             'description' => 'O WOW.js é uma biblioteca JavaScript que permite adicionar animações de scroll a elementos HTML, tornando a interatividade do site mais envolvente e atraente.',
-            'version' => '1.1.2',
+            'default_version' => '1.1.2',
             'js'          => [
                 'wow.js' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.min.js',
-                    'attributes' => [
-                        'integrity'      => 'sha512-Eak/29OTpb36LLo2r47IpVzPBLXnAMPAVypbSZiZ4Qkf8p/7S/XRG5xp7OKWPPYfJT6metI+IORkR5G8F900+g==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/wow/{version}/wow.min.js',
+                    'defer' => true,
                 ],
             ],
         ],
@@ -186,36 +215,24 @@ return [
             'title'       => 'Slick Carousel',
             'dependencies' => ['jQuery'],
             'description' => 'O Slick Carousel é um plugin jQuery que simplifica a criação de carrosséis interativos, tornando a exibição de conteúdo deslizante em sites mais fácil e flexível.',
-            'version' => '1.8.1',
+            'default_version' => '1.8.1',
             'css'         => [
                 'slick.css'       => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.css',
-                    'attributes' => [
-                        'integrity'      => 'sha512-wR4oNhLBHf7smjy0K4oqzdWumd+r5/+6QO/vDda76MW5iug4PT7v86FoEkySIJft3XA0Ae6axhIvHrqwm793Nw==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/{version}/slick.css',
+                    'defer' => true,
+                    'bundle' => false,
                 ],
                 'slick-theme.css' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css',
-                    'attributes' => [
-                        'integrity'      => 'sha512-17EgCFERpgZKcm0j0fEq1YCJuyAWdz9KUtv1EjVuaOz8pDnh/0nZxmU6BBXwaaxqoi9PQXnRWqlcDB027hgv9A==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                        'rel'    => 'stylesheet',
-                        'media'  => 'print',
-                        'onload' => "this.media='all'",
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/{version}/slick-theme.min.css',
+                    'defer' => true,
+                    'bundle' => false,
                 ],
             ],
             'js'          => [
                 'slick.js' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js',
-                    'attributes' => [
-                        'integrity'      => 'sha512-XtmMtDEcNz2j7ekrtHvOVR4iwwaD6o/FUJe6+Zq+HgcCsk3kj4uSQQR8weQ2QVj1o0Pk6PwYLohm206ZzNfubg==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/{version}/slick.min.js',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
         ],
@@ -223,28 +240,19 @@ return [
         'swiper' => [
             'title'       => 'Swiper Slider',
             'description' => 'O Swiper Slider é uma biblioteca JavaScript de slide/touch/swipe altamente personalizável, usada para criar carrosséis e galerias responsivas em páginas da web e aplicativos móveis.',
-            'version' => '8.4.5',
+            'default_version' => '8.4.5',
             'css'         => [
                 'swiper-bundle.css' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.4.5/swiper-bundle.css',
-                    'attributes' => [
-                        'integrity'      => 'sha512-jxGmKjC/OykrTklkNK2NgnhNtKtUAADFY+rvSi3nA7dbaPRfjrSXYxHqX8iq5N6WTOntqEQZrEwW3L84sirfKQ==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                        'rel'    => 'stylesheet',
-                        'media'  => 'print',
-                        'onload' => "this.media='all'",
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/Swiper/{version}/swiper-bundle.css',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
             'js'          => [
                 'swiper-bundle.js' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/Swiper/8.4.5/swiper-bundle.min.js',
-                    'attributes' => [
-                        'integrity'      => 'sha512-wdUM0BxMyMC/Yem1RWDiIiXA6ssXMoxypihVEwxDc+ftznGeRu4s9Fmxl8PthpxOh5CQ0eqjqw1Q8ScgNA1moQ==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/Swiper/{version}/swiper-bundle.min.js',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
         ],
@@ -256,36 +264,21 @@ return [
             'version' => '2.3.4',
             'css'         => [
                 'owl.carousel.css'      => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css',
-                    'attributes' => [
-                        'integrity'      => 'sha512-tS3S5qG0BlhnQROyJXvNjeEM4UpMXHrQfTGmbQ1gKmelCxlSEBUaxhRBj/EFTzpbP4RVSrpEikbmdJobCvhE3g==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                        'rel'    => 'stylesheet',
-                        'media'  => 'print',
-                        'onload' => "this.media='all'",
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/{version}/assets/owl.carousel.min.css',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
                 'owl.theme.default.css' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css',
-                    'attributes' => [
-                        'integrity'      => 'sha512-sMXtMNL1zRzolHYKEujM2AqCLUR9F2C4/05cdbxjjLSRvMQIciEPCQZo++nk7go3BtSuK9kfa/s+a4f4i5pLkw==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                        'rel'    => 'stylesheet',
-                        'media'  => 'print',
-                        'onload' => "this.media='all'",
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/{version}/assets/owl.theme.default.min.css',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
             'js'          => [
                 'owl.carousel.js' => [
-                    'src'        => 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js',
-                    'attributes' => [
-                        'integrity'      => 'sha512-bPs7Ae6pVvhOSiIcyUClR7/q2OAsRiovw4vAkX+zJbw3ShAeeqezq50RIIcIURq7Oa20rW2n2q+fyXBNcU9lrw==',
-                        'crossorigin'    => 'anonymous',
-                        'referrerpolicy' => 'no-referrer',
-                    ],
+                    'url'        => 'https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/{version}/owl.carousel.min.js',
+                    'defer' => true,
+                    'bundle' => true,
                 ],
             ],
         ],

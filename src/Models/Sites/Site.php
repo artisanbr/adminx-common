@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -258,7 +258,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
     protected function cdnProxyUrl(): Attribute
     {
-        return Attribute::make(get: fn() => "/storage/sites/{$this->public_id}");
+        return Attribute::make(get: fn() => "/sites/{$this->public_id}");
     }
 
     protected function cdnUri(): Attribute

@@ -6,18 +6,22 @@
 
 namespace Adminx\Common\Models\Themes\Objects\Config;
 
-use Adminx\Common\Enums\Themes\ThemeFramework;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
+use ArtisanLabs\GModel\Traits\NonRecursiveGenericModel;
 
 class ThemeConfig extends GenericModel
 {
+    use NonRecursiveGenericModel;
 
     protected $fillable = [
         //'no_framework',
         //'framework',
 
-        'bootstrap_enable',
+        'bundles_after',
+
+
+        /*'bootstrap_enable',
         'bootstrap_version',
         'bootstrap_strict',
 
@@ -28,7 +32,7 @@ class ThemeConfig extends GenericModel
         'jquery_version',
         'jquery_ui_enable',
         'jquery_ui_version',
-        'jquery_ui_strict',
+        'jquery_ui_strict',*/
 
 
         'breadcrumb',
@@ -40,27 +44,31 @@ class ThemeConfig extends GenericModel
         //'no_framework' => false,
         //'framework' => 'bootstrap:5',
 
-        'bootstrap_enable' => false,
-        'bootstrap_strict' => false,
+        //'bootstrap_enable' => false,
+        //'bootstrap_strict' => false,
 
-        'jquery_enable' => true,
-        'jquery_version' => '3.6.3',
-        'jquery_ui_enable' => true,
-        'jquery_ui_version' => '1.13.2',
+        //'jquery_enable' => true,
+        //'jquery_version' => '3.6.3',
+        //'jquery_ui_enable' => true,
+        //'jquery_ui_version' => '1.13.2',
 
         'plugins' => ['modernizr','magnific-popup','animations'],
         'breadcrumb' => [],
         'libs' => [],
+        'bundles_after' => [],
     ];
 
     protected $casts = [
-        'no_framework' => 'bool',
-        'framework' => ThemeFramework::class,
+        'bundles_after' => 'collection',
 
-        'jquery_enable' => 'bool',
-        'jquery_version' => 'string',
-        'jquery_ui_enable' => 'bool',
-        'jquery_ui_version' => 'string',
+
+        //'no_framework' => 'bool',
+        //'framework' => ThemeFramework::class,
+
+        //'jquery_enable' => 'bool',
+        //'jquery_version' => 'string',
+        //'jquery_ui_enable' => 'bool',
+        //'jquery_ui_version' => 'string',
 
         'plugins' => 'collection',
         'breadcrumb' => BreadcrumbConfig::class,

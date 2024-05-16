@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Generics\Elements\Themes;
 
 use Adminx\Common\Models\Generics\Files\GenericImageFile;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 class ThemeMediaElement extends GenericModel
 {

@@ -14,10 +14,10 @@ use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Sites\Site;
+use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use ArtisanBR\GenericModel\Model as GenericModel;
 
 /**
  * @property Page|Form|Article|CustomListAbstract|null $data

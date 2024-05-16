@@ -40,6 +40,12 @@
 @endif
 
 {{--</div>--}}
+{{--Build--}}
+{{--@if($theme->build->bundles?->get('js') ?? null)
+    <script defer>
+        {!! $theme->build->bundles?->get('js') ?? '' !!}
+    </script>
+@endif--}}
 
 {{--Scripts--}}
 @if($themeMeta ?? false)
@@ -49,8 +55,11 @@
 {{--<script src="https://www.google.com/recaptcha/api.js?render=explicit"></script>--}}
 {{--@@stack('js-includes')--}}
 
-<script>
-    moment.locale("pt-br");
+<script type="text/javascript" async>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        moment.locale("pt-br");
+    });
+
     // Ajax calls should always have the CSRF token attached to them, otherwise they won't work
     /*$.ajaxSetup({
         // force ajax call on all browsers

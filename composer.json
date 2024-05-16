@@ -34,7 +34,6 @@
         "laravel/framework": ">=10",
         "artisan-labs/laravel-breadcrumbs": "*",
         "artisan-labs/laravel-geo-database": "*",
-        "artisanbr/generic-model": "dev-main",
         "artisanbr/goodies": "dev-main",
         "artisan-labs/laravel-router": "*",
         "artisan-labs/laravel-ide-helper-plus": "*",
@@ -61,7 +60,8 @@
         "spatie/laravel-activitylog": "^4.5",
         "yadahan/laravel-authentication-log": "^1.4",
         "laravelcollective/html": "*",
-        "anhskohbo/no-captcha": "*"
+        "anhskohbo/no-captcha": "*",
+        "jenssegers/model": "^1.5"
     },
     "require-dev": {
         "spatie/laravel-ignition": "^2.0",
@@ -69,7 +69,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Adminx\\Common\\": "src/"
+            "Adminx\\Common\\": "src/",
+            "ArtisanLabs\\GModel\\": "packages/laravel-gmodel/src/"
         }
     },
     "autoload-dev": {

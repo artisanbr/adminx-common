@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Objects\Seo\Config;
 
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 class SeoConfig extends GenericModel
 {

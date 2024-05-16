@@ -9,8 +9,8 @@ namespace Adminx\Common\Models\Generics\Social;
 use Adminx\Common\Enums\SocialLinkType;
 use Adminx\Common\Models\Generics\Address;
 use Adminx\Common\Models\Generics\Contact\Phone;
+use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
-use ArtisanBR\GenericModel\Model as GenericModel;
 
 /**
  * @property Collection|Phone[] $extra_phones

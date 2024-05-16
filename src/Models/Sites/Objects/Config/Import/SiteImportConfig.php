@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Sites\Objects\Config\Import;
 
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 use Corcel\Model\Post;
 use Exception;
 use Illuminate\Support\Facades\Config;

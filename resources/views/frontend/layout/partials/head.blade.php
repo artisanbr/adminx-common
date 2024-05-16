@@ -14,9 +14,22 @@ $captcha = new \Anhskohbo\NoCaptcha\NoCaptcha($site->config->recaptcha_private_k
 {{--Assets--}}
 {{--Meta--}}
 {{--@{{ frontendBuild.meta.toHtml() }}--}}
+
 {{--Pre meta--}}
 @if($themeMeta ?? false)
     {!! $themeMeta->toHtml() !!}
+@endif
+
+{{--Build--}}
+{{--@if($theme->build->bundles?->get('css') ?? null)
+    <style type="text/css">
+        {!! $theme->build->bundles?->get('css') ?? '' !!}
+    </style>
+@endif--}}
+@if($theme->build->bundles?->get('head_js') ?? null)
+    <script type="text/javascript">
+        {!! $theme->build->bundles?->get('head_js') ?? '' !!}
+    </script>
 @endif
 {{--Site CSS--}}
 {!! $theme->assets->css_bundle_html ?? '' !!}

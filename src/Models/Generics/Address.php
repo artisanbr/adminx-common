@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Generics;
 
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 use ArtisanLabs\LaravelGeoDatabase\Models\GeoCity;
 use ArtisanLabs\LaravelGeoDatabase\Models\GeoCountry;
 use ArtisanLabs\LaravelGeoDatabase\Models\GeoState;
@@ -36,7 +36,7 @@ class Address extends GenericModel
     protected $appends = [
         /*'geo_country',
         'geo_state',
-        'geo_city',*/
+        'geo_city',
         'address_number',
         'address_number_html',
         'address_simple',
@@ -46,7 +46,7 @@ class Address extends GenericModel
         'full_address',
         'full_address_html',
         'map_uri',
-        'map_uri_embed',
+        'map_uri_embed',*/
     ];
 
     protected $casts = [
@@ -57,12 +57,13 @@ class Address extends GenericModel
 
     //region HELPERS
     //todo: attributes
-    public function getHtml($address = null)
+    public function getHtml($address = null): string
     {
-        $address = $address ?? $this->address_ext;
+        $address = $address ?? $this->getAddressExtAttribute();
+        $mapUri = $this->getMapUriAttribute();
 
         return $address ? <<<blade
-                        <a rel="tooltip" class="text-wrap" title="Abrir no Google Maps" href="{$this->map_uri}" target="_blank">
+                        <a rel="tooltip" class="text-wrap" title="Abrir no Google Maps" href="{$mapUri}" target="_blank">
                             {$address}
                         </a>
                         blade: "-";
@@ -89,64 +90,141 @@ class Address extends GenericModel
 
     //endregion
 
-    protected function getZipCodeNumberAttribute()
+   /* public function set($model, $key, $value, $attributes)
+
     {
-        return preg_replace('/\D+/mi', '', $this->zip_code);
+
+        //Se o valor for nulo e a model atual for nullable
+
+        if (is_null($value) && $this->isNullable()) {
+
+            return [$key => null]; //null;
+
+        }
+
+
+
+        $currentAttributes = $this->castRawValue($attributes[$key] ?? []);
+
+
+
+        $mergeResult = array_replace_recursive($currentAttributes, $this->castRawValue($value));
+
+        //$mergeResult = array_replace($currentAttributes, $this->castRawValue($value));
+
+
+
+        //return [$key => json_encode(self::make($mergeResult)->jsonSerialize())];
+        dump(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 5));
+        return json_encode(self::make($mergeResult)->jsonSerialize());
+
     }
 
-    protected function getMapUriAttribute()
+    public function jsonSerialize(): array
     {
-        return 'https://www.google.com/maps/search/' . urlencode($this->full_address);
+        $attributes = $this->getArrayableAttributes();
+
+
+        //
+
+        $mutatedAttributes = $this->getMutatedAttributes();
+        $appendAttributes = $this->getArrayableAppends();
+
+
+        // We want to spin through all the mutated attributes for this model and call
+        // the mutator for the attribute. We cache off every mutated attributes so
+        // we don't have to constantly check on attributes that actually change.
+        foreach ($mutatedAttributes as $attribute => $value) {
+            if (!array_key_exists($attribute, $attributes)) {
+                continue;
+            }
+
+            $attributes[$attribute] = $this->mutateAttributeForArray(
+                $attribute, $value
+            );
+        }
+
+        // Next we will handle any casts that have been setup for this model and cast
+        // the values to their appropriate type. If the attribute has a mutator we
+        // will not perform the cast on those attributes to avoid any confusion.
+        $attributes = $this->addCastAttributesToArray(
+            $attributes, $mutatedAttributes
+        );
+
+        // Here we will grab all of the appended, calculated attributes to this model
+        // as these attributes are not really in the attributes array, but are run
+        // when we need to array or JSON the model for convenience to the coder.
+
+        foreach ($attributes as $attribute => $value) {
+            $attributes[$attribute] = $this->mutateAttributeForArray($attribute, $value);
+        }
+
+
+        return collect($attributes)->except($this->appends)->except($this->temporary)->toArray();
+
+        return $attributes;
+    }*/
+
+    protected function getZipCodeNumberAttribute(): array|string|null
+    {
+        return preg_replace('/\D+/mi', '', $this->attributes['zip_code'] ?? '');
     }
 
-    protected function getMapUriEmbedAttribute()
+    protected function getMapUriAttribute(): string
     {
-        return 'https://www.google.com/maps/embed/v1/search?key=AIzaSyCDjsl_WAFbY7D-0Scr3TX_s6dSmxVK2RA&region=br&q=' . urlencode($this->full_address);
+        return '';
+        return 'https://www.google.com/maps/search/' . urlencode($this->getFullAddressAttribute());
+    }
+
+    protected function getMapUriEmbedAttribute(): string
+    {
+        return '';
+        return 'https://www.google.com/maps/embed/v1/search?key=AIzaSyCDjsl_WAFbY7D-0Scr3TX_s6dSmxVK2RA&region=br&q=' . urlencode($this->getFullAddressAttribute());
     }
 
     protected function getAddressNumberAttribute(): string
     {
-        return $this->address . ($this->number ? ", {$this->number}" : "");
+        return ($this->address ?? '') . (($this->number ?? false) ? ", {$this->number}" : "");
     }
 
     protected function getAddressNumberHtmlAttribute(): string
     {
-        return $this->getHtml($this->address_number);
+        return $this->getHtml($this->getAddressNumberAttribute());
     }
 
     protected function getAddressSimpleAttribute(): string
     {
-        return $this->address_number .
-            ($this->district ? " - {$this->district}" : "");
+        return ($this->address_number ?? '') .
+            (($this->district ?? false) ? " - {$this->district}" : "");
     }
 
     protected function getAddressSimpleHtmlAttribute(): string
     {
-        return $this->getHtml($this->address_simple);
+        return $this->getHtml($this->getAddressSimpleAttribute());
     }
 
     protected function getAddressExtAttribute(): string
     {
-        return $this->address_simple . ($this->zip_code ? " - CEP: {$this->zip_code}" : "");
+        return $this->getAddressSimpleAttribute() . (($this->zip_code ?? false) ? " - CEP: {$this->zip_code}" : "");
     }
 
     protected function getAddressExtHtmlAttribute(): string
     {
-        return $this->getHtml($this->address_ext);
+        return $this->getHtml($this->getAddressExtAttribute());
     }
 
     protected function getFullAddressAttribute(): string
     {
-        return $this->address_number .
-            ($this->district ? " - {$this->district}" : "") .
-            ($this->city ? " - {$this->city}, {$this->state}" : "") .
-            ($this->country ? " - {$this->country}" : "") .
-            ($this->zip_code ? " - CEP: {$this->zip_code}" : "");
+        return ($this->address_number ?? '') .
+            (($this->district ?? false) ? " - {$this->district}" : "") .
+            (($this->city ?? false) ? " - {$this->city}, {$this->state}" : "") .
+            (($this->country ?? false) ? " - {$this->country}" : "") .
+            (($this->zip_code ?? false) ? " - CEP: {$this->zip_code}" : "");
     }
 
-    protected function getFullAddressHtmlAttribute()
+    protected function getFullAddressHtmlAttribute(): string
     {
-        return $this->getHtml($this->full_address);
+        return $this->getHtml($this->getFullAddressAttribute());
     }
     //endregion
 }

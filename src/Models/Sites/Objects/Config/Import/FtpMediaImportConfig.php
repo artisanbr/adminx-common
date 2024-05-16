@@ -8,6 +8,7 @@ namespace Adminx\Common\Models\Sites\Objects\Config\Import;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Sites\Site;
+use ArtisanLabs\GModel\GenericModel;
 use Exception;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemAdapter;
@@ -15,7 +16,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
-use ArtisanBR\GenericModel\Model as GenericModel;
 
 class FtpMediaImportConfig extends GenericModel
 {

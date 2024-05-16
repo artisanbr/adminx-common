@@ -8,7 +8,7 @@ namespace Adminx\Common\Models\Sites\Objects\Config\Import;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Sites\Tools\Facades\WordpressImport;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Facades\Crypt;
 
 class WordpressImportConfig extends GenericModel

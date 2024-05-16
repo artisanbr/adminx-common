@@ -8,8 +8,8 @@ namespace Adminx\Common\Models\Traits;
 
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Facades\Auth;
-use ArtisanBR\GenericModel\Model as GenericModel;
 
 /**
  * @var EloquentModelBase|GenericModel $this

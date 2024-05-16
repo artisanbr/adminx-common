@@ -23,6 +23,7 @@ use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Themes\ThemeBuild;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Exception;
 use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Cache;
@@ -174,7 +175,7 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         if (!$themeBuild) {
 
-            $theme->compile();
+            $theme->generateBuild();
 
             $themeBuild = $theme->build()->latest()->first();
 
@@ -206,6 +207,7 @@ class FrontendTwigEngine extends FrontendEngineBase
     protected function prepareTwig(): static
     {
 
+        Debugbar::startMeasure('prepareTwig');
         $arrayTemplates = [];
         $this->twigArrayLoader = new ArrayLoader($this->getTemplatesToTwig());
 
@@ -255,6 +257,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         $this->twig->addExtension(new FrontendTwigExtension($this->twig, $this->currentSite));
         $this->twig->addExtension(new StringLoaderExtension());
 
+        Debugbar::stopMeasure('prepareTwig');
 
         /*$this->twig->addFunction(new TwigFunction('getTemplate', function (string $file) {
             return $this->getTwigTemplateName($file);
@@ -503,7 +506,7 @@ class FrontendTwigEngine extends FrontendEngineBase
     }
 
     public function getFromCache($name){
-        return Cache::has("site-cache:{$name}") ? Cache::get("site-cache-:{$name}") : false;
+        return Cache::has("site-cache:{$name}") ? Cache::get("site-cache:{$name}") : false;
     }
 
     public function saveCache($name, $content){
@@ -555,6 +558,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         if($useCache){
             $cache = $this->getFromCache($this->templateNamePrefix);
 
+            Debugbar::debug($cache);
             if(!empty($cache)){
                 return $cache;
             }

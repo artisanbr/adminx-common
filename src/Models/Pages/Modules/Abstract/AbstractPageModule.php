@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Pages\Modules\Abstract;
 
 use Adminx\Common\Models\Traits\HasSelect2;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 
 abstract class AbstractPageModule extends GenericModel

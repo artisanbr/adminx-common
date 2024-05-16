@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Objects\Frontend\Assets;
 
 use Adminx\Common\Models\Objects\Frontend\Assets\Code\FrontendJsAssetsCode;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 class FrontendJsAssetsBundle extends GenericModel
 {

@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Objects\Frontend\Assets\Abstract;
 
 use Adminx\Common\Libs\Support\Str;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 abstract class AbstractFrontendAssetsResourceScript extends GenericModel
 {
@@ -15,6 +15,8 @@ abstract class AbstractFrontendAssetsResourceScript extends GenericModel
         'path',
         'url',
         'external',
+        'bundle',
+        'defer',
         //'theme_path',
         'position',
         'load_mode',
@@ -29,6 +31,8 @@ abstract class AbstractFrontendAssetsResourceScript extends GenericModel
         'position'        => 'int',
         'load_mode'           => 'string',
         'external'        => 'boolean',
+        'bundle'        => 'boolean',
+        'defer'        => 'boolean',
         'html_attributes' => 'collection',
         //Computed
         'html'            => 'string',
@@ -37,6 +41,8 @@ abstract class AbstractFrontendAssetsResourceScript extends GenericModel
     protected $attributes = [
         'position' => 0,
         'load_mode'    => 'default',
+        'bundle'    => false,
+        'defer'    => false,
     ];
 
     abstract protected function getHtmlAttribute();
@@ -44,14 +50,19 @@ abstract class AbstractFrontendAssetsResourceScript extends GenericModel
 
     //region Attributes
     //region GET's
+    protected function getExternalAttribute(): bool
+    {
+        return Str::startsWith($this->attributes["url"] ?? '', ['http', '//']);
+    }
+
     protected function getIdAttribute(): string
     {
-        return 'file-' . Str::replace(['/', '.'], '-', $this->path);
+        return str($this->path)->slug();
     }
 
     protected function getNameAttribute(): string
     {
-        return collect(explode('/', $this->path))->last();
+        return str($this->path)->afterLast('/');
     }
 
     protected function getPathAttribute()
@@ -70,9 +81,9 @@ abstract class AbstractFrontendAssetsResourceScript extends GenericModel
     {
         $this->attributes["url"] = $value;
 
-        if (Str::startsWith($value, ['http', '//'])) {
+        /*if (Str::startsWith($value, ['http', '//'])) {
             $this->external = true;
-        }
+        }*/
 
         return $this;
     }

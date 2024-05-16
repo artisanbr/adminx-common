@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Traits;
 
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Database\Eloquent\Model;
 
 /**

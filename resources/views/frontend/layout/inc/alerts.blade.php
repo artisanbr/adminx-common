@@ -1,6 +1,6 @@
 {{-- Bootstrap Notifications using Prologue Alerts --}}
-<script type="text/javascript">
-    jQuery(document).ready(function ($) {
+<script type="text/javascript" defer>
+    document.addEventListener('DOMContentLoaded', (event) => {
 
         /*PNotify.prototype.options.styling = "bootstrap4";
         PNotify.prototype.options.styling = "fontawesome";*/

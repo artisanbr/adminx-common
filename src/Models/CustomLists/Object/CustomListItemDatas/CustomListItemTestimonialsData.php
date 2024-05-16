@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas;
 
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 class CustomListItemTestimonialsData extends GenericModel
 {

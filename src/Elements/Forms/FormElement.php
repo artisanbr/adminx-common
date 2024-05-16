@@ -7,7 +7,7 @@
 namespace Adminx\Common\Elements\Forms;
 
 use Adminx\Common\Enums\Forms\FormElementType;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
 class FormElement extends GenericModel

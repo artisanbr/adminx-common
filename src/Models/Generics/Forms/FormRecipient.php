@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Generics\Forms;
 
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 class FormRecipient extends GenericModel
 {

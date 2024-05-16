@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Objects\Frontend\Builds\Common\Abstract;
 
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 /**
  * @property string $html

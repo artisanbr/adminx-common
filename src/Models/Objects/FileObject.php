@@ -8,7 +8,7 @@ namespace Adminx\Common\Models\Objects;
 
 
 use Adminx\Common\Libs\FileManager\Helpers\FileHelper;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 
 /**

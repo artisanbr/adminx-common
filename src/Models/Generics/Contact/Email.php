@@ -6,7 +6,7 @@
 
 namespace Adminx\Common\Models\Generics\Contact;
 
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 class Email extends GenericModel
 {

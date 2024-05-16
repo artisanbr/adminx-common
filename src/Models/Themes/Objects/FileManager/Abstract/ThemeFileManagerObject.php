@@ -8,9 +8,9 @@ namespace Adminx\Common\Models\Themes\Objects\FileManager\Abstract;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Themes\Theme;
+use ArtisanLabs\GModel\GenericModel;
 use Delight\Random\Random;
 use Illuminate\Support\Collection;
-use ArtisanBR\GenericModel\Model as GenericModel;
 
 abstract class ThemeFileManagerObject extends GenericModel
 {

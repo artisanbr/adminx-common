@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Menus\Objects\Config\Render;
 
 use Adminx\Common\Models\Casts\AsCollectionOf;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 class MenuRenderRepository extends GenericModel
 {

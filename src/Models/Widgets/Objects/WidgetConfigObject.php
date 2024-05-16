@@ -10,7 +10,7 @@ use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigPaging;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigSorting;
 use Adminx\Common\Models\Generics\Widgets\WidgetConfigVariable;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
 /**s

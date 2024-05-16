@@ -8,8 +8,8 @@ namespace Adminx\Common\Models\Objects\Seo;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Objects\Seo\Config\SeoConfig;
+use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
-use ArtisanBR\GenericModel\Model as GenericModel;
 
 
 class Seo extends GenericModel

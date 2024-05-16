@@ -1,11 +1,12 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Themes\Objects\Config\Libraries;
 
+use Adminx\Common\Models\Themes\Enums\ThemeAssetCompile;
 use Adminx\Common\Models\Themes\Objects\Abstract\ThemeConfigLibraryAbstract;
 
 class BoostrapLibrary extends ThemeConfigLibraryAbstract
@@ -13,16 +14,17 @@ class BoostrapLibrary extends ThemeConfigLibraryAbstract
 
     protected $attributes = [
         'enable' => false,
+        'compile' => ThemeAssetCompile::Js->value,
         'version' => '5.3.2',
         'strict' => false,
     ];
 
-    protected array $js_files = [
+    protected array $included_js_files = [
         'js/bootstrap.bundle.min.js',
     ];
 
 
-    protected array $css_files = [
+    protected array $included_css_files = [
         'css/bootstrap.min.css',
     ];
 

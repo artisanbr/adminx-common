@@ -9,8 +9,8 @@ namespace Adminx\Common\Models\Objects\Frontend\Assets;
 use Adminx\Common\Libs\FileManager\Helpers\FileHelper;
 use Adminx\Common\Models\Objects\Frontend\Assets\Resources\FrontendCssAssetsResources;
 use Adminx\Common\Models\Objects\Frontend\Assets\Resources\FrontendJsAssetsResources;
+use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
-use ArtisanBR\GenericModel\Model as GenericModel;
 
 class FrontendResourceAssetsBundle extends GenericModel
 {

@@ -7,7 +7,7 @@
 namespace Adminx\Common\Models\Generics\Widgets;
 
 use Adminx\Common\Enums\Widgets\WidgetConfigVariableType;
-use ArtisanBR\GenericModel\Model as GenericModel;
+use ArtisanLabs\GModel\GenericModel;
 
 class WidgetConfigVariable extends GenericModel
 {

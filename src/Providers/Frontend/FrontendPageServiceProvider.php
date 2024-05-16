@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -76,12 +76,13 @@ class FrontendPageServiceProvider extends ServiceProvider
 
         Meta::macro('registerFromSiteTheme', function (Theme $theme) {
 
+            $this->setFavicon($theme->media->favicon->url ?? '');
+
             $theme->registerMetaPackage();
 
 
-            $this->setFavicon($theme->media->favicon->url ?? '');
-
-            $this->includePackages([$theme->meta_pkg_name, 'frontend.pos']);
+           $this->includePackages([$theme->meta_pkg_name]);
+           //$this->includePackages([$theme->meta_pkg_name, 'frontend.pos']);
 
         });
 

@@ -6,15 +6,20 @@
 
 namespace Adminx\Common\Models\Themes\Objects\Abstract;
 
+use Adminx\Common\Models\Themes\Enums\ThemeAssetCompile;
+use ArtisanLabs\GModel\GenericModel;
 use Butschster\Head\Packages\Package;
 use Illuminate\Support\Collection;
-use ArtisanBR\GenericModel\Model as GenericModel;
 
+/**
+ * @property ThemeAssetCompile $compile
+ */
 abstract class ThemeConfigLibraryAbstract extends GenericModel
 {
 
     protected $fillable = [
         'enable',
+        'compile',
         'version',
         'strict',
     ];
@@ -25,6 +30,7 @@ abstract class ThemeConfigLibraryAbstract extends GenericModel
 
     protected $casts = [
         'enable'       => 'bool',
+        'compile'       => ThemeAssetCompile::class,
         'version'      => 'string',
         'cdn_base_uri' => 'string',
         //'strict'       => 'string',
@@ -33,16 +39,16 @@ abstract class ThemeConfigLibraryAbstract extends GenericModel
     /**
      * @var array<string>
      */
-    protected array $js_files = [];
+    protected array $included_js_files = [];
 
     /**
      * @var array<string>
      */
-    protected array $css_files = [];
+    protected array $included_css_files = [];
 
     const strictTypes = [
         false => 'Completo',
-        'js' => 'Apenas o Javascript',
+        'js'  => 'Apenas o Javascript',
         'css' => 'Apenas o CSS',
     ];
 
@@ -54,7 +60,7 @@ abstract class ThemeConfigLibraryAbstract extends GenericModel
     //region Helpers
     public function cdnFile($file): string
     {
-        return $this->getCdnBaseUriAttribute().$file;
+        return $this->getCdnBaseUriAttribute() . $file;
     }
 
     public function registerMetaPackage(Package &$package): Package
@@ -62,8 +68,11 @@ abstract class ThemeConfigLibraryAbstract extends GenericModel
         if ($this->enable) {
 
             $strict = $this->strict;
-            if (!$strict || $strict === 'js') {
-                foreach ($this->js_files as $file) {
+            if ((!$strict || $strict === 'js') && !$this->compile->isAny([
+                ThemeAssetCompile::All,
+                ThemeAssetCompile::Js
+                                                                         ])) {
+                foreach ($this->included_js_files as $file) {
                     $package->addScript($file, $this->cdnFile($file), [
                         'crossorigin'    => 'anonymous',
                         'referrerpolicy' => 'no-referrer',
@@ -72,8 +81,11 @@ abstract class ThemeConfigLibraryAbstract extends GenericModel
                 }
             }
 
-            if (!$strict || $strict === 'css') {
-                foreach ($this->css_files as $file) {
+            if ((!$strict || $strict === 'css') && !$this->compile->isAny([
+                ThemeAssetCompile::All,
+                ThemeAssetCompile::Css
+                                                                          ])) {
+                foreach ($this->included_css_files as $file) {
                     $package->addStyle($file, $this->cdnFile($file), [
                         'crossorigin'    => 'anonymous',
                         'referrerpolicy' => 'no-referrer',
@@ -88,11 +100,62 @@ abstract class ThemeConfigLibraryAbstract extends GenericModel
     }
     //endregion
 
-
     //region Attributes
-
     //region GET's
     abstract protected function getCdnBaseUriAttribute(): string;
+
+    protected function getCssCompileFilesAttribute(): array
+    {
+        return $this->enable && $this->compile->isAny([
+            ThemeAssetCompile::All,
+            ThemeAssetCompile::Css
+                                                      ]) ? $this->included_css_files : [];
+    }
+
+    protected function getJsCompileFilesAttribute(): array
+    {
+        return $this->enable && $this->compile->isAny([
+            ThemeAssetCompile::All,
+            ThemeAssetCompile::Js
+                                                      ]) ? $this->included_js_files : [];
+    }
+
+    protected function getCssFilesAttribute(): array
+    {
+        return $this->enable ? $this->included_css_files : [];
+    }
+
+    protected function getJsFilesAttribute(): array
+    {
+        return $this->enable ? $this->included_js_files : [];
+    }
+
+
+    protected function getCdnCssCompileFilesAttribute(): array
+    {
+        return $this->enable && $this->compile->isAny([
+                                                          ThemeAssetCompile::All,
+                                                          ThemeAssetCompile::Css
+                                                      ]) ? $this->getCdnCssFilesAttribute() : [];
+    }
+
+    protected function getCdnJsCompileFilesAttribute(): array
+    {
+        return $this->enable && $this->compile->isAny([
+                                                          ThemeAssetCompile::All,
+                                                          ThemeAssetCompile::Js
+                                                      ]) ? $this->getCdnJsFilesAttribute() : [];
+    }
+
+    protected function getCdnCssFilesAttribute(): array
+    {
+        return collect($this->getCssFilesAttribute())->map(fn($file) => $this->cdnFile($file))->toArray();
+    }
+
+    protected function getCdnJsFilesAttribute(): array
+    {
+        return collect($this->getJsFilesAttribute())->map(fn($file) => $this->cdnFile($file))->toArray();
+    }
     //endregion
 
     //region SET's
