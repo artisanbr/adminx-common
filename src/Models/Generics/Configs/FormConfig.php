@@ -6,9 +6,9 @@
 
 namespace Adminx\Common\Models\Generics\Configs;
 
+use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Forms\FormRecipient;
 use Adminx\Common\Models\Generics\Forms\FormSendButton;
-use ArtisanLabs\GModel\Casts\AsCollectionOf;
 use ArtisanLabs\GModel\GenericModel;
 
 class FormConfig extends GenericModel
