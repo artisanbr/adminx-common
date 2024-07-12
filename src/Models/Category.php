@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -25,13 +25,14 @@ use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\ScopeOrganize;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class Category extends EloquentModelBase implements OwneredModel
 {
-    use HasSelect2, HasUriAttributes, ScopeOrganize, HasUriAttributes, HasMorphAssigns, HasValidation, BelongsToSite, BelongsToAccount, HasParent, BelongsToUser, HasOwners, BelongsToPage;
+    use HasSelect2, HasUriAttributes, ScopeOrganize, HasUriAttributes, HasMorphAssigns, HasValidation, BelongsToSite, BelongsToAccount, HasParent, BelongsToUser, HasOwners, BelongsToPage, SoftDeletes;
 
     protected $fillable = [
         'site_id',
