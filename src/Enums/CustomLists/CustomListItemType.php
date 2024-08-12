@@ -1,37 +1,42 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Enums\CustomLists;
 
 use Adminx\Common\Enums\Traits\EnumToArray;
-use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
-use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml;
-use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemImageSlider;
-use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemTestimonials;
+use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemHtmlData;
+use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemImageData;
+use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\CustomListItemTestimonialData;
 
 enum CustomListItemType: string
 {
     use EnumToArray;
 
+    //case ImageSlide = 'slide.image': to: image;
     case Image = 'image';
-    case Video = 'video';
-    case File = 'file';
-    case Post = 'article';
-    case HTML = 'html';
-    case ImageSlide = 'slide.image';
     case Testimonial = 'testimonial';
+    case HTML = 'html';
 
-    public function mountClass(): string
+    //Todo:
+    /*case Video = 'video';
+    case File = 'file';
+    case Article = 'article';*/
+
+    public function dataClass(): string
     {
-        return self::getMountClassTo($this);
+        return self::getDataClassTo($this);
     }
 
-    public static function getMountClassTo($type): string
+    public static function getDataClassTo($type): string
     {
         return match ($type) {
-            self::ImageSlide => CustomListItemImageSlider::class,
-            self::Testimonial => CustomListItemTestimonials::class,
-            self::HTML => CustomListItemHtml::class,
-            default => CustomListItem::class
+            self::Image => CustomListItemImageData::class,
+            self::Testimonial => CustomListItemTestimonialData::class,
+            self::HTML => CustomListItemHtmlData::class,
+            //default => CustomListItem::class
         };
     }
 
@@ -45,11 +50,10 @@ enum CustomListItemType: string
     {
         return match ($type) {
             self::Image => 'Imagem',
-            self::Video => 'Vídeo',
-            self::File => 'Arquivo',
-            self::HTML => 'HTML',
-            self::ImageSlide => 'Slide de Imagem',
             self::Testimonial => 'Depoimento/Testemunho',
+            self::HTML => 'HTML',
+            /*self::Video => 'Vídeo',
+            self::File => 'Arquivo',*/
         };
     }
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -167,15 +167,6 @@ class MenuItem extends EloquentModelBase
 
                         $customList = $this->menuable->model;
 
-                        if (method_exists($customList, 'mountModel')) {
-                            $customList = $customList->mountModel();
-                        }
-
-                        /*if($menu->id == 7){
-
-                            dd($customList);
-                        }*/
-
 
                         foreach ($customList->items as $modelItem) {
                             $listItemLink = Link::to($modelItem->url, $modelItem->title)
@@ -186,16 +177,7 @@ class MenuItem extends EloquentModelBase
                             $subMenu->add($listItemLink);
                         }
 
-                    }/*else if ($this->config->is_source_submenu && $this->config->submenu_source->data->id ?? false) {
-                        //Subitens de uma fonte de dados
-                        $sourceData = $this->config->submenu_source->data->mountModel();
-
-
-                        foreach ($sourceData->items as $dataItem) {
-                            $subMenu->add(Link::to($sourceData->itemUrl($dataItem), $dataItem->title)->addParentClass($menu->config->menu_item_class ?? ''));
-                        }
-
-                    }*/
+                    }
                     else if ($this->children->count()) {
                         //Subitens cadastrados
                         foreach ($this->children as $childMenuItem) {
@@ -287,10 +269,6 @@ class MenuItem extends EloquentModelBase
 
                         $customList = $this->menuable->model;
 
-                        if (method_exists($customList, 'mountModel')) {
-                            $customList = $customList->mountModel();
-                        }
-
 
                         foreach ($customList->items as $modelItem) {
                             $listItemLink = Link::to($modelItem->url, $modelItem->title)
@@ -304,7 +282,7 @@ class MenuItem extends EloquentModelBase
 
                     }/*else if ($this->config->is_source_submenu && $this->config->submenu_source->data->id ?? false) {
                         //Subitens de uma fonte de dados
-                        $sourceData = $this->config->submenu_source->data->mountModel();
+                        $sourceData = $this->config->submenu_source->data;
 
 
                         foreach ($sourceData->items as $dataItem) {

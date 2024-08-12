@@ -8,73 +8,11 @@ namespace Adminx\Common\Libs\FileManager;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Objects\FileObject;
-use Adminx\Common\Models\Sites\Site;
 use Buglinjo\LaravelWebp\Webp;
-use Delight\Random\Random;
-use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
-class FileUploadManager
+class FileUploadManager extends FileManager
 {
-
-    protected Filesystem $remoteStorage, $tempStorage;
-
-    public function __construct(
-        protected ?Site      $site = null,
-        protected string     $uploadPathBase = '',
-        protected string     $uploadPath = '',
-        protected string     $fileName = '',
-        protected FileObject $fileObject = new FileObject(),
-    )
-    {
-        $this->remoteStorage = Storage::disk('ftp');
-        $this->tempStorage = Storage::disk('temp');
-
-        if (!$this->site && @Auth::check() && Auth::user()->site) {
-            $this->onSite(Auth::user()->site);
-        }
-    }
-
-    public function site(Site $site): static
-    {
-
-        $this->site = $site;
-
-        return $this;
-    }
-
-    public function onSite(Site $site): static
-    {
-
-        $this->site($site);
-
-        $this->uploadPathBase = "sites/{$site->public_id}/";
-
-        return $this;
-    }
-
-    protected function basePathTo($path): string
-    {
-        return $this->uploadPathBase . $path;
-    }
-
-    protected function fullPathTo($path = ''): string
-    {
-        return $this->uploadPathBase . $this->uploadPath . $path;
-    }
-
-    protected function filePath(): string
-    {
-        return $this->uploadPathBase . $this->uploadPath . $this->fileName;
-    }
-
-    public function onPath(string $uploadPath): static
-    {
-        $this->uploadPath = $uploadPath . (Str::endsWith($uploadPath, '/') ? '' : '/');
-        return $this;
-    }
 
     public function upload(UploadedFile $requestFile, $uploadPath = '', $fileName = '', $imagesToWebp = true): ?FileObject
     {
@@ -82,8 +20,12 @@ class FileUploadManager
         $this->fileObject = new FileObject();
 
         if (empty($fileName)) {
-            $fileName = Random::uuid4();
+            $fileName = Str::ulid();
         }
+
+        //Remover caracteres indesejados
+        $fileName = str($fileName)->slug('-')->toString();
+
 
         $this->onPath($uploadPath);
 

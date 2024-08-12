@@ -15,7 +15,7 @@ use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
-use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml;
+use Adminx\Common\Models\CustomLists\CustomListItem;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Pages\Page;
@@ -702,12 +702,12 @@ class FrontendTwigEngine extends FrontendEngineBase
     public function pageInternal(Page $page, PageInternal $pageInternal, $modelItem): string
     {
         /**
-         * @var EloquentModelBase|CustomListItemAbstract|CustomListItemHtml $modelItem
+         * @var EloquentModelBase|CustomListItem $modelItem
          */
 
         $this->templateNamePrefix = "@page={$page->public_id}@internal={$pageInternal->public_id}@model=" . (@$modelItem->public_id ?? @$modelItem->slug ?? Str::slug($modelItem?->title ?? ''));
 
-        $pageInternal->breadcrumb_config->background_url = $modelItem->data->image_url;
+        $pageInternal->breadcrumb_config->background_url = $modelItem->image_url;
 
         $this->setViewData($pageInternal->page->getBuildViewData([
                                                                      'pageInternal' => $pageInternal,
@@ -721,9 +721,9 @@ class FrontendTwigEngine extends FrontendEngineBase
         if ($pageInternal->frontend_build ?? false) {
             $this->registerFrontendBuild($pageInternal->frontend_build);
         }
-        if ($modelItem->data->frontend_build ?? false) {
-            $this->registerFrontendBuild($modelItem->data->frontend_build);
-        }
+        /*if ($modelItem->schema->frontend_build ?? false) {
+            $this->registerFrontendBuild($modelItem->schema->frontend_build);
+        }*/
 
         //$this->frontendBuild->meta->registerSeoForPage($page);
 

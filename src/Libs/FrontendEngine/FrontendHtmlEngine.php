@@ -524,7 +524,6 @@ blade;
             $customList = $this->currentPage->site->lists()->where('public_id', $public_id)->orWhere('slug', $public_id)->first();
 
             if ($customList) {
-                $customList = $customList->mountModel();
                 $this->customLists->add($customList);
             }
         }

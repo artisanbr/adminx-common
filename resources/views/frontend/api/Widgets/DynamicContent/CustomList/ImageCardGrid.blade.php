@@ -211,7 +211,7 @@
                 <div class="image-card-grid-box">
                     <div class="image-card-grid-thumb">
                         <div class="thumb bg-img-c"
-                             style="background-image: url('{{ $listItem->data->image_url }}');"></div>
+                             style="background-image: url('{{ $listItem->image_url }}');"></div>
                     </div>
                     <div class="image-card-grid-desc text-center">
                         <h4><a href="{{ $customList->itemUrl($listItem) ?? '#' }}">{{ $listItem->title }}</a></h4>

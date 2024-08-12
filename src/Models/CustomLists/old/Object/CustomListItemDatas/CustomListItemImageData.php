@@ -10,7 +10,7 @@ use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\CustomLists\Object\CustomListItemDatas\Sliders\SliderDataButtons;
 use ArtisanLabs\GModel\GenericModel;
 
-class CustomListItemImageSliderData extends GenericModel
+class CustomListItemImageData extends GenericModel
 {
 
     protected $fillable = [

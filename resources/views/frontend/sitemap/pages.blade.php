@@ -46,20 +46,22 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
         @foreach($page->page_internals as $pageInternal)
 
             @if($pageInternal->model?->items ?? false)
-                @foreach($pageInternal->model->mountModel()->items as $modelItem)
-                    <url>
-                        <loc>{{ $site->uriTo($modelItem->url) }}</loc>
-                        <changefreq>weekly</changefreq>
-                        <lastmod>{{ $modelItem->updated_at->toIso8601String() }}</lastmod>
-                        <priority>0.5</priority>
+                @foreach($pageInternal->model->items as $modelItem)
+                    @if($modelItem->url ?? false)
+                        <url>
+                            <loc>{{ $site->uriTo($modelItem->url) }}</loc>
+                            <changefreq>weekly</changefreq>
+                            <lastmod>{{ $modelItem->updated_at->toIso8601String() }}</lastmod>
+                            <priority>0.5</priority>
 
-                        @if($modelItem->data->image_url)
-                            <image:image>
-                                <image:loc>{{ FrontendUtils::url($modelItem->data->image_url) }}</image:loc>
-                                {{--<image:title>{{ $article->seoTitle() }}</image:title>--}}
-                            </image:image>
-                        @endif
-                    </url>
+                            @if($modelItem->data->image_url ?? false)
+                                <image:image>
+                                    <image:loc>{{ FrontendUtils::url($modelItem->data->image_url) }}</image:loc>
+                                    {{--<image:title>{{ $article->seoTitle() }}</image:title>--}}
+                                </image:image>
+                            @endif
+                        </url>
+                    @endif
                 @endforeach
             @endif
 

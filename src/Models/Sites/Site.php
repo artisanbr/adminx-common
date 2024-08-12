@@ -108,7 +108,11 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
     //region HELPERS
     public function uploadPathTo(?string $path = null): string
     {
-        return "sites/{$this->public_id}" . ($path ? "/{$path}" : '');
+        return str("sites/{$this->public_id}")
+            ->when(!empty($path), fn($str) => $str->append(str($path)
+                                                               ->start('/')
+                                                               ->toString()))
+            ->toString();
     }
 
     public function cdnProxyUrlTo(?string $path = ''): string
@@ -129,22 +133,26 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         return $this->cdn_proxy_uri . $path;
     }
 
-    public function cdnUrlTo(?string $path = ''): string
+    protected function convertStorageUrlToCdn(?string $storageUrl = ''): string
     {
-        if (!Str::startsWith($path, '/')) {
-            $path = "/{$path}";
+        $storageUrl = str($storageUrl)->start('/');
+
+        if ($storageUrl->startsWith('/storage')) {
+            $storageUrl = $storageUrl->after('/storage/sites/' . $this->public_id);
         }
 
-        return $this->cdn_url.$path;
+        return $storageUrl->toString();
+    }
+
+    public function cdnUrlTo(?string $path = ''): string
+    {
+        return $this->cdn_url . $this->convertStorageUrlToCdn($path);
     }
 
     public function cdnUriTo(?string $path = ''): string
     {
-        if (!Str::startsWith($path, '' )) {
-            $path = "/{$path}";
-        }
 
-        return $this->cdn_uri.$path;
+        return $this->cdn_uri . $this->convertStorageUrlToCdn($path);
     }
 
     public static function getFromPreviousDomain($public_id): EloquentModelBase|Builder|Site|null
@@ -194,10 +202,10 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
         //SEO
         $frontendBuild->seo->fill([
                                       //'title'         => "{{ page.getTitle() }}",
-                                      'title_prefix'  => "{{ site.getTitle() }}",
-                                      'description'   => $this->getDescription(),
-                                      'keywords'      => $this->getKeywords(),
-                                      'image_url'     => $this->seoImage(),
+                                      'title_prefix' => "{{ site.getTitle() }}",
+                                      'description'  => $this->getDescription(),
+                                      'keywords'     => $this->getKeywords(),
+                                      'image_url'    => $this->seoImage(),
                                   ]);
 
         return $frontendBuild;

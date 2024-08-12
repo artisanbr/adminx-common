@@ -6,6 +6,7 @@
 
 namespace ArtisanLabs\GModel;
 
+use Adminx\Common\Libs\Support\ArrayObject;
 use ArtisanLabs\GModel\Concerns\HasCastables;
 use ArtisanLabs\GModel\Contracts\CastsAttributes as GenericCastsAttributes;
 use ArtisanLabs\GModel\Contracts\CastsInboundAttributes as GenericCastsInboundAttributes;
@@ -28,11 +29,12 @@ use InvalidArgumentException;
 use Jenssegers\Model\Model;
 use JsonException;
 use JsonSerializable;
+use Livewire\Wireable;
 use ReflectionMethod;
 use ReflectionNamedType;
 use UnitEnum;
 
-abstract class GenericModel extends Model implements CastsAttributes, GenericCastsAttributes, GenericCastsInboundAttributes
+abstract class GenericModel extends Model implements CastsAttributes, GenericCastsAttributes, GenericCastsInboundAttributes, Wireable
 {
     use HasTimestamps, HasCastables;
 
@@ -180,19 +182,19 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
             }
             else if ($totallyGuarded || static::preventsSilentlyDiscardingAttributes()) {
                 throw new \Jenssegers\Model\MassAssignmentException(sprintf(
-                                                      'Add [%s] to fillable property to allow mass assignment on [%s].',
-                                                      $key, get_class($this)
-                                                  ));
+                                                                        'Add [%s] to fillable property to allow mass assignment on [%s].',
+                                                                        $key, get_class($this)
+                                                                    ));
             }
         }
 
 
         if (static::preventsSilentlyDiscardingAttributes() && count($attributes) !== count($fillable)) {
             throw new \Jenssegers\Model\MassAssignmentException(sprintf(
-                                                  'Add fillable property [%s] to allow mass assignment on [%s].',
-                                                  implode(', ', array_diff(array_keys($attributes), array_keys($fillable))),
-                                                  get_class($this)
-                                              ));
+                                                                    'Add fillable property [%s] to allow mass assignment on [%s].',
+                                                                    implode(', ', array_diff(array_keys($attributes), array_keys($fillable))),
+                                                                    get_class($this)
+                                                                ));
         }
 
 
@@ -1438,13 +1440,14 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
     /**
      * Decode the given JSON back into an array or object.
      *
-     * @param  string  $value
-     * @param  bool  $asObject
+     * @param string $value
+     * @param bool   $asObject
+     *
      * @return mixed
      */
     public function fromJson($value, $asObject = false)
     {
-        return json_decode(is_string($value) ? $value : json_encode($value), ! $asObject);
+        return json_decode(is_string($value) ? $value : json_encode($value), !$asObject);
     }
 
     /**
@@ -1619,6 +1622,16 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
         return (new static($attributes));
     }
 
+    public function toLivewire(): array
+    {
+        return $this->toArray();
+    }
+
+    public static function fromLivewire($value): static
+    {
+        return new static($value);
+    }
+
     /**
      * @throws JsonException
      */
@@ -1640,7 +1653,7 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
                      'attributes' => $attributes,
                      //'model'      => $model,
                      //'trace'      => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10),
-                     'error' => $e->getMessage()
+                     'error'      => $e->getMessage(),
                  ]);
             throw $e;
         }
@@ -1666,7 +1679,13 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
 
             $currentAttributes = $this->castRawValue($attributes[$key] ?? []);
 
-            $mergeResult = array_replace_recursive($currentAttributes, $this->castRawValue($value));
+            //$mergeResult = array_replace_recursive($currentAttributes, $this->castRawValue($value));
+
+
+            $mergeValue = ArrayObject::mergeRecursive($currentAttributes, $this->castRawValue($value));
+
+
+
             //$mergeResult = array_replace($currentAttributes, $this->castRawValue($value));
 
             //$mergeResult = collect($currentAttributes)->replaceRecursive($this->castRawValue($value))->toArray();
@@ -1690,7 +1709,7 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
                      ]);
             }*/
 
-            return [$key => json_encode(self::make($mergeResult)->jsonSerialize())];
+            return [$key => json_encode(self::make($mergeValue)->jsonSerialize())];
 
         } catch (\Exception $e) {
             dump("exception set: $key", $value, $attributes);

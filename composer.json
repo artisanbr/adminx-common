@@ -38,6 +38,8 @@
         "artisan-labs/laravel-router": "*",
         "artisan-labs/laravel-ide-helper-plus": "*",
         "artisan-labs/laravel-bs-components": "*",
+        "livewire/livewire": "^3.0",
+        "jantinnerezo/livewire-alert": "^3.0",
         "delight-im/random": "^1.0",
         "league/flysystem-ftp": "^3.0",
         "butschster/meta-tags": "^2.2",

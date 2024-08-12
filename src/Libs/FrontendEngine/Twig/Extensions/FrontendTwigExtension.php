@@ -252,9 +252,8 @@ class FrontendTwigExtension extends AbstractExtension
 
             if ($customList) {
                 /**
-                 * @var CustomListAbstract $customList
+                 * @var CustomList $customList
                  */
-                $customList = $customList->mountModel();
 
 
                 $customList->append('categories');

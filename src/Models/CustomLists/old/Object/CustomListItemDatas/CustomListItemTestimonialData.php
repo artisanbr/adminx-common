@@ -9,7 +9,7 @@ namespace Adminx\Common\Models\CustomLists\Object\CustomListItemDatas;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use ArtisanLabs\GModel\GenericModel;
 
-class CustomListItemTestimonialsData extends GenericModel
+class CustomListItemTestimonialData extends GenericModel
 {
 
     protected $fillable = [

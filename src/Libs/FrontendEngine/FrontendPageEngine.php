@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -13,6 +13,7 @@ use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
+use Adminx\Common\Models\CustomLists\CustomListItem;
 use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Pages\PageInternal;
@@ -211,7 +212,7 @@ class FrontendPageEngine extends FrontendEngineBase
         return null;
     }
 
-    public function getInternalModel($url, Article|PageInternal|FrontendModel|EloquentModelBase|Page $mainModel): Article|PageInternal|FrontendModel|CustomListItemAbstract|null
+    public function getInternalModel($url, Article|PageInternal|FrontendModel|EloquentModelBase|Page $mainModel): Article|PageInternal|FrontendModel|CustomListItem|null
     {
 
         //Validar pelo tipo da página
@@ -225,12 +226,7 @@ class FrontendPageEngine extends FrontendEngineBase
         //Custom List Item
         if (get_class($mainModel) === PageInternal::class && method_exists($mainModel->model, 'items')) {
 
-            if (method_exists($mainModel->model, 'mountModel')) {
-                $customList = $mainModel->model->mountModel();
-            }
-            else {
-                $customList = $mainModel->model;
-            }
+            $customList = $mainModel->model;
 
             return $customList->items()->where('slug', $url)->orWhere('public_id', $url)->first();
         }

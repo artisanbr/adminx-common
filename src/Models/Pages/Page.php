@@ -14,7 +14,6 @@ use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\CustomList;
-use Adminx\Common\Models\CustomLists\CustomListHtml;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
@@ -70,7 +69,7 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
 
 /**
- * @property Collection|CustomList[]|CustomListHtml[] $data_sources
+ * @property Collection|CustomList[] $data_sources
  * @property AbstractPageType                         $type
  * @property AbstractTemplate                         $template_global
  * @property BreadcrumbConfig                         $breadcrumb_config
@@ -530,10 +529,6 @@ class Page extends EloquentModelBase implements BuildableModel,
         $sources = collect();
 
         //CustomLists
-        /*if ($this->custom_lists->count()) {
-            $sources = $this->custom_lists->keyBy(fn($customList, $key) => Str::camel($customList->slug))
-                                          ->map(fn($customList) => $customList->mountModel());
-        }*/
 
         return Attribute::make(
             get: fn() => $sources,

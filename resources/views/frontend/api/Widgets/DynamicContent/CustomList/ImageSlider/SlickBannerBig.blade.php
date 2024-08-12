@@ -19,20 +19,20 @@
         <div class="banner-slider" id="bannerSlider-{{ $widget->public_id }}">
             @foreach($customListItems as $listItem)
                 @push('css')
-                    <link rel="preload" as="image" href="{{ $listItem->data->image_url ?? '' }}"/>
+                    <link rel="preload" as="image" href="{{ $listItem->image_url ?? '' }}"/>
                 @endpush
                 <div class="single-banner"
-                     style="background-image: url({{ $listItem->data->image_url ?? '' }});">
+                     style="background-image: url({{ $listItem->image_url ?? '' }});">
                     <div class="container">
                         <div class="row justify-content-center">
                             <div class="col-lg-10">
                                 <div class="banner-content text-center">
                                     <div data-animation="fadeInDown" data-delay="0.8s">{!! $listItem->title !!}</div>
                                     <p data-animation="fadeInUp" data-delay="1s">
-                                        {!! $listItem->data->description !!}
+                                        {!! $listItem->description !!}
                                     </p>
                                     <ul class="btn-wrap">
-                                        @foreach($listItem->data->buttons as $button)
+                                        @foreach($listItem->buttons as $button)
                                             <li data-animation="fadeInLeft" data-delay="1.2s">
                                                 {!! $button->html !!}
                                             </li>

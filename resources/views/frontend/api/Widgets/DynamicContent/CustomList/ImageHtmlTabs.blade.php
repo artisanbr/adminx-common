@@ -30,15 +30,15 @@
         'show active' => $loop->first
 ]) id="tab-{{ $listItem->public_id }}" role="tabpanel">
                     <div class="row align-items-center justify-content-center">
-                        @if($listItem->data->image)
+                        @if($listItem->image)
                             <div @class(['col-lg-6 col-md-10', 'order-1' => $loop->odd])>
                                 <div class="block-image">
-                                    <img src="{{ $listItem->data->image_url }}" alt="Image">
+                                    <img src="{{ $listItem->image_url }}" alt="Image">
                                 </div>
                             </div>
                         @endif
                         <div @class(['col-lg-6 col-md-10', 'order-0 pe-5 pr-5' => $loop->odd, 'ps-5 pl-5' => !$loop->odd]) >
-                            {!! $listItem->data->html !!}
+                            {!! $listItem->html !!}
                         </div>
                     </div>
                 </div>

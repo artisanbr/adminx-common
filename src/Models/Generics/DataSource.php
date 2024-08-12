@@ -197,7 +197,7 @@ class DataSource extends GenericModel
                         $customList = $site->lists()->where('id', $dataId)->first();
 
                         if ($customList) {
-                            $this->dataCache = $customList->mountModel();
+                            $this->dataCache = $customList;
                         }
                         break;
                     /*//Todo \/

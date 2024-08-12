@@ -5,25 +5,23 @@
  */
 
 namespace Adminx\Common\Models\CustomLists\Object\Configs;
+use Adminx\Common\Enums\CustomLists\CustomListConfigListMode;
 use ArtisanLabs\GModel\GenericModel;
 
 class CustomListConfig extends GenericModel
 {
 
     protected $fillable = [
-        'menu_class',
-        'menu_item_class',
-        'menu_item_append',
-        'menu_item_prepend',
+        'images',
+        'list_mode',
     ];
 
     protected $attributes = [
+        'list_mode' => CustomListConfigListMode::Draggable->value,
     ];
 
     protected $casts = [
-        'menu_class' => 'string',
-        'menu_item_class' => 'string',
-        'menu_item_append' => 'string',
-        'menu_item_prepend' => 'string',
+        'images' => CustomListConfigImages::class,
+        'list_mode' => CustomListConfigListMode::class,
     ];
 }
