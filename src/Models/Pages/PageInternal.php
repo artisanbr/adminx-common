@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -124,8 +124,8 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
         $frontendBuild->body->addAfter($this->assets->js->after_body_html ?? '');
 
         /*$frontendBuild->seo->fill([
-                                      'title'         => $this->getTitle(),
-                                      'title_prefix' => "{{ site.getTitle() }} - {{ page.getTitle() }}",
+                                      'title'         => $this->seoTitle(),
+                                      'title_prefix' => "{{ site.seoTitle() }} - {{ page.seoTitle() }}",
                                       'description'   => $this->getDescription(),
                                       'keywords'      => $this->getKeywords(),
                                       'image_url'     => $this->seoImage(),

@@ -7,7 +7,6 @@
 namespace Adminx\Common\Libs\FrontendEngine\Twig\Extensions;
 
 use Adminx\Common\Facades\Frontend\FrontendSite;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Menus\Menu;
@@ -48,7 +47,7 @@ class FrontendTwigExtension extends AbstractExtension
      */
     protected mixed $menus;
     /**
-     * @var Collection|mixed|CustomListAbstract[]
+     * @var Collection|mixed|CustomList[]
      */
     protected mixed $customLists;
 
@@ -68,10 +67,19 @@ class FrontendTwigExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
-            new TwigFunction('widget', [$this, 'widget'], ['needs_context' => true]),
-            new TwigFunction('form', [$this, 'form'], ['needs_context' => true]),
-            new TwigFunction('menu', [$this, 'menu'], ['needs_context' => true]),
-            new TwigFunction('custom_list', [$this, 'customList'], ['needs_context' => true]),
+            new TwigFunction('widget', $this->widget(...), ['needs_context' => true]),
+            new TwigFunction('w', $this->widget(...), ['needs_context' => true]),
+
+            new TwigFunction('form', $this->form(...), ['needs_context' => true]),
+            new TwigFunction('f', $this->form(...), ['needs_context' => true]),
+
+            new TwigFunction('menu', $this->menu(...), ['needs_context' => true]),
+            new TwigFunction('m', $this->menu(...), ['needs_context' => true]),
+
+            new TwigFunction('custom_list', $this->customList(...), ['needs_context' => true]),
+            new TwigFunction('lista', $this->customList(...), ['needs_context' => true]),
+            new TwigFunction('list', $this->customList(...), ['needs_context' => true]),
+            new TwigFunction('l', $this->customList(...), ['needs_context' => true]),
         ];
     }
 

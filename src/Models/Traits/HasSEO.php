@@ -47,11 +47,18 @@ trait HasSEO
     //region HELPERS
     public function seoTitle($append = null, $prepend = null): string
     {
-        return ($prepend ?? false ? "{$prepend} - " : '') . ($this->seo->title ?? $this->title) . ($append ?? false ? " - {$append}" : '');
+
+        $title = blank($this->seo->title) ? $this->title : $this->seo->title;
+
+        return ($prepend ?? false ? "{$prepend} - " : '') . $title . ($append ?? false ? " - {$append}" : '');
     }
 
-    public function seoDescription($default = ''): string
+    public function seoDescription($default = null): string
     {
+        if(get_class($this) !== Site::class && ($this->site ?? false) && $this->site->seo->config->use_defaults && !$default){
+            $default = $this->site->seoDescription();
+        }
+
         return $this->seo->description ?? @$this->description ?? $default;
     }
 
@@ -89,7 +96,7 @@ trait HasSEO
 
     //region SEO Helpers
 
-    public function getTitle(): string
+    /*public function seoTitle(): string
     {
         return $this->seo->title ?? $this->title ?? '';
     }
@@ -114,7 +121,7 @@ trait HasSEO
         return $this->seoKeywords();
 
         //return $this->seoKeywords($this->site->seo->keywords ?? '');
-    }
+    }*/
 
     public function getRobots(): string
     {

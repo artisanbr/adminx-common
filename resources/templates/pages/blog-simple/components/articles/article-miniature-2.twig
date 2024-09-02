@@ -26,7 +26,7 @@
         </h3>
         {% if showDescription %}
             <p class="article-description limit-lines"
-               style="-webkit-line-clamp: {{ descriptionLines }};">{!! article.description ?? article.limitContent(big ? 500 : 150) !!}</p>
+               style="-webkit-line-clamp: {{ descriptionLines }};">{{ article.description ?? article.limitContent(big ? 500 : 150) }}</p>
         {% endif %}
 
         <div class="d-flex align-items-center justify-content-between">

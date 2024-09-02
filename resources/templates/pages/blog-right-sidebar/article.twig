@@ -47,11 +47,12 @@
                                 Categorias: {{ article.categories.pluck('title').join(', ') }}
                             </p>
                         {% endif %}
+                        {# todo: definir por configuração no artigo ou página do blog:
                         {% if article.has_custom_description %}
                             <p class="short-desc mb-5 pb-5">
                                 {{ article.description }}
                             </p>
-                        {% endif %}
+                        {% endif %}#}
 
                         {{ article.content }}
 
@@ -129,7 +130,7 @@
                                         </div>
                                         <div class="blog-comment-content ms-0 me-0 ml-0 mr-0 w-auto pb-5">
                                             <div class="user-meta">
-                                                <span><strong>{{ comment.name }} -</strong> {{ comment.published_at.diffForHumans() }}</span>
+                                                <span><strong>{{ comment.name }} -</strong> {{ comment.created_at.diffForHumans() }}</span>
                                             </div>
                                             <p class="user-comment mb-4">
                                                 {{ comment.comment }}

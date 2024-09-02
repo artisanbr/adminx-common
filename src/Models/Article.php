@@ -7,7 +7,6 @@
 namespace Adminx\Common\Models;
 
 use Adminx\Common\Facades\Frontend\FrontendTwig;
-use Adminx\Common\Libs\Support\HtmlString;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Interfaces\FrontendModel;
@@ -49,7 +48,16 @@ use Illuminate\Foundation\Http\FormRequest;
  */
 class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel, FrontendModel
 {
-    use HasUriAttributes, HasSelect2, HasPublishTimestamps, SoftDeletes, HasValidation, HasSEO, HasFiles, BelongsToPage, BelongsToUser, BelongsToSite, HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes,
+    use HasUriAttributes,
+        HasSelect2,
+        HasPublishTimestamps,
+        SoftDeletes,
+        HasValidation, HasSEO,
+        HasFiles,
+        BelongsToPage,
+        BelongsToUser,
+        BelongsToSite,
+        HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes,
         HasSiteRoutes, HasPublicIdAttribute;
 
     protected $table = 'articles';
@@ -87,7 +95,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         'updated_at'     => 'datetime:d/m/Y H:i:s',
         'content'        => 'string',
         'is_published'   => 'bool',
-        
+
         'is_unpublished' => 'bool',
         'description'    => 'string',
         //'html'     => 'string',
@@ -127,17 +135,25 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     //region SEO
     public function seoDescription(): string
     {
-        return Str::replace(['<', '>'], '', $this->seo->description ?? strip_tags($this->description));
+
+        $description = match (true) {
+            !blank($this->seo->description) => $this->seo->description,
+            !blank($this->description) => $this->description,
+            default => $this->introduction,
+        };
+
+
+        return str($description)->stripTags();
     }
 
-    public function getDescription(): string
+    /*public function getDescription(): string
     {
         return $this->seoDescription();
-    }
+    }*/
 
     public function getKeywords(): string
     {
-        return $this->seoKeywords($this->page->getKeywords());
+        return $this->seoKeywords($this->page->seoKeywords());
     }
 
     public function getRobots(): string
@@ -147,10 +163,12 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     //endregion
 
-    public function limitContent($limit = 300, $end = ''): string
+    public function limitContent($words = 50, $end = '...'): string
     {
 
-        return (new HtmlString(Str::limit(strip_tags($this->content, '<p><br><strong><em><del><b><i>'), $limit, $end)))->toHtml();
+        return str($this->content)->stripTags('<strong><em><del><b><i>')->words($words, $end);
+
+        //return (new HtmlString(Str::limit(strip_tags($this->content, '<p><br><strong><em><del><b><i>'), $limit, $end)))->toHtml();
 
         //return Str::limit(strip_tags($this->content), $limit);
     }
@@ -162,7 +180,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     public function getBuildViewData(array $merge_data = []): array
     {
-        $this->page->breadcrumb->items = $this->page->breadcrumb->items->merge(['' => $this->seoTitle()]);
+        $this->page->breadcrumb->items = $this->page->breadcrumb->items->merge(['' => $this->title]);
 
         if (!empty($this->cover_url)) {
             $this->page->breadcrumb->background_url = $this->cover_url;
@@ -210,16 +228,16 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
         /*$frontendBuild->seo->fill([
                                       ...$this->seo->toArray(),
-                                      'title'       => $this->getTitle(),
+                                      'title'       => $this->seoTitle(),
                                       'description' => $this->getDescription(),
                                       'keywords'    => $this->getKeywords(),
                                       'image_url'   => $this->seoImage(),
                                   ]);*/
 
         $frontendBuild->seo->fill([
-                                      'title'         => $this->getTitle(),
-                                      'title_prefix'  => "{{ site.getTitle() }} - {{ page.getTitle() }}",
-                                      'description'   => $this->getDescription(),
+                                      'title'         => $this->seoTitle(),
+                                      'title_prefix'  => "{{ site.seoTitle() }} - {{ page.seoTitle() }}",
+                                      'description'   => $this->seoDescription(),
                                       'keywords'      => $this->getKeywords(),
                                       'image_url'     => $this->seoImage($this->page?->seoImage()),
                                       'published_at'  => ($this->published_at ?? Carbon::now())->toIso8601String(),
@@ -312,18 +330,21 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         );
     }
 
-    protected function description(): Attribute
+    /*protected function description(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => empty($value) ? $this->content_description : Str::of($value)->replaceMatches('/\r\n+/', "\r\n"),
-            set: static fn($value) => $value,
+            get: fn($value) => $value,
+            set: fn($value) => $value,
         );
-    }
+    }*/
 
-    protected function contentDescription(): Attribute
+    protected function introduction(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => Str::of(Str::limit(strip_tags($this->content), 300))->replaceMatches('/\r\n+/', "\r\n"),
+            get: fn($value) => str($this->content)
+                ->stripTags()
+                ->words(50)
+                ->replaceMatches('/\r\n+/', "\r\n"),
         );
     }
 
@@ -344,7 +365,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     protected function hasCustomDescription(): Attribute
     {
         return Attribute::make(
-            get: fn() => (string)$this->content_description !== (string)$this->description,
+            get: fn() => str($this->description)->isNotEmpty(),
         );
     }
 
@@ -522,7 +543,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     public function menu_items()
     {
-        return $this->morphMany(MenuItem::class, 'menuable',);
+        return $this->morphMany(MenuItem::class, 'menuable');
     }
 
     /*public function cover()

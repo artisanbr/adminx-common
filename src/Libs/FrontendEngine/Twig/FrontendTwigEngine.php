@@ -435,7 +435,7 @@ class FrontendTwigEngine extends FrontendEngineBase
     {
 
         $previousUrl = url()->previous();
-        
+
         return <<<html
                 <div class="error-{$exception->getCode()}-area py-150">
                     <div class="container">
@@ -471,7 +471,7 @@ class FrontendTwigEngine extends FrontendEngineBase
     public function getCDNDirListTemplate(): string
     {
 
-        return  Cache::remember('cdn-dir-list', now()->addMonth(1), function() {
+        return Cache::remember('cdn-dir-list', now()->addMonth(1), function () {
             return <<<html
                 <!DOCTYPE html>
                 <html lang="pt-BR">
@@ -491,13 +491,14 @@ class FrontendTwigEngine extends FrontendEngineBase
 
     }
 
-    public function useCache(){
+    public function useCache()
+    {
 
-        if($this->currentSite){
+        if ($this->currentSite) {
             //Verifica se está ativo nas configurações
             $useCacheConfig = $this->currentSite->config->performance->enable_advanced_cache ?? false;
 
-            if($useCacheConfig){
+            if ($useCacheConfig) {
                 //Verifica se não está em uma página de busca
             }
         }
@@ -505,11 +506,13 @@ class FrontendTwigEngine extends FrontendEngineBase
         return false;
     }
 
-    public function getFromCache($name){
+    public function getFromCache($name)
+    {
         return Cache::has("site-cache:{$name}") ? Cache::get("site-cache:{$name}") : false;
     }
 
-    public function saveCache($name, $content){
+    public function saveCache($name, $content)
+    {
         return Cache::put("site-cache:{$name}", $content, now()->addHours($this->cacheHours));
     }
 
@@ -541,28 +544,28 @@ class FrontendTwigEngine extends FrontendEngineBase
         $this->currentSite = $page->site;
 
         //Template Name considerando busca, categoria, etc..
-        if(($this->viewData['search'] ?? false) && !empty($this->viewData['searchQuery'] ?? null)){
-            $this->templateNamePrefix .= '@search='.Str::slug($this->viewData['searchQuery']);
+        if (($this->viewData['search'] ?? false) && !empty($this->viewData['searchQuery'] ?? null)) {
+            $this->templateNamePrefix .= '@search=' . Str::slug($this->viewData['searchQuery']);
         }
 
-        if( $this->viewData['category'] ?? null){
-            $this->templateNamePrefix .= '@category='.$this->viewData['category']->id;
+        if ($this->viewData['category'] ?? null) {
+            $this->templateNamePrefix .= '@category=' . $this->viewData['category']->id;
         }
-
 
 
         $useCache = $this->currentSite->config->performance->enable_advanced_cache ?? false;
 
         //Debugbar::debug($this->templateNamePrefix, $useCache);
 
-        if($useCache){
+        if ($useCache) {
             $cache = $this->getFromCache($this->templateNamePrefix);
 
             Debugbar::debug($cache);
-            if(!empty($cache)){
+            if (!empty($cache)) {
                 return $cache;
             }
-        }else{
+        }
+        else {
             $this->purgeCache($this->templateNamePrefix);
         }
 
@@ -586,7 +589,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         if ($category) {
             $this->registerFrontendSeo([
                                            'title'        => $category->title,
-                                           'title_prefix' => '{{ site.getTitle() }} - {{ page.getTitle() }}',
+                                           'title_prefix' => '{{ site.seoTitle() }} - {{ page.seoTitle() }}',
                                        ]);
 
             /*if($this->viewData['breadcrumb'] ?? false){
@@ -613,9 +616,11 @@ class FrontendTwigEngine extends FrontendEngineBase
             $renderedTemplate = $htmlMin->minify($renderedTemplate);
         }
 
-        if($useCache){
+        if ($useCache) {
             $this->saveCache($this->templateNamePrefix, $renderedTemplate);
         }
+
+        //dd($this->viewData['articles']->first()->description);
 
         return $renderedTemplate;
     }
@@ -633,13 +638,14 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //Debugbar::debug($this->templateNamePrefix, $useCache);
 
-        if($useCache){
+        if ($useCache) {
             $cache = $this->getFromCache($this->templateNamePrefix);
 
-            if(!empty($cache)){
+            if (!empty($cache)) {
                 return $cache;
             }
-        }else{
+        }
+        else {
             $this->purgeCache($this->templateNamePrefix);
         }
 
@@ -686,7 +692,7 @@ class FrontendTwigEngine extends FrontendEngineBase
             $renderedTemplate = $htmlMin->minify($renderedTemplate);
         }
 
-        if($useCache){
+        if ($useCache) {
             $this->saveCache($this->templateNamePrefix, $renderedTemplate);
         }
 
@@ -727,6 +733,18 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //$this->frontendBuild->meta->registerSeoForPage($page);
 
+        $this->registerFrontendSeo([
+                                       'title'        => $modelItem->title,
+                                       'title_prefix' => '{{ site.seoTitle() }} - {{ page.seoTitle() }}',
+                                       'published_at' => $modelItem->created_at,
+                                       'updated_at'   => $modelItem->updated_at,
+                                   ]);
+
+        if ($modelItem->seo ?? null) {
+            $this->registerFrontendSeo(array_filter($modelItem->seo->toArray()));
+        }
+
+
         $this->currentSite = $pageInternal->page->site;
 
 
@@ -734,13 +752,14 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //Debugbar::debug($this->templateNamePrefix, $useCache);
 
-        if($useCache){
+        if ($useCache) {
             $cache = $this->getFromCache($this->templateNamePrefix);
 
-            if(!empty($cache)){
+            if (!empty($cache)) {
                 return $cache;
             }
-        }else{
+        }
+        else {
             $this->purgeCache($this->templateNamePrefix);
         }
 
@@ -776,7 +795,7 @@ class FrontendTwigEngine extends FrontendEngineBase
             $renderedTemplate = $htmlMin->minify($renderedTemplate);
         }
 
-        if($useCache){
+        if ($useCache) {
             $this->saveCache($this->templateNamePrefix, $renderedTemplate);
         }
 

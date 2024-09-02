@@ -1,4 +1,5 @@
 {% set showAuthor = showAuthor ?? false %}
+{% set descriptionLines = descriptionLines ?? 4 %}
 {% set showDate = showDate ?? true %}
 {% set showMeta = showMeta ?? true %}
 {% set showComments = showComments ?? false %}
@@ -35,7 +36,9 @@
 
         {% if showDescription %}
             <p class="article-description limit-lines mb-0"
-               style="-webkit-line-clamp: {{ descriptionLines }};">{{ article.description ?? article.limitContent(big ? 500 : 150) }}</p>
+               style="-webkit-line-clamp: {{ descriptionLines }};">
+                {{ article.description ?? article.limitContent(big ? 50 : 25) }}
+            </p>
         {% endif %}
 
         {% if showMeta and bottomMeta and not coverMeta %}

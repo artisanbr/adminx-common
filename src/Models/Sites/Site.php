@@ -201,10 +201,10 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
         //SEO
         $frontendBuild->seo->fill([
-                                      //'title'         => "{{ page.getTitle() }}",
-                                      'title_prefix' => "{{ site.getTitle() }}",
-                                      'description'  => $this->getDescription(),
-                                      'keywords'     => $this->getKeywords(),
+                                      //'title'         => "{{ page.seoTitle() }}",
+                                      'title_prefix' => "{{ site.seoTitle() }}",
+                                      'description'  => $this->seoDescription(),
+                                      'keywords'     => $this->seoKeywords(),
                                       'image_url'    => $this->seoImage(),
                                   ]);
 

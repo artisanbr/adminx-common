@@ -83,7 +83,8 @@ class CustomListSchemaColumn extends GenericModel
     {
 
         if (blank($this->attributes["id"] ?? null)) {
-            $this->attributes["id"] = Str::ulid();
+            $this->attributes["id"] = (string) Str::ulid();
+            //dd($this->attributes["id"]);
         }
 
         return $this->attributes["id"];

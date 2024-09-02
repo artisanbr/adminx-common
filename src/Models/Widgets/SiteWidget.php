@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -167,8 +167,8 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
             $site = FrontendSite::current() ?? $this->site;
             //Debugbar::startMeasure('start view data');
             $viewData = [
-                'site'      => $site,
-                'variables' => $this->variables,
+                'site'      => $site->toArray(),
+                //'variables' => $this->variables,
                 'widget'    => $this,
             ];
             //Debugbar::stopMeasure('start view data');
@@ -205,7 +205,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
                         $customList = $this->source->data;
                         //$page = $customList->page;
                         //$viewData['page'] = $page;
-                        $viewData['sourceData'] = $viewData['customList'] = $customList;
+                        $viewData['sourceData'] = $viewData['customList'] = $customList->toArray();
                         //Todo: personalizar quantidade de itens
                         $viewData['customListItems'] = $customList->items()->take(10)->get();
                         break;
@@ -348,7 +348,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
         );
     }
 
-    protected function contentRender(): Attribute
+   /* protected function contentRender(): Attribute
     {
         $contentRender = '';
 
@@ -374,12 +374,12 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
                  *
                  * }
                  *
-                 * if($this->config->render_mode)*/
+                 * if($this->config->render_mode)
 
                 return (!empty($value) && (string)$value !== (string)$this->file_contents) ? $value : null;
             }
         );
-    }
+    }*/
 
     /*protected function html(): Attribute
     {

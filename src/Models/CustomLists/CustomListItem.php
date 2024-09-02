@@ -294,7 +294,7 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
     protected function html(): Attribute
     {
         return Attribute::make(
-            get: fn($value, array $attributes) => $this->getAttribute('html') ?? $this->getAttribute('content'),
+            get: fn($value, array $attributes) => $this->data['html'] ?? $this->data['content'],
         );
     }
 
@@ -316,6 +316,11 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
 
         if (is_null($value)
         ) {
+
+            if($key == 'html'){
+                dd($key);
+            }
+
 
             if (isset($this->data[$key]) && !is_null($this->data[$key])) {
                 return $this->data[$key];

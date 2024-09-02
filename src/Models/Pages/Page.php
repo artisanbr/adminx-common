@@ -57,7 +57,6 @@ use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Butschster\Head\Contracts\MetaTags\RobotsTagsInterface;
-use Butschster\Head\Contracts\MetaTags\SeoMetaTagsInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -79,7 +78,7 @@ class Page extends EloquentModelBase implements BuildableModel,
                                                 OwneredModel,
                                                 PublicIdModel,
                                                 RobotsTagsInterface,
-                                                SeoMetaTagsInterface,
+                                                /*SeoMetaTagsInterface,*/
                                                 UploadModel
 {
     use BelongsToSite,
@@ -381,10 +380,10 @@ class Page extends EloquentModelBase implements BuildableModel,
         $frontendBuild->body->addAfter($this->assets->js->after_body->html ?? '');
 
         $frontendBuild->seo->fill([
-                                      'title'         => "{{ page.getTitle() }}",
-                                      'title_prefix'  => "{{ site.getTitle() }}",
-                                      'description'   => $this->getDescription(),
-                                      'keywords'      => $this->getKeywords(),
+                                      'title'         => "{{ page.seoTitle() }}",
+                                      'title_prefix'  => "{{ site.seoTitle() }}",
+                                      'description'   => $this->seoDescription(),
+                                      'keywords'      => $this->seoKeywords(),
                                       'image_url'     => $this->seoImage($this->site?->seoImage()),
                                       'published_at'  => $this->published_at->toIso8601String(),
                                       'updated_at'    => $this->updated_at->toIso8601String(),

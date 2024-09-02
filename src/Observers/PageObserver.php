@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -52,7 +52,7 @@ class PageObserver
             $model->seo->html = $model->frontend_build->seo->html;
             /*$model->frontend_build->seo = $model->seo;
             $model->frontend_build->seo->fill([
-                                                  'title'       => $model->getTitle(),
+                                                  'title'       => $model->seoTitle(),
                                                   'description' => $model->getDescription(),
                                                   'keywords'    => $model->getKeywords(),
                                                   'image_url'   => $model->seoImage(),

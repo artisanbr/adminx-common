@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -27,9 +27,9 @@ class ArticleObserver
         $model->seo->html = $model->meta->frontend_build->seo->html;
         /*$model->meta->frontend_build->seo = $model->seo;
         $model->meta->frontend_build->seo->fill([
-                                              'title'       => $model->getTitle(),
+                                              'title'       => $model->seoTitle(),
                                               'description' => $model->getDescription(),
-                                              'keywords'    => $model->getKeywords(),
+                                              'keywords'    => $model->seotKeywords(),
                                               'image_url'   => $model->seoImage(),
                                           ]);*/
 

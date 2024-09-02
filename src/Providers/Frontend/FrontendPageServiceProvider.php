@@ -89,7 +89,7 @@ class FrontendPageServiceProvider extends ServiceProvider
         Meta::macro('registerSeoForPage', function (Page $page) {
 
             if ($page->site->seo->config->show_parent_title) {
-                $this->prependTitle("{{ site.getTitle() }}");
+                $this->prependTitle("{{ site.seoTitle() }}");
             }
 
             $this->setMetaFrom($page);
@@ -101,25 +101,25 @@ class FrontendPageServiceProvider extends ServiceProvider
                 $metaTwitter
                     ->setType('summary_large_image')
                     ->setImage($page->seoImage())
-                    ->addMeta('image:alt', $page->getTitle());
+                    ->addMeta('image:alt', $page->seoTitle());
 
                 $metaOg->addImage($page->seoImage(), [
                     'type' => 'image',
-                    'alt'  => $page->getTitle(),
+                    'alt'  => $page->seoTitle(),
                 ]);
             }
 
             $metaOg
                 ->setType('page')
-                ->setTitle($page->getTitle())
-                ->setDescription($page->getDescription())
+                ->setTitle($page->seoTitle())
+                ->setDescription($page->seoDescription())
                 //->setUrl($article->uri)
                 //->addOgMeta('article:author', $article->user->name)
                 ->addOgMeta('og:updated_time', $page->updated_at->toIso8601String());
 
             $metaTwitter
-                ->setTitle($page->getTitle())
-                ->setDescription($page->getDescription());
+                ->setTitle($page->seoTitle())
+                ->setDescription($page->seoDescription());
 
 
             //Page
@@ -140,7 +140,7 @@ class FrontendPageServiceProvider extends ServiceProvider
             $page = FrontendPage::current() ?? $article->page;
 
             if ($site->seo->config->show_parent_title) {
-                $this->prependTitle("{{ site.getTitle() }} - {{ page.getTitle() }}");
+                $this->prependTitle("{{ site.seoTitle() }} - {{ page.seoTitle() }}");
             }
 
             //$article->load(['site','page']);
@@ -148,12 +148,12 @@ class FrontendPageServiceProvider extends ServiceProvider
             $metaTwitter = new TwitterCardPackage('site_tt_article');
 
 
-            $seoFullTitle = $article->getTitle(); //$site->seoTitle($page->seoTitle($article->getTitle()));
+            $seoFullTitle = $article->seoTitle(); //$site->seoTitle($page->seoTitle($article->seoTitle()));
 
             $metaOg
                 ->setType('article')
                 ->setTitle($seoFullTitle)
-                ->setDescription($article->getDescription())
+                ->setDescription($article->seoDescription())
                 //->setUrl($article->uri)
                 //->addOgMeta('article:author', $article->user->name)
                 ->addOgMeta('article:section', $page->title)
@@ -164,17 +164,17 @@ class FrontendPageServiceProvider extends ServiceProvider
 
             $metaTwitter
                 ->setTitle($seoFullTitle)
-                ->setDescription($article->getDescription());
+                ->setDescription($article->seoDescription());
 
             if ($article->seoImage()) {
                 $metaTwitter
                     ->setType('summary_large_image')
                     ->setImage($article->seoImage())
-                    ->addMeta('image:alt', $article->getTitle());
+                    ->addMeta('image:alt', $article->seoTitle());
 
                 $metaOg->addImage($article->seoImage(), [
                     'type' => 'image',
-                    'alt'  => $article->getTitle(),
+                    'alt'  => $article->seoTitle(),
                 ]);
             }
 
@@ -183,7 +183,7 @@ class FrontendPageServiceProvider extends ServiceProvider
             $this
                 ->setMetaFrom($article)
                 ->setTitle($seoFullTitle)
-                ->setDescription($article->getDescription())
+                ->setDescription($article->seoDescription())
                 ->setKeywords($article->getKeywords())
                 ->registerPackage($metaOg)
                 ->setPaginationLinks($comments)
@@ -205,7 +205,7 @@ class FrontendPageServiceProvider extends ServiceProvider
             $metaTwitter = new TwitterCardPackage('site_tt_seo');
 
 
-            //$seoFullTitle = $seo->title; //$site->seoTitle($page->seoTitle($article->getTitle()));
+            //$seoFullTitle = $seo->title; //$site->seoTitle($page->seoTitle($article->seoTitle()));
 
             $metaOg
                 ->setType($seo->document_type)
@@ -251,13 +251,13 @@ class FrontendPageServiceProvider extends ServiceProvider
             $metaTwitter = new TwitterCardPackage('site_tt_page_internal');
 
             if ($pageInternal->page->site->seo->config->show_parent_title) {
-                $this->prependTitle("{{ site.getTitle() }} - {{ page.getTitle() }}");
+                $this->prependTitle("{{ site.seoTitle() }} - {{ page.seoTitle() }}");
             }
 
             $seoFullTitle = @$modelItem->seoTitle() ?? @$modelItem->title ?? null; //$pageInternal->page->site->seoTitle($pageInternal->page->seoTitle(@$modelItem->seoTitle() ?? @$modelItem->title ?? null));
 
-            $seoDescription = @$modelItem->getDescription() ?? @$modelItem->description ?? $pageInternal->page->getDescription();
-            $seoKeywords = @$modelItem->getKeywords() ?? @$modelItem->keywords ?? $pageInternal->page->getKeywords();
+            $seoDescription = @$modelItem->seoDescription() ?? @$modelItem->description ?? $pageInternal->page->seoDescription();
+            $seoKeywords = @$modelItem->seoKeywords() ?? @$modelItem->keywords ?? $pageInternal->page->seoKeywords();
 
             $metaOg
                 ->setType('article')

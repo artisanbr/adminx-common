@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -126,8 +126,13 @@ class WidgetController extends Controller
             $viewData = $siteWidget->getTwigRenderData();
             //Debugbar::stopMeasure('get build data');
 
+            //dd($viewData['customListItems']->first()->html);
+
+            //dd($siteWidget->template_content, $viewData['customListItems'], 'widget-'.$siteWidget->public_id);
+
             //Debugbar::startMeasure('render widget template');
             $widgetRender = FrontendTwig::html($siteWidget->template_content, $viewData, 'widget-'.$siteWidget->public_id);
+
             //Debugbar::stopMeasure('render widget template');
 
             //Debugbar::stopMeasure('controller render');
