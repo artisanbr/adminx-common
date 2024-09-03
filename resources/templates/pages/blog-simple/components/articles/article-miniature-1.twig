@@ -1,4 +1,7 @@
+{% set titleLines = titleLines ?? false %}
 {% set showAuthor = showAuthor ?? false %}
+{% set showReadMore = showReadMore ?? false %}
+{% set showCategories = showCategories ?? false %}
 {% set showDate = showDate ?? true %}
 {% set showMeta = showMeta ?? true %}
 {% set showComments = showComments ?? false %}
@@ -7,6 +10,7 @@
 {% set showDescription = showDescription ?? true %}
 {% set big = big ?? false %}
 {% set small = small ?? false %}
+{% set bottomMeta = bottomMeta ?? false %}
 {% set bottomMeta = bottomMeta ?? false %}
 
 <article id="article-item-{{ article.id }}" class="article-item article-miniature article-miniature-one {{ (big ?? false) ? 'mb-5' : 'mb-4' }}">
@@ -21,7 +25,7 @@
     <div class="article-content">
         <a class="article-title mt-3 {{ (big ?? false) ? 'h2' : 'limit-lines' }} {% if small %}h5{% elseif (not big) and (not small) %}h4{% endif %}" href="{{ article.url }}"
            data-bs-toggle="tooltip"
-           title="{{ article.title }}" style="-webkit-line-clamp: {{ titleLines }};">{{ article.title }}</a>
+           title="{{ article.title }}" {% if titleLines %} style="-webkit-line-clamp: {{ titleLines }};" {% endif %}>{{ article.title }}</a>
 
         {% if showMeta and not bottomMeta %}
             {{ include('@template/components/articles/partials/article-meta.twig', {article: article}) }}
@@ -29,7 +33,7 @@
 
         {% if showDescription %}
             <p class="article-description limit-lines mb-0"
-               style="-webkit-line-clamp: {{ descriptionLines }};">{{ article.description ?? article.limitContent(big ? 500 : 150) }}</p>
+               style="-webkit-line-clamp: {{ descriptionLines }};">{{ article.description ?? article.introduction }}</p>
         {% endif %}
 
         {% if showMeta and bottomMeta %}

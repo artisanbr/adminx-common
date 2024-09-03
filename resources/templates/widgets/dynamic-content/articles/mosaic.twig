@@ -1,0 +1,112 @@
+{% if articles.count() %}
+    <div class="row articles-mosaic articles-mosaic-{{ widget.public_id }} widget-module widget-module-{{ widget.public_id }}">
+
+        {% for article in articles.take(2).get() %}
+            {# @foreach($articlesQuery.take(2).get() as $article) #}
+            <div class="col-xl-4 col-lg-6 col-md-6 articles-mosaic-left">
+                {# <x-frontend::pages.Articles.article-miniature-1 :article="$article"
+                                                             class="articles-mosaic-item articles-mosaic-featured-item widget-article-featured-item mb-30"
+                                                             :show-read-more="false" :show-categories="false"
+                                                             bottom-meta show-comments/>
+                #}
+
+                <article id="article-item-{{ article.id }}"
+                         class="article-item article-miniature article-miniature-one mb-4 articles-mosaic-item articles-mosaic-featured-item widget-article-featured-item">
+                    {% if article.cover_url %}
+                        <div class="article-cover img-hover-effect mb-3 mt-3">
+                            <a class="img-zoom-effect" href="{{ article.url }}">
+                                <img class="img-full img-fluid w-100" src="{{ article.cover_url }}"
+                                     alt="{{ article.title }}">
+                            </a>
+                        </div>
+                    {% endif %}
+                    <div class="article-content">
+                        <a class="article-title mt-3 limit-lines h4" href="{{ article.url }}"
+                           data-bs-toggle="tooltip"
+                           title="{{ article.title }}">{{ article.title }}</a>
+
+
+                        <p class="article-description limit-lines mb-0"
+                           style="-webkit-line-clamp: {{ descriptionLines }};">{{ article.description ?? article.introduction }}</p>
+
+                        <div id="article-meta-{{ article.id }}"
+                             class="article-meta mb-2 d-inline-row text-muted small mt-2">
+
+                                <span class="me-3 mr-3 article-meta-date"
+                                      title="Publicado {{ article.published_at_long }}">
+            <i class="fa-solid fa-calendar-days me-1"></i>
+            <time datetime="{{ article.published_at.format('Y-m-d H:i:S') }}">
+                {{ article.published_at.diffForHumans() }}
+            </time>
+        </span>
+
+                            <span class="article-meta-comments" title="Comentários">
+            <i class="fa-solid fa-comments me-1"></i>
+                                {{ article.comments().count() }}
+        </span>
+
+                        </div>
+
+                    </div>
+                </article>
+
+            </div>
+        {% endfor %}
+
+
+        <div class="col-xl-4 col-lg-12 col-md-12 articles-mosaic-right">
+            <div class="widget-article-list mb-30">
+                {% for article in articles.skip(2).take(3).get() %}
+                    {# @foreach($articlesQuery.skip(2).take(3).get() as $article) #}
+                    {# <x-frontend::pages.Articles.article-miniature-1 :article="$article"
+                                                                 class="articles-mosaic-item articles-mosaic-list-item widget-article-list-item"
+                                                                 :show-read-more="false" :show-categories="false"
+                                                                 :show-description="false" :show-cover="false"
+                                                                 bottom-meta/> #}
+
+                    <article id="article-item-{{ article.id }}"
+                             class="article-item article-miniature article-miniature-one mb-4 articles-mosaic-item articles-mosaic-featured-item widget-article-featured-item">
+                        {% if article.cover_url %}
+                            <div class="article-cover img-hover-effect mb-3 mt-3">
+                                <a class="img-zoom-effect" href="{{ article.url }}">
+                                    <img class="img-full img-fluid w-100" src="{{ article.cover_url }}"
+                                         alt="{{ article.title }}">
+                                </a>
+                            </div>
+                        {% endif %}
+                        <div class="article-content">
+                            <a class="article-title mt-3 limit-lines h4" href="{{ article.url }}"
+                               data-bs-toggle="tooltip"
+                               title="{{ article.title }}">{{ article.title }}</a>
+
+
+                            <p class="article-description limit-lines mb-0"
+                               style="-webkit-line-clamp: {{ descriptionLines }};">{{ article.description ?? article.introduction }}</p>
+
+                            <div id="article-meta-{{ article.id }}"
+                                 class="article-meta mb-2 d-inline-row text-muted small mt-2">
+
+                                <span class="me-3 mr-3 article-meta-date"
+                                      title="Publicado {{ article.published_at_long }}">
+            <i class="fa-solid fa-calendar-days me-1"></i>
+            <time datetime="{{ article.published_at.format('Y-m-d H:i:S') }}">
+                {{ article.published_at.diffForHumans() }}
+            </time>
+        </span>
+
+                                <span class="article-meta-comments" title="Comentários">
+            <i class="fa-solid fa-comments me-1"></i>
+                                        {{ article.comments().count() }}
+        </span>
+
+                            </div>
+
+                        </div>
+                    </article>
+
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endif %}
+
