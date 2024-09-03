@@ -45,7 +45,7 @@ trait HasSEO
     //endregion
 
     //region HELPERS
-    public function seoTitle($append = null, $prepend = null): string
+    public function seoTitle($append = null, $prepend = null): ?string
     {
 
         $title = blank($this->seo->title) ? $this->title : $this->seo->title;
@@ -53,16 +53,16 @@ trait HasSEO
         return ($prepend ?? false ? "{$prepend} - " : '') . $title . ($append ?? false ? " - {$append}" : '');
     }
 
-    public function seoDescription($default = null): string
+    public function seoDescription($default = ''): ?string
     {
         if(get_class($this) !== Site::class && ($this->site ?? false) && $this->site->seo->config->use_defaults && !$default){
             $default = $this->site->seoDescription();
         }
 
-        return $this->seo->description ?? @$this->description ?? $default;
+        return str($this->seo->description ?? @$this->description ?? $default)->toString();
     }
 
-    public function seoKeywords($default = ''): string
+    public function seoKeywords($default = ''): ?string
     {
         return $this->seo->keywords ?? @$this->keywords ?? $default;
     }
