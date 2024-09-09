@@ -191,6 +191,16 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
             $this->load(['site']);
         }
 
+        $themeBuild = $this->build()->firstOrNew([
+                                                     'site_id'    => $this->site_id,
+                                                     'user_id'    => $this->user_id,
+                                                     'account_id' => $this->account_id,
+                                                 ]);
+
+        $themeBuild->save();
+
+        //dd($themeBuild->toArray());
+
         //Meta::reset();
         AppMetaTagsServiceProvider::registerFrontendPackages();
 
@@ -251,12 +261,6 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 
         $htmlMin = new HtmlMin();
 
-        $themeBuild = $this->build()->firstOrNew([
-                                                     'site_id'    => $this->site_id,
-                                                     'user_id'    => $this->user_id,
-                                                     'account_id' => $this->account_id,
-                                                 ]);
-
         $headHtml = View::make('common-frontend::layout.partials.head', [
             'site'      => $this->site,
             'theme'     => $this,
@@ -308,30 +312,35 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
             };*/
 
             //dd($this->build);
+            $this->load('build');
 
-            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssMain->value)){
-                $this->build->main_css_bundle->registerMetaPackages($package);
+            if($this->build){
+                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssMain->value)){
+                    $this->build->main_css_bundle->registerMetaPackages($package);
+                }
+
+                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssDefer->value)){
+                    $this->build->defer_css_bundle->registerMetaPackages($package);
+                }
+
+                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsMain->value)){
+                    $this->build->main_body_js_bundle->registerMetaPackages($package);
+                }
+
+                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsDefer->value)){
+                    $this->build->defer_body_js_bundle->registerMetaPackages($package);
+                }
+
+                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsMain->value)){
+                    $this->build->main_head_js_bundle->registerMetaPackages($package);
+                }
+
+                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsDefer->value)){
+                    $this->build->defer_head_js_bundle->registerMetaPackages($package);
+                }
             }
 
-            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssDefer->value)){
-                $this->build->defer_css_bundle->registerMetaPackages($package);
-            }
 
-            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsMain->value)){
-                $this->build->main_body_js_bundle->registerMetaPackages($package);
-            }
-
-            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsDefer->value)){
-                $this->build->defer_body_js_bundle->registerMetaPackages($package);
-            }
-
-            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsMain->value)){
-                $this->build->main_head_js_bundle->registerMetaPackages($package);
-            }
-
-            if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsDefer->value)){
-                $this->build->defer_head_js_bundle->registerMetaPackages($package);
-            }
 
             /*if ($this->build->main_css_bundle->id && !blank($this->build->main_css_bundle->content)) {
 

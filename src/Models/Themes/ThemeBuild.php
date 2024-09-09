@@ -45,13 +45,13 @@ class ThemeBuild extends EloquentModelBase implements PublicIdModel, OwneredMode
         'head'        => 'string',
         'header'        => 'string',
         'footer'        => 'string',
-        'bundles'        => 'collection',
+        //'bundles'        => 'collection',
     ];
 
     /*protected $appends = [];*/
 
     protected $attributes = [
-        'bundles' => [],
+        //'bundles' => '[]',
     ];
 
     //protected $with = ['site'];
