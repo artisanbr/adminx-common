@@ -12,8 +12,8 @@ use Adminx\Common\Enums\Traits\EnumWithTitles;
 use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\CustomLists\Object\Schemas\CustomListSchemaColumn;
 use Adminx\Common\Models\CustomLists\Object\Values\ButtonValue;
+use Adminx\Common\Models\CustomLists\Object\Values\ImageValue;
 use Adminx\Common\Models\Objects\Seo\Seo;
-use Adminx\Common\Objects\Files\ImageFileObject;
 
 enum CustomListSchemaType: string
 {
@@ -77,7 +77,7 @@ enum CustomListSchemaType: string
     {
         return match ($type) {
             self::Text, self::Html, self::TextArea => 'string',
-            self::Image => ImageFileObject::class,
+            self::Image => ImageValue::class,
             //self::Button => ButtonValue::class,
             self::ButtonCollection => AsCollectionOf::class . ':' . ButtonValue::class . ',' . 'position',
             //self::ImageCollection => AsCollectionOf::class . ':' . ImageFileObject::class,

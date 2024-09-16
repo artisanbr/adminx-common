@@ -14,6 +14,7 @@ use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\Object\Configs\CustomListItems\CustomListItemConfig;
 use Adminx\Common\Models\CustomLists\Object\Schemas\CustomListItemSchemaValue;
 use Adminx\Common\Models\CustomLists\Object\Schemas\CustomListSchemaColumn;
+use Adminx\Common\Models\CustomLists\Object\Values\ImageValue;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
@@ -280,7 +281,7 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
             get: fn($value, array $attributes) => $this->schema->whereIn('type', [
                 CustomListSchemaType::Image,
                 CustomListSchemaType::Image->value,
-            ])->first()->value,
+            ])->first()?->value ?? new ImageValue(),
         );
     }
 

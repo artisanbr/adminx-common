@@ -8,12 +8,13 @@ namespace Adminx\Common\Models\CustomLists\Object\Schemas;
 
 use Adminx\Common\Enums\CustomLists\CustomListSchemaType;
 use Adminx\Common\Models\CustomLists\Object\Values\ButtonValue;
+use Adminx\Common\Models\CustomLists\Object\Values\ImageValue;
 use Adminx\Common\Objects\Files\ImageFileObject;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
 
 /**
- * @property array|object|ImageFileObject|ButtonValue|null|string|Collection<ButtonValue>|Collection<ImageFileObject>|ButtonValue[]|ImageFileObject[]
+ * @property array|object|ImageValue|ButtonValue|null|string|Collection<ButtonValue>|Collection<ImageFileObject>|ButtonValue[]|ImageValue[]
  *           $value
  * @property ?CustomListSchemaType
  *                                                    $type
@@ -88,10 +89,10 @@ class CustomListItemSchemaValue extends GenericModel
         };
     }*/
 
-    protected function getImageValue($value): ImageFileObject
+    protected function getImageValue($value): ImageValue
     {
 
-        if ($value instanceof ImageFileObject) {
+        if ($value instanceof ImageValue) {
             return $value;
         }
 
@@ -101,7 +102,7 @@ class CustomListItemSchemaValue extends GenericModel
             default => $value,
         };
 
-        return new ImageFileObject($imageData);
+        return new ImageValue($imageData);
     }
 
     protected function getUrlAttribute()
@@ -125,7 +126,7 @@ class CustomListItemSchemaValue extends GenericModel
 
         if ($this->type && $this->type->is(CustomListSchemaType::Image)) {
             if (is_string($value) && !json_validate($value)) {
-                $this->attributes['value'] = ImageFileObject::make([
+                $this->attributes['value'] = ImageValue::make([
                                                                        'url'           => $value,
                                                                        'width'         => '',
                                                                        'height'        => '',
@@ -133,11 +134,11 @@ class CustomListItemSchemaValue extends GenericModel
                                                                        'relative_path' => '',
                                                                    ])->toArray();
             }
-            else if ($value instanceof ImageFileObject) {
+            else if ($value instanceof ImageValue) {
                 $this->attributes['value'] = $value->toArray();
             }
             else {
-                $this->attributes['value'] = ImageFileObject::make(is_string($value) ? json_decode($value) : $value)->toArray();
+                $this->attributes['value'] = ImageValue::make(is_string($value) ? json_decode($value) : $value)->toArray();
             }
         }
         else {

@@ -8,6 +8,7 @@ namespace Adminx\Common\Models\CustomLists\Object\Schemas;
 
 use Adminx\Common\Enums\CustomLists\CustomListSchemaType;
 use Adminx\Common\Libs\Support\Str;
+use Adminx\Common\Models\CustomLists\Object\Values\ImageValue;
 use Adminx\Common\Objects\Files\ImageFileObject;
 use ArtisanLabs\GModel\GenericModel;
 
@@ -136,7 +137,7 @@ class CustomListSchemaColumn extends GenericModel
 
         if ($this->type->is(CustomListSchemaType::Image)) {
             if (is_string($value) && !json_validate($value)) {
-                $this->attributes['default_value'] = ImageFileObject::make([
+                $this->attributes['default_value'] = ImageValue::make([
                                                                                'url'           => $value,
                                                                                'width'         => '',
                                                                                'height'        => '',
@@ -145,7 +146,7 @@ class CustomListSchemaColumn extends GenericModel
                                                                            ])->toArray();
             }
             else {
-                $this->attributes['default_value'] = ImageFileObject::make(is_string($value) ? json_decode($value) : $value)->toArray();
+                $this->attributes['default_value'] = ImageValue::make(is_string($value) ? json_decode($value) : $value)->toArray();
             }
         }
         else {

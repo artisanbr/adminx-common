@@ -89,6 +89,7 @@ class CustomListItemRepository extends Repository
                     if ($uploadedFile instanceof UploadedFile) {
 
 
+
                         $mediaFile = FileUpload::upload($uploadedFile, $this->uploadPathBase, $renameFileTo ?: $uploadedFile->getClientOriginalName());
 
                         if (!$mediaFile) {

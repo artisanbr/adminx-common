@@ -24,12 +24,13 @@ class FileUploadManager extends FileManager
         }
 
         //Remover caracteres indesejados
-        $fileName = str($fileName)->slug('-')->toString();
+        //Remover extensão e tratar para URL amigavel
+        $fileName = str($fileName)->beforeLast('.'.$requestFile->getClientOriginalExtension())->slug();
 
 
         $this->onPath($uploadPath);
 
-        $this->fileName = Str::contains($fileName, '.') ? $fileName : "{$fileName}." . $requestFile->getClientOriginalExtension();
+        $this->fileName = $fileName->toString() . '.' . $requestFile->getClientOriginalExtension();
 
 
         //Checkar se o arquivo existe atualmente e removê-lo
