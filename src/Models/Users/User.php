@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -120,6 +120,7 @@ class User extends EloquentModelBase implements AuthenticatableContract,
 
         $this->setConnection('mysql');
     }
+
 
     //region Validations
     public static function createRules(FormRequest $request = null): array

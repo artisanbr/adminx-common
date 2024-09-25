@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models\Users\AccessRules;
 
@@ -12,6 +16,7 @@ class Permission extends \Spatie\Permission\Models\Permission
     protected $appends = [
         //'roles_list',
     ];
+
 
     protected function displayName(): Attribute
     {
