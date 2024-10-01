@@ -447,7 +447,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     protected function getPublicIdUrlAttribute(): string
     {
 
-        return $this->page->public_id_url ? "{$this->page->public_id_url}/article/{$this->public_id}" : '';
+        return $this->page->public_id_url ? "{$this->page->public_id_url}{$this->public_id}" : '';
     }
 
     protected function getUrlAttribute(): string

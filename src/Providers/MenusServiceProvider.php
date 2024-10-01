@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -255,22 +255,24 @@ html;
 
                 foreach ($pages as $page) {
 
-                    if ($page->using_articles) {
+                    if ($page->using_articles && auth()->user()->canAny(['create article', 'read article'])) {
                         //Posts
                         $this->itemSubmenu($page->title, function (Menu $submenu) use ($page) {
-                            $submenu->subItem("Configurar Página", route('app.pages.cadastro', $page->public_id));
+                            if(auth()->user()->can(['update page'])) {
+                                $submenu->subItem("Configurar Página", route('app.pages.cadastro', $page->public_id), 'notepad-edit');
+                            }
 
-                            $submenu->subItem('Gerenciar Artigos', route('app.pages.articles.index', $page->id))
-                                    ->subItem('Novo Artigo', route('app.pages.articles.cadastro', $page->id));
+                            $submenu->subItem('Gerenciar Artigos', route('app.pages.articles.index', $page->id), 'notepad-bookmark')
+                                    ->subItem('Novo Artigo', route('app.pages.articles.cadastro', $page->id), 'add-notepad');
 
 
                             return $submenu;
-                        },                 $page->is_home ? 'home' : 'blog');
+                        },                 $page->is_home ? 'home' : 'element-8');
 
                     }
-                    else {
+                    else if(auth()->user()->can(['update page'])) {
                         //Default
-                        $this->item($page->title, route('app.pages.cadastro', $page->public_id), $page->is_home ? 'home' : 'page');
+                        $this->item($page->title, route('app.pages.cadastro', $page->public_id), $page->is_home ? 'home' : 'file');
                     }
 
                 }

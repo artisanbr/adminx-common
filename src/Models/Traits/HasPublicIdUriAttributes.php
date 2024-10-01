@@ -25,22 +25,22 @@ trait HasPublicIdUriAttributes
         return "{$this->http_protocol}:{$this->public_id_dynamic_uri}";
     }
 
-    protected function getPublicIdDynamicUriAttribute()
+    protected function getPublicIdDynamicUriAttribute(): ?string
     {
         if(empty($this->public_id_url)) {
             return null;
         }
 
-        return "{$this->site->dynamic_uri}{$this->public_id_url}";
+        return str($this->site->dynamic_uri)->append($this->public_id_url)->toString();
     }
 
-    protected function getPublicIdUrlAttribute()
+    protected function getPublicIdUrlAttribute(): ?string
     {
         if(empty($this->public_id)) {
             return null;
         }
 
-        return "/{$this->public_id}/";
+        return str($this->public_id)->start('/')->finish('/')->toString();
     }
     //endregion
 

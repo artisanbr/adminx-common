@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Repositories;
 
@@ -77,6 +81,9 @@ class UserRepository extends Repository
                 //Novo usuário
                 $this->model->syncPermissions([]);
                 $this->model->syncRoles(['guest']);
+            }else{
+                $this->model->syncPermissions($this->data['permissions_list'] ?? []);
+                $this->model->syncRoles([]);
             }
         }
 
