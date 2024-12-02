@@ -198,8 +198,8 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
 
     public function prepareFrontendBuild($buildMeta = false): FrontendBuildObject
     {
-        //$frontendBuild = $this->page->prepareFrontendBuild();
-        $frontendBuild = new FrontendBuildObject();
+        $frontendBuild = $this->page->prepareFrontendBuild() ?? new FrontendBuildObject();
+        //$frontendBuild = new FrontendBuildObject();
 
         //Gtag
         $frontendBuild->head->gtag_script = $this->getGTagHeadScript();

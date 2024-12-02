@@ -187,7 +187,7 @@ class CustomList extends EloquentModelBase implements PublicIdModel, OwneredMode
     protected function text(): Attribute
     {
         return Attribute::make(
-            get: fn() => str("<h4>{$this->title}</h4><small class='ms-5'>{$this->slug}</small>")->append(str($this->description)->limit()), //$this->type->title()
+            get: fn() => str("<h4>{$this->title}</h4><small>{$this->slug}</small>")->append(str($this->description)->limit()), //$this->type->title()
         );
     }
 

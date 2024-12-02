@@ -104,8 +104,8 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
 
     public function prepareFrontendBuild($buildMeta = false): FrontendBuildObject
     {
-        //$frontendBuild = $this->page->frontend_build;
-        $frontendBuild = new FrontendBuildObject();
+        $frontendBuild = $this->page->prepareFrontendBuild() ?? new FrontendBuildObject();
+        //$frontendBuild = new FrontendBuildObject();
 
         //Antes inicio da tag head
         //$frontendBuild->head->addBefore(Meta::toHtml());

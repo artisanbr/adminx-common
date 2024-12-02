@@ -717,7 +717,7 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $pageInternal->breadcrumb_config->background_url = $modelItem->image_url;
 
-        $this->setViewData($pageInternal->page->getBuildViewData([
+        $this->setViewData($page->getBuildViewData([
                                                                      'pageInternal' => $pageInternal,
                                                                      'currentItem'  => $modelItem,
                                                                      'breadcrumb'   => $pageInternal->breadcrumb([
@@ -725,6 +725,10 @@ class FrontendTwigEngine extends FrontendEngineBase
                                                                                                                      '#' => $modelItem->title,
                                                                                                                  ]),
                                                                  ]));
+
+
+        //$this->registerFrontendBuild($page->prepareFrontendBuild());
+
 
         if ($pageInternal->frontend_build ?? false) {
             $this->registerFrontendBuild($pageInternal->frontend_build);
