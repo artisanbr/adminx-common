@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -26,6 +26,7 @@ class FileUploadManager extends FileManager
         //Remover caracteres indesejados
         //Remover extensão e tratar para URL amigavel
         $fileName = str($fileName)->beforeLast('.'.$requestFile->getClientOriginalExtension())->slug();
+
 
 
         $this->onPath($uploadPath);
@@ -81,7 +82,9 @@ class FileUploadManager extends FileManager
             }
         }
 
+
         $finalPath = $this->remoteStorage->putFileAs($this->fullPathTo(), $requestFile, $this->fileName, 'public');
+
         $this->fileObject->fill([
                                     'path' => $finalPath,
                                 ]);

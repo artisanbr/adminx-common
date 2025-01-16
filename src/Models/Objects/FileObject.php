@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -64,9 +64,9 @@ class FileObject extends GenericModel
     protected function getIsImageAttribute()
     {
         return match (true) {
-            FileHelper::isImageByExtension($this->extension),
-            FileHelper::isImageByMimeType($this->mime_type),
-            FileHelper::isImage($this->path) => true,
+            !blank($this->extension) && FileHelper::isImageByExtension($this->extension),
+                !blank($this->mime_type) && FileHelper::isImageByMimeType($this->mime_type),
+                !blank($this->path) && FileHelper::isImage($this->path) => true,
             default => false,
         };
     }

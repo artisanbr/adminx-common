@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
 
 class FrontendResourceAssetsBundle extends GenericModel
 {
+    protected $mergeAttributesOnSet = false;
 
     protected $fillable = [
         'head_js',

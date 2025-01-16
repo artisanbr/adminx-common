@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -9,6 +9,7 @@ namespace Adminx\Common\Repositories\Themes;
 
 use Adminx\Common\Models\Themes\Theme;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class ThemeFileBundleRepository
 {
@@ -19,6 +20,10 @@ class ThemeFileBundleRepository
     public function saveList(Theme &$theme, $data): bool
     {
 
+        $theme->config->bundles_after = $data['bundles_after'] ?? [];
+        $theme->save();
+
+
         foreach (['css', 'js', 'head_js'] as $collect) {
             /*$theme->assets->resources->{$collect}->fill([
                                                             'items' => $this->traitRequestDataList($data, $collect)->toArray(),
@@ -28,36 +33,50 @@ class ThemeFileBundleRepository
 
             //dd($theme->toArray());
             //$theme->save();
-            //dump($theme->config);
-            $theme->fill([
-                             'assets' => [
-                                 'resources' => [
-                                     $collect => [
-                                         'items' => $this->traitRequestDataList($data, $collect)->toArray(),
-                                     ],
-                                 ],
-                             ],
-                             'config' => [
-                                 'bundles_after' => $data['bundles_after'] ?? []
-                             ]
-                         ]);
-            /*$theme->assets->resources->{$collect}->setAttribute('items', $this->traitRequestDataList($data, $collect)->toArray());*/
-            //$theme->config->setAttribute('bundles_after', $data['bundle_after'] ?? []);
+            //dump($theme->assets->resources->{$collect}, $this->traitRequestDataList($data, $collect)->toArray());
 
-            //dd($theme->config);
+            /*$theme->update([
+                               'assets' => $theme->assets->fill([
+                                                                    'resources' => [
+                                                                        $collect => [
+                                                                            'items' => $this->traitRequestDataList($data, $collect)->toArray(),
+                                                                        ],
+                                                                    ],
+                                                                ])->toArray(),
+                           ]);*/
+
+            /*$theme->assets->fill([
+                                     'resources' => [
+                                         $collect => [
+                                             'items' => $this->traitRequestDataList($data, $collect)->toArray(),
+                                         ],
+                                     ],
+                                 ]);*/
+
+            $theme->assets->resources->{$collect}->setAttribute('items', $this->traitRequestDataList($data, $collect)->toArray());
+
 
 
 
         }
 
-
-        //$theme->assets->resources->css->items = $this->traitRequestDataList($data, 'css')->toArray();
-        //$theme->assets->resources->js->items = $this->traitRequestDataList($data, 'js')->toArray();
-        //$theme->assets->resources->head_js->items = $this->traitRequestDataList($data, 'head_js')->toArray();
-
-        //dd($theme->assets->resources->css->items->toArray());
-
-        return $theme->save();
+        return DB::table('themes')->where('id', $theme->id)->update([
+            'assets->resources' => $theme->assets->resources->toJson(),
+        ]) > 0;
+        /*return $theme->update([
+                           'assets->resources' => $theme->assets->resources->toArray(),
+                       ]);*/
+        /* $theme->assets->resources->fill([
+                                             'head_js' => [
+                                                 'items' => $this->traitRequestDataList($data, 'head_js')->toArray(),
+                                             ],
+                                             'js'      => [
+                                                 'items' => $this->traitRequestDataList($data, 'js')->toArray(),
+                                             ],
+                                             'css'     => [
+                                                 'items' => $this->traitRequestDataList($data, 'css')->toArray(),
+                                             ],
+                                         ]);*/
 
     }
     //endregion
@@ -66,9 +85,9 @@ class ThemeFileBundleRepository
     protected function traitRequestDataList($data, $listName = 'css'): Collection
     {
 
+
         $listItems = collect($data['items'][$listName] ?? [])->unique();
 
-        //dd($listItems);
 
         $listLoadModes = collect($data['load_modes'][$listName] ?? []);
         $listBundles = collect($data['bundles'][$listName] ?? []);

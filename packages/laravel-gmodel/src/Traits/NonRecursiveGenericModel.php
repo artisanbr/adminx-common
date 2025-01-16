@@ -15,7 +15,7 @@ trait NonRecursiveGenericModel
     {
         try {
 
-            return ($this->isNullable() && is_null($value)) ? null : new static($this->castRawValue($value));
+            return ($this->isNullable() && is_null($value)) ? null : new static($this->traitRawValue($value));
 
         } catch (\Exception $e) {
             //dump("exception get: $key", $value, $attributes[$key]);
@@ -70,9 +70,9 @@ trait NonRecursiveGenericModel
                 return [$key => null]; //null;
             }
 
-            $currentAttributes = $this->castRawValue($attributes[$key] ?? []);
+            $currentAttributes = $this->traitRawValue($attributes[$key] ?? []);
 
-            $mergeResult = array_replace($currentAttributes, $this->castRawValue($value));
+            $mergeResult = array_replace($currentAttributes, $this->traitRawValue($value));
             //$mergeResult = array_replace($currentAttributes, $this->castRawValue($value));
 
             //$mergeResult = collect($currentAttributes)->replaceRecursive($this->castRawValue($value))->toArray();
@@ -96,7 +96,7 @@ trait NonRecursiveGenericModel
                      ]);
             }*/
 
-            return [$key => json_encode(self::make($this->castRawValue($value))->jsonSerialize())];
+            return [$key => json_encode(self::make($this->traitRawValue($value))->jsonSerialize())];
 
         } catch (\Exception $e) {
             dump("exception set: $key", $value, $attributes);

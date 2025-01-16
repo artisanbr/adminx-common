@@ -52,7 +52,6 @@ use Adminx\Common\Models\Traits\HasVisitCounter;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasArticles;
-use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -85,7 +84,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         BelongsToUser,
         HasArticles,
         HasBreadcrumbs,
-        HasFiles,
+        //HasFiles,
         HasGenericConfig,
         HasOwners,
         HasParent,

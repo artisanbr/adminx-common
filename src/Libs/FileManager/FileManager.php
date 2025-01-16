@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -62,6 +62,7 @@ class FileManager
             ->append($this->uploadPath)
             ->finish('/')
             ->when(!empty($path), fn($str) => $str->append(str($path)->replaceStart('/', '')))
+            ->replaceEnd('/', '')
             ->toString();
     }
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -57,6 +57,7 @@ class ThemeFileManagerRepository
     public function listDirectories(Theme $theme, ?string $relative_path = null): Collection
     {
         $currentPath = $theme->upload_path . ($relative_path ? "/$relative_path" : '');
+
         $directoriesArray = $this->storageRemote->directories($currentPath);
 
         return ThemeDirectoryObject::fromPathArray($theme, $directoriesArray);
@@ -115,7 +116,14 @@ class ThemeFileManagerRepository
 
         $file = $this->traitFileArgument($theme, $fileOrRelativePath);
 
-        if ($this->storageRemote->delete($file->path)) {
+        //dd(str($file->theme_path)->start($theme->public_id.'/')->toString());
+
+        if ($this->storageRemote->directoryExists($file->path)) {
+
+            return $this->storageRemote->deleteDirectory($file->path);
+
+        }
+        else if ($this->storageRemote->delete($file->path)) {
 
             if ($theme->assets->hasFile($file->theme_path)) {
                 $theme->assets->removeFile($file->theme_path);

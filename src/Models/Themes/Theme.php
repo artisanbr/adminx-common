@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -25,7 +25,6 @@ use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
-use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use App\Libs\Utils\FrontendUtils;
 use App\Providers\AppMetaTagsServiceProvider;
@@ -43,7 +42,8 @@ use voku\helper\HtmlMin;
 
 class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
-    use SoftDeletes, HasUriAttributes, BelongsToSite, BelongsToUser, HasSelect2, HasParent, HasValidation, HasOwners, HasFiles, HasPublicIdAttribute;
+    use SoftDeletes, HasUriAttributes, BelongsToSite, BelongsToUser, HasSelect2, HasParent, HasValidation, HasOwners, /*HasFiles,*/
+        HasPublicIdAttribute;
 
     protected $fillable = [
         'account_id',
@@ -193,7 +193,6 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 
         $themeBuild = $this->build()->firstOrNew([
                                                      'site_id'    => $this->site_id,
-                                                     'user_id'    => $this->user_id,
                                                      'account_id' => $this->account_id,
                                                  ]);
 
@@ -314,32 +313,31 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
             //dd($this->build);
             $this->load('build');
 
-            if($this->build){
-                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssMain->value)){
+            if ($this->build) {
+                if (!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssMain->value)) {
                     $this->build->main_css_bundle->registerMetaPackages($package);
                 }
 
-                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssDefer->value)){
+                if (!$this->config->bundles_after?->contains(ThemeBundleDefaults::CssDefer->value)) {
                     $this->build->defer_css_bundle->registerMetaPackages($package);
                 }
 
-                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsMain->value)){
+                if (!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsMain->value)) {
                     $this->build->main_body_js_bundle->registerMetaPackages($package);
                 }
 
-                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsDefer->value)){
+                if (!$this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsDefer->value)) {
                     $this->build->defer_body_js_bundle->registerMetaPackages($package);
                 }
 
-                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsMain->value)){
+                if (!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsMain->value)) {
                     $this->build->main_head_js_bundle->registerMetaPackages($package);
                 }
 
-                if(!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsDefer->value)){
+                if (!$this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsDefer->value)) {
                     $this->build->defer_head_js_bundle->registerMetaPackages($package);
                 }
             }
-
 
 
             /*if ($this->build->main_css_bundle->id && !blank($this->build->main_css_bundle->content)) {
@@ -436,9 +434,13 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                 $package->addScript(str($headFile->url)->afterLast('/'), $headFile->url, $headFile->defer ? ['defer'] : [], Meta::PLACEMENT_HEAD);
             }
 
-            $bodyJsResources = $this->assets->resources->js->listToOrder()->where('bundle', '!=', true)->map(fn(AbstractFrontendAssetsResourceScript $assetItem) => $assetItem->fill([
-                                                                                                                                                                                         'url' => $assetItem->external ? $assetItem->url : $this->cdnUploadUrlTo($assetItem->url),
-                                                                                                                                                                                     ]));
+            $bodyJsResources = $this->assets->resources->js->listToOrder()
+                                                           ->where('bundle', '!=', true)
+                                                           ->map(fn(AbstractFrontendAssetsResourceScript $assetItem) => $assetItem->fill([
+                                                                                                                                             'url' => $assetItem->external ? $assetItem->url : $this->cdnUploadUrlTo($assetItem->url),
+                                                                                                                                         ]));
+
+            //dd($this->assets->resources->js->listToOrder()->toArray(), $bodyJsResources);
 
             foreach ($bodyJsResources as $bodyFile) {
                 $package->addScript(str($bodyFile->url)->afterLast('/'), $bodyFile->url, $bodyFile->defer ? ['defer'] : []);
@@ -447,27 +449,27 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
             //region Pos
 
 
-            if($this->config->bundles_after?->contains(ThemeBundleDefaults::CssMain->value)){
+            if ($this->config->bundles_after?->contains(ThemeBundleDefaults::CssMain->value)) {
                 $this->build->main_css_bundle->registerMetaPackages($package);
             }
 
-            if($this->config->bundles_after?->contains(ThemeBundleDefaults::CssDefer->value)){
+            if ($this->config->bundles_after?->contains(ThemeBundleDefaults::CssDefer->value)) {
                 $this->build->defer_css_bundle->registerMetaPackages($package);
             }
 
-            if($this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsMain->value)){
+            if ($this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsMain->value)) {
                 $this->build->main_body_js_bundle->registerMetaPackages($package);
             }
 
-            if($this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsDefer->value)){
+            if ($this->config->bundles_after?->contains(ThemeBundleDefaults::BodyJsDefer->value)) {
                 $this->build->defer_body_js_bundle->registerMetaPackages($package);
             }
 
-            if($this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsMain->value)){
+            if ($this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsMain->value)) {
                 $this->build->main_head_js_bundle->registerMetaPackages($package);
             }
 
-            if($this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsDefer->value)){
+            if ($this->config->bundles_after?->contains(ThemeBundleDefaults::HeadJsDefer->value)) {
                 $this->build->defer_head_js_bundle->registerMetaPackages($package);
             }
 
@@ -654,7 +656,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
 
     protected function text(): Attribute
     {
-        return Attribute::make(get: fn() => ($this->parent && $this->parent->title ? "{$this->parent->title} &raquo; " : '') . ($this->title ?? ''),);
+        return Attribute::make(get: fn() => ($this->parent && $this->parent->title ? "{$this->parent->title} &raquo; " : '') . ($this->title ?? ''));
     }
 
     protected function uploadPath(): Attribute

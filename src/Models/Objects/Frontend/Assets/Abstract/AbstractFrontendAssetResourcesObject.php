@@ -21,6 +21,8 @@ use Illuminate\Support\Collection;
 abstract class AbstractFrontendAssetResourcesObject extends GenericModel
 {
 
+    protected $mergeAttributesOnSet = false;
+
     protected $fillable = [
         'items',
     ];
@@ -44,7 +46,7 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
     {
         try {
 
-            return ($this->isNullable() && is_null($value)) ? null : new static($this->castRawValue($value));
+            return ($this->isNullable() && is_null($value)) ? null : new static($this->traitRawValue($value));
 
         } catch (\Exception $e) {
             //dump("exception get: $key", $value, $attributes[$key]);
@@ -58,7 +60,7 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
                      'attributes' => $attributes,
                      //'model'      => $model,
                      //'trace'      => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10),
-                     'error' => $e->getMessage()
+                     'error'      => $e->getMessage(),
                  ]);
             throw $e;
         }
@@ -75,22 +77,22 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
             dd(static::make($currentAttributes)->fill($this->buildCastAttributes($value))->jsonSerialize());
         }*/
 
-       /* dd([
-                 'type'              => 'set',
-                 'key'               => $key,
-                 'value'             => $value,
-                 //'currentAttributes' => $currentAttributes,
-                 'model_current'             => $model->{$key} ?? null,
-                 //'merge'             => $mergeResult,
-                 //'result'            => [$key => json_encode($mergeResult)],
+        /* dd([
+                  'type'              => 'set',
+                  'key'               => $key,
+                  'value'             => $value,
+                  //'currentAttributes' => $currentAttributes,
+                  'model_current'             => $model->{$key} ?? null,
+                  //'merge'             => $mergeResult,
+                  //'result'            => [$key => json_encode($mergeResult)],
 
-                 //'attributes' => $attributes,
-                 'attributes_current' => $attributes[$key] ?? null,
-                 //'this'      => $this,
-                 //'trace'      => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 25),
-                 'model_array'             => $model->toArray(),
-                 'this_array'             => $this->toArray(),
-             ]);*/
+                  //'attributes' => $attributes,
+                  'attributes_current' => $attributes[$key] ?? null,
+                  //'this'      => $this,
+                  //'trace'      => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 25),
+                  'model_array'             => $model->toArray(),
+                  'this_array'             => $this->toArray(),
+              ]);*/
 
         try {
 
@@ -99,9 +101,9 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
                 return [$key => null]; //null;
             }
 
-            $currentAttributes = $this->castRawValue($attributes[$key] ?? []);
+            $currentAttributes = $this->traitRawValue($attributes[$key] ?? []);
 
-            $mergeResult = array_replace($currentAttributes, $this->castRawValue($value));
+            $mergeResult = array_replace($currentAttributes, $this->traitRawValue($value));
             //$mergeResult = array_replace($currentAttributes, $this->castRawValue($value));
 
             //$mergeResult = collect($currentAttributes)->replaceRecursive($this->castRawValue($value))->toArray();
@@ -125,7 +127,7 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
                      ]);
             }*/
 
-            return [$key => json_encode(self::make($this->castRawValue($value))->jsonSerialize())];
+            return [$key => json_encode(self::make($this->traitRawValue($value))->jsonSerialize())];
 
         } catch (\Exception $e) {
             dump("exception set: $key", $value, $attributes);
@@ -152,7 +154,7 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
 
         $itemArray = is_string($file_path) ? ['url' => $file_path] : $file_path;
 
-        if(!$this->hasFile($itemArray['url'])){
+        if (!$this->hasFile($itemArray['url'])) {
             if (!isset($itemArray['position'])) {
                 $itemArray['position'] = $this->items->count();
             }
@@ -167,7 +169,7 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
     public function setFiles(array $files): static
     {
 
-       $this->items = $files;
+        $this->items = $files;
 
         return $this;
     }
@@ -216,6 +218,7 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
     {
         return $this->items->map(function (AbstractFrontendAssetsResourceScript $file) {
             $file->append('id');
+
             return $file;
         })->unique('url')->sortBy('position')->values();
     }

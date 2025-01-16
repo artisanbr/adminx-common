@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -25,7 +25,7 @@ class FileHelper
             $fileModel = new File();
         }
 
-        $uploadPath = "sites/{$site->public_id}/{$path}";
+        $uploadPath = str($path)->start("sites/{$site->public_id}/")->toString();
 
 
         $fileModel->site_id = $site->id;

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -61,6 +61,7 @@ class ThemeBundle extends EloquentModelBase
     {
 
         if ($this->id && $this->placement && !blank($this->content)) {
+
             if ($this->placement === ThemeBundlePlacement::Css) {
                 $package->addStyle($this->file_name_minified,
                                    $this->url_minified,

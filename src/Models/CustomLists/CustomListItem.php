@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -28,7 +28,6 @@ use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
-use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Observers\OwneredModelObserver;
@@ -53,7 +52,7 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         HasPublicIdAttribute,
         HasPublicIdUriAttributes,
         HasUriAttributes,
-        HasFiles,
+        //HasFiles,
         HasSiteRoutes,
         SoftDeletes;
 
@@ -101,7 +100,7 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         'updated_at' => 'datetime:d/m/Y H:i:s',
     ];
 
-    protected $with = ['list'];
+    //protected $with = ['list'];
 
     public function __construct(array $attributes = [])
     {
@@ -235,22 +234,33 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
 
     //region ATTRIBUTES
 
+    protected function slug(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, array $attributes) => blank($value) ? str($attributes['title'] ?? '')->slug()->toString() : $value,
+            set: fn($value) => $value,
+        );
+    }
+
     protected array $dataCache = [];
 
     protected function data(): Attribute
     {
         if (!$this->dataCache) {
             $this->dataCache = $this->schema->mapWithKeys(fn(CustomListItemSchemaValue $schemaItem, int $key) => match (true) {
-                $schemaItem->type && $schemaItem->type->is(CustomListSchemaType::Image) => [
+                $schemaItem->type?->is(CustomListSchemaType::Image) => [
                     $schemaItem->slug                => $schemaItem,
                     $schemaItem->slug . "_url"       => $schemaItem->url,
                     $schemaItem->slug . "_alt"       => $schemaItem->value->alt,
                     $schemaItem->slug . "_html"      => $schemaItem->value->html,
                     $schemaItem->slug . "_full_html" => $schemaItem->value->full_html,
                 ],
+                $schemaItem->type?->is(CustomListSchemaType::PDF) => [
+                    $schemaItem->slug                => $schemaItem,
+                    $schemaItem->slug . "_url"       => $schemaItem->url,
+                ],
                 $schemaItem->slug === 'content' &&
-                $schemaItem->type &&
-                $schemaItem->type->is(CustomListSchemaType::Html) &&
+                $schemaItem->type?->is(CustomListSchemaType::Html) &&
                 !$this->schema->where('slug', 'html')->count() => [
                     $schemaItem->slug => $schemaItem->value,
                     'html'            => $schemaItem->value,

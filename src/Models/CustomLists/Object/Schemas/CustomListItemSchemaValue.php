@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -9,6 +9,8 @@ namespace Adminx\Common\Models\CustomLists\Object\Schemas;
 use Adminx\Common\Enums\CustomLists\CustomListSchemaType;
 use Adminx\Common\Models\CustomLists\Object\Values\ButtonValue;
 use Adminx\Common\Models\CustomLists\Object\Values\ImageValue;
+use Adminx\Common\Models\CustomLists\Object\Values\PDFValue;
+use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Objects\Files\ImageFileObject;
 use ArtisanLabs\GModel\GenericModel;
 use Illuminate\Support\Collection;
@@ -16,8 +18,8 @@ use Illuminate\Support\Collection;
 /**
  * @property array|object|ImageValue|ButtonValue|null|string|Collection<ButtonValue>|Collection<ImageFileObject>|ButtonValue[]|ImageValue[]
  *           $value
- * @property ?CustomListSchemaType
- *                                                    $type
+ * @property ?CustomListSchemaType $type
+ * @property null|string|ImageValue|Seo|ButtonValue|ImageValue[]|ButtonValue[]|Collection<ButtonValue>|Collection<ImageValue>|PDFValue|PDFValue[]|Collection<PDFValue> $value
  */
 class CustomListItemSchemaValue extends GenericModel
 {
@@ -108,7 +110,7 @@ class CustomListItemSchemaValue extends GenericModel
     protected function getUrlAttribute()
     {
         return match ($this->type) {
-            CustomListSchemaType::Image => $this->value?->url ?? null,
+            CustomListSchemaType::Image, CustomListSchemaType::PDF => $this->value?->url ?? null,
             default => null,
         };
     }
@@ -124,22 +126,8 @@ class CustomListItemSchemaValue extends GenericModel
     public function setValue($value): static
     {
 
-        if ($this->type && $this->type->is(CustomListSchemaType::Image)) {
-            if (is_string($value) && !json_validate($value)) {
-                $this->attributes['value'] = ImageValue::make([
-                                                                       'url'           => $value,
-                                                                       'width'         => '',
-                                                                       'height'        => '',
-                                                                       'file_name'     => '',
-                                                                       'relative_path' => '',
-                                                                   ])->toArray();
-            }
-            else if ($value instanceof ImageValue) {
-                $this->attributes['value'] = $value->toArray();
-            }
-            else {
-                $this->attributes['value'] = ImageValue::make(is_string($value) ? json_decode($value) : $value)->toArray();
-            }
+        if ($this->type && $this->type->isAny(CustomListSchemaType::Image, CustomListSchemaType::PDF)) {
+            $this->fillFileObjectValue($value, $this->type->valueCast());
         }
         else {
             parent::setAttribute('value', $value);
@@ -147,6 +135,25 @@ class CustomListItemSchemaValue extends GenericModel
 
         return $this;
 
+    }
+
+    protected function fillFileObjectValue($value, $valueClass): void
+    {
+        if (is_string($value) && !json_validate($value)) {
+            $this->attributes['value'] = $valueClass::make([
+                                                              'url'           => $value
+                                                          ])->toArray();
+        }
+        else if ($value instanceof $valueClass) {
+            $this->attributes['value'] = $value->toArray();
+        }
+        else {
+            $this->attributes['value'] = $valueClass::make(is_string($value) ? json_decode($value) : $value)->toArray();
+        }
+    }
+
+    protected function getValueObjectInstance($valueClass, $attributes = []) {
+        return new $valueClass($attributes);
     }
 
     //endregion

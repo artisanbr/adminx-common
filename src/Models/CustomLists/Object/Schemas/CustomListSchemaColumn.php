@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -14,6 +14,7 @@ use ArtisanLabs\GModel\GenericModel;
 
 /**
  * @property mixed|ImageFileObject|null $default_value
+ * @property CustomListSchemaType $type
  */
 class CustomListSchemaColumn extends GenericModel
 {

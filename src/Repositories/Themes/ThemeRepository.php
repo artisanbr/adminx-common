@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -69,7 +69,10 @@ class ThemeRepository extends Repository
 
 
         $this->processUploads();
-        $this->generateBundles($this->model);
+
+        if($this->data['publish_theme'] ?? false){
+            $this->generateBundles($this->model);
+        }
 
         //$this->model->saveAndBuild();
 
@@ -326,7 +329,8 @@ class ThemeRepository extends Repository
         //endregion
 
         //Build Theme Again
-        $theme->saveAndBuild();
+        $theme->generateBuild();
+        //$theme->saveAndBuild();
     }
 
     protected function compileCss(string $fileUrl): string

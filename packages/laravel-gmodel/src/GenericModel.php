@@ -150,6 +150,8 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
 
     protected $temporary = [];
 
+    protected $mergeAttributesOnSet = true;
+
     /**
      * Indicates if an exception should be thrown instead of silently discarding non-fillable attributes.
      *
@@ -1469,7 +1471,7 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
     /**
      * @throws JsonException
      */
-    protected function castRawValue($value): array
+    protected function traitRawValue($value): array
     {
 
         try {
@@ -1639,7 +1641,7 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
     {
         try {
 
-            return ($this->isNullable() && is_null($value)) ? null : new static($this->castRawValue($value));
+            return ($this->isNullable() && is_null($value)) ? null : new static($this->traitRawValue($value));
 
         } catch (\Exception $e) {
             //dump("exception get: $key", $value, $attributes[$key]);
@@ -1677,12 +1679,32 @@ abstract class GenericModel extends Model implements CastsAttributes, GenericCas
                 return [$key => null]; //null;
             }
 
-            $currentAttributes = $this->castRawValue($attributes[$key] ?? []);
+            $currentAttributes = $this->traitRawValue($attributes[$key] ?? []);
 
             //$mergeResult = array_replace_recursive($currentAttributes, $this->castRawValue($value));
 
+            if($this->mergeAttributesOnSet){
+                $mergeValue = ArrayObject::mergeRecursive($currentAttributes, $this->traitRawValue($value));
+            }else{
+                $mergeValue = array_replace_recursive($currentAttributes, $this->traitRawValue($value));
+                /*dd([
+                         'type'              => 'set',
+                         'key'               => $key,
+                         'value'             => $value,
+                         'model'             => $model,
+                         //'currentAttributes' => $currentAttributes,
+                         'current'             => $model->{$key},
+                         //'merge'             => $mergeResult,
+                         //'result'            => [$key => json_encode($mergeResult)],
 
-            $mergeValue = ArrayObject::mergeRecursive($currentAttributes, $this->castRawValue($value));
+                         //'attributes' => $attributes,
+                         //'attributes_current' => $attributes[$key] ?? null,
+                         //'model_array'      => $this->toArray(),
+                         //'model'      => $this,
+                         //'trace'      => debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 25),
+                     ]);*/
+            }
+
 
 
 

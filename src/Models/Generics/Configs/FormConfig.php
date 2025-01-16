@@ -85,7 +85,7 @@ class FormConfig extends GenericModel
      */
     public function get($model, $key, $value, $attributes)
     {
-        return ($this->isNullable() && is_null($value)) ? null : new static($this->castRawValue($value));
+        return ($this->isNullable() && is_null($value)) ? null : new static($this->traitRawValue($value));
 
     }
 
@@ -99,9 +99,9 @@ class FormConfig extends GenericModel
             return [$key => null]; //null;
         }
 
-        $currentAttributes = $this->castRawValue($attributes[$key] ?? []);
+        $currentAttributes = $this->traitRawValue($attributes[$key] ?? []);
 
-        $valueArray = collect($this->castRawValue($value))->filter()->toArray();
+        $valueArray = collect($this->traitRawValue($value))->filter()->toArray();
 
         $valueArray = array_filter_recursive($valueArray);
 

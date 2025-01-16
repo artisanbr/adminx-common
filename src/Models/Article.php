@@ -33,7 +33,6 @@ use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasCategoriesMorph;
 use Adminx\Common\Models\Traits\Relations\HasComments;
-use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
 use Adminx\Common\Rules\HtmlEmptyRule;
 use Carbon\Carbon;
@@ -53,7 +52,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         HasPublishTimestamps,
         SoftDeletes,
         HasValidation, HasSEO,
-        HasFiles,
+        //HasFiles,
         BelongsToPage,
         BelongsToUser,
         BelongsToSite,

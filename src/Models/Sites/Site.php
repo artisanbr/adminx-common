@@ -35,7 +35,6 @@ use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasArticles;
-use Adminx\Common\Models\Traits\Relations\HasFiles;
 use Adminx\Common\Models\Users\User;
 use Adminx\Common\Models\Widgets\SiteWidget;
 use Adminx\Common\Rules\DomainRule;
@@ -45,7 +44,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
-    use HasUriAttributes, HasValidation, HasSEO, HasFiles, HasArticles, BelongsToUser, HasOwners, HasPublicIdAttribute, HasRelatedCache;
+    use HasUriAttributes, HasValidation, HasSEO, /*HasFiles,*/ HasArticles, BelongsToUser, HasOwners, HasPublicIdAttribute, HasRelatedCache;
 
     protected $connection = 'mysql';
 
