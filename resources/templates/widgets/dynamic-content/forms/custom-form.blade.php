@@ -91,6 +91,11 @@
                             $alertMsg.html(message);
                             if (autoShow) {
                                 alertManager.show();
+
+                                //const alertElement = document.querySelector(".alert");
+                                if ($alert[0]) {
+                                    $alert[0].scrollIntoView({ behavior: "smooth", block: "center" });
+                                }
                             }
                         },
                         alert: (message, type = 'info') => {
