@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -24,7 +24,7 @@ class FormElement extends GenericModel
         'title',
         'slug',
         'html',
-        'attrs',
+        'css_class',
         'validation_rules',
     ];
 
@@ -44,7 +44,7 @@ class FormElement extends GenericModel
         'title' => 'string',
         'html' => 'string',
         'validation_rules' => 'collection',
-        'attrs' => 'collection',
+        'css_class' => 'string',
         'custom_sizes' => 'bool',
     ];
 
