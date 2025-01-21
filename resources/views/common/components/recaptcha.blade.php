@@ -129,7 +129,7 @@
 
 <div id="{{ $id }}" class="g-recaptcha mb-3"></div>
 <script>
-    $(function () {
+    document.addEventListener('DOMContentLoaded', function() {
         //recaptcha
         grecaptcha.render(document.getElementById('{{ $id }}'), {
             'sitekey': '{{ $site->config->recaptcha_site_key }}',
