@@ -80,7 +80,7 @@
     <p class="text-gray-700"
        style="line-height: 24px; font-size: 16px; color: #4a5568; width: 100%; margin: 0;"
        align="left">
-        Em breve você poderá conferir o histórico dos formulários diretamente pelo seu Painel Administrativo.
-        {{--todo: Confira mais respostas para este formul&aacute;rio no <a href="{{ route('app.elements.forms.answers', $formAnswer->form->id) }}" target="_blank" style="color: #0d6efd;">Painel de Controle</a> do seu site.--}}
+        {{--Em breve você poderá conferir o histórico dos formulários diretamente pelo seu Painel Administrativo.
+        todo: Confira mais respostas para este formul&aacute;rio no <a href="{{ route('app.elements.forms.answers', $formAnswer->form->id) }}" target="_blank" style="color: #0d6efd;">Painel de Controle</a> do seu site.--}}
     </p>
 @endsection
