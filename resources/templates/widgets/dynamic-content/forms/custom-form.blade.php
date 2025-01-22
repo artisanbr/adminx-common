@@ -41,7 +41,7 @@
             <div class="col-12 col-sm-8">
                 <x-common::recaptcha :site="$form->site"/>
             </div>
-            <div class="col-12 col-sm d-flex justify-content-end align-items-end">
+            <div class="col-12 col-sm d-flex justify-content-end align-items-start">
                 {!! $form->config->send_button->html !!}
             </div>
         </div>
