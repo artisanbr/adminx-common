@@ -20,7 +20,8 @@ class FormConfig extends GenericModel
         'captcha', //Enviar respostas por email
         'allow_select_recipient', //Permitir selecionar destinos de entrega
         'select_recipient_title', //Permitir selecionar destinos de entrega
-        'enable_recaptcha', //Permitir selecionar destinos de entrega
+        'enable_redirect', //Permitir selecionar destinos de entrega
+        'redirect_url',
         'show_title',
         'destinations',
         'recipients',
@@ -39,7 +40,6 @@ class FormConfig extends GenericModel
         'send_mail'              => true,
         'allow_select_recipient' => false,
         'select_recipient_title' => 'Selecione um destinatário',
-        'enable_recaptcha'       => true,
         'show_title'             => true,
         'destinations'           => [],
         'recipients'             => [],
@@ -49,7 +49,8 @@ class FormConfig extends GenericModel
     protected $casts = [
         'send_mail'              => 'bool',
         'captcha'                => FormCaptcha::class,
-        'enable_recaptcha'       => 'bool',
+        'enable_redirect'       => 'bool',
+        'redirect_url'       => 'string',
         'allow_select_recipient' => 'bool',
         'select_recipient_title' => 'string',
         'show_title'             => 'bool',
@@ -75,6 +76,11 @@ class FormConfig extends GenericModel
                 'address' => $recipient,
             ])->toArray();
         }
+    }
+
+    protected function getEnableRecaptchaAttribute()
+    {
+        return $this->captcha->enabled;
     }
 
     protected function getRenderSendButtonHtmlAttributesAttribute()
