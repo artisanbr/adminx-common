@@ -37,7 +37,7 @@
         {% if showDescription %}
             <p class="article-description limit-lines mb-0"
                style="-webkit-line-clamp: {{ descriptionLines }};">
-                {{ article.description ?? article.limitContent(big ? 50 : 25) }}
+                {{ article.description ?? article.introduction }}
             </p>
         {% endif %}
 
