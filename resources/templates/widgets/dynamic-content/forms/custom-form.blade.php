@@ -186,7 +186,6 @@
                                         $submitButton.prop('disabled', false);
                                         let isToRedirect = @json($form->config->enable_redirect);
                                         let redirectUrl = '{{ $form->config->redirect_url }}';
-
                                         if(isToRedirect && redirectUrl && redirectUrl.length){
                                             location.href = redirectUrl;
                                         }
