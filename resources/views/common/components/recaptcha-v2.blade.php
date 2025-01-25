@@ -1,8 +1,10 @@
 @props([
-    'site' => new \Adminx\Common\Models\Sites\Site(),
+    //'site' => new \Adminx\Common\Models\Sites\Site(),
     'noAjax' => false,
     'id' => 'g-recaptcha-'.\Delight\Random\Random::alphaLowercaseHumanString(7),
     'callback' => null,
+    'siteKey' => null,
+    //'privateKey' => null,
 ])
 {{--@once
     @prepend('js')
@@ -132,7 +134,7 @@
     document.addEventListener('DOMContentLoaded', function() {
         //recaptcha
         grecaptcha.render(document.getElementById('{{ $id }}'), {
-            'sitekey': '{{ $site->config->recaptcha_site_key }}',
+            'sitekey': '{{ $siteKey /*$site->config->recaptcha_site_key*/ }}',
 
             @if($callback)
             'callback': {{ $callback }},

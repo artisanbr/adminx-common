@@ -1,12 +1,13 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Generics\Configs;
 
 use Adminx\Common\Models\Casts\AsCollectionOf;
+use Adminx\Common\Models\Generics\Forms\FormCaptcha;
 use Adminx\Common\Models\Generics\Forms\FormRecipient;
 use Adminx\Common\Models\Generics\Forms\FormSendButton;
 use ArtisanLabs\GModel\GenericModel;
@@ -16,6 +17,7 @@ class FormConfig extends GenericModel
 
     protected $fillable = [
         'send_mail', //Enviar respostas por email
+        'captcha', //Enviar respostas por email
         'allow_select_recipient', //Permitir selecionar destinos de entrega
         'select_recipient_title', //Permitir selecionar destinos de entrega
         'enable_recaptcha', //Permitir selecionar destinos de entrega
@@ -46,6 +48,7 @@ class FormConfig extends GenericModel
 
     protected $casts = [
         'send_mail'              => 'bool',
+        'captcha'                => FormCaptcha::class,
         'enable_recaptcha'       => 'bool',
         'allow_select_recipient' => 'bool',
         'select_recipient_title' => 'string',
@@ -110,7 +113,7 @@ class FormConfig extends GenericModel
         //$mergeResult = array_replace_recursive($currentAttributes, $this->castRawValue($value));
         //$mergeResult = array_replace($currentAttributes, $this->castRawValue($value));
 
-        //return [$key => json_encode(self::make($mergeResult)->jsonSerialize())];
-        return json_encode(self::make($valueArray)->jsonSerialize());
+        return [$key => json_encode(self::make($valueArray)->jsonSerialize())];
+        //return json_encode(self::make($valueArray)->jsonSerialize());
     }
 }

@@ -1,3 +1,4 @@
+@php use Adminx\Common\Enums\Forms\FormCaptchaType; @endphp
 <?php
 /***
  * @var \Adminx\Common\Models\Widgets\SiteWidget|null $widget
@@ -7,12 +8,12 @@
 ?>
 @extends('common::layouts.api.ajax-view')
 
-{{--@php
-    $form = $widget->sources->first();
-@endphp--}}
+@php
+    $formId = "form-{$form->public_id}";
+@endphp
 
 @if($form->id ?? false)
-    <form id="form-{{$form->id}}" class="form w-100" action="{{ route('frontend.send-form', $form->id, false) }}"
+    <form id="{{ $formId }}" class="form w-100" action="{{ route('frontend.send-form', $form->public_id, false) }}" method="POST"
           enctype="multipart/form-data" data-grecaptcha-action="{{$form->slug}}">
         @method('POST')
 
@@ -38,9 +39,14 @@
             @endforeach
         </div>
         <div class="row">
+            {{--@dump($form->config->captcha->type?->is(FormCaptchaType::RecaptchaV2->value), $form->config->captcha->keys->get('site_key') ??  $form->site->config->recaptcha_site_key)--}}
+            @if($form->config->captcha->enabled)
             <div class="col-12 col-sm-8">
-                <x-common::recaptcha :site="$form->site"/>
+                @if($form->config->captcha->type?->is(FormCaptchaType::RecaptchaV2->value))
+                <x-common::recaptcha-v2 :site-key="$form->config->captcha->keys->get('site_key') ??  $form->site->config->recaptcha_site_key"/>
+                @endif
             </div>
+            @endif
             <div class="col-12 col-sm d-flex justify-content-end align-items-start">
                 {!! $form->config->send_button->html !!}
             </div>
@@ -58,7 +64,7 @@
         <script>
 
             // Class definition
-            const formModule_{{$form->id}} = function () {
+            const formModule_{{$form->public_id}} = function () {
                 // Elements
                 let $form;
                 let $submitButton;
@@ -195,7 +201,7 @@
                 return {
                     // Initialization
                     init: function () {
-                        $form = $('form#form-{{$form->id}}');
+                        $form = $('form#form-{{$form->public_id}}');
                         $submitButton = $form.find('button:submit');
                         $alert = $form.find('.alert');
                         $alertMsg = $form.find('.alert > span:first');
@@ -209,11 +215,11 @@
             //$(function () {
             @if($widget ?? false)
             $(function () {
-                formModule_{{$form->id}}.init();
+                formModule_{{$form->public_id}}.init();
             });
                 @else
                 document.addEventListener('DOMContentLoaded', (event) => {
-                    formModule_{{$form->id}}.init();
+                    formModule_{{$form->public_id}}.init();
                 });
                 @endif
 

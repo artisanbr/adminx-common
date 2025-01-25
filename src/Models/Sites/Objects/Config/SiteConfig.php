@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -64,12 +64,12 @@ class SiteConfig extends GenericModel
     //region GETS
     protected function getRecaptchaSiteKeyAttribute($value)
     {
-        return $value ?? config("services.recaptcha.site_key");
+        return $value; // ?? config("services.recaptcha.site_key");
     }
 
     protected function getRecaptchaPrivateKeyAttribute($value)
     {
-        return $value ?? config("services.recaptcha.private_key");
+        return $value; // ?? config("services.recaptcha.private_key");
     }
     //endregion
     //endregion

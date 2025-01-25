@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -40,9 +40,11 @@ class FormRepository
 
             $form->fill($data);
 
-            $form->config = new FormConfig($data['config']);
-
             $form->save();
+
+
+            $form->config = new FormConfig($data['config']);
+            DB::table('forms')->where('id', $form->id)->update(['config' => $form->config->toJson()]);
             //$form->refresh();
 
             $form->elements = $form->elements->values()->map(function (FormElement $item, $i) use ($dataElements) {
