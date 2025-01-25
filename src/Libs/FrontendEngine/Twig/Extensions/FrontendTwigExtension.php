@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -10,6 +10,7 @@ use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Menus\Menu;
+use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
 use Adminx\Common\Models\Templates\Template;
@@ -43,13 +44,19 @@ class FrontendTwigExtension extends AbstractExtension
 
 
     /**
-     * @var Collection|mixed|Menu[]
+     * @property Collection<Menu>|Menu[]
      */
-    protected mixed $menus;
+    protected Collection $menus;
+
     /**
-     * @var Collection|mixed|CustomList[]
+     * @property Collection<CustomList>|CustomList[]
      */
-    protected mixed $customLists;
+    protected Collection $customLists;
+
+    /**
+     * @property Collection<Page>|Page[]
+     */
+    protected Collection $pages;
 
     public function __construct(protected Environment $twig, protected ?Site $currentSite = null)
     {
@@ -61,6 +68,7 @@ class FrontendTwigExtension extends AbstractExtension
 
         $this->menus = collect();
         $this->customLists = collect();
+        $this->pages = collect();
 
     }
 
@@ -70,6 +78,7 @@ class FrontendTwigExtension extends AbstractExtension
             new TwigFunction('widget', $this->widget(...), ['needs_context' => true]),
             new TwigFunction('w', $this->widget(...), ['needs_context' => true]),
 
+            //Todo: formRender e formRenderAjax
             new TwigFunction('form', $this->form(...), ['needs_context' => true]),
             new TwigFunction('f', $this->form(...), ['needs_context' => true]),
 
@@ -77,9 +86,18 @@ class FrontendTwigExtension extends AbstractExtension
             new TwigFunction('m', $this->menu(...), ['needs_context' => true]),
 
             new TwigFunction('custom_list', $this->customList(...), ['needs_context' => true]),
+            new TwigFunction('customList', $this->customList(...), ['needs_context' => true]),
             new TwigFunction('lista', $this->customList(...), ['needs_context' => true]),
             new TwigFunction('list', $this->customList(...), ['needs_context' => true]),
             new TwigFunction('l', $this->customList(...), ['needs_context' => true]),
+
+            new TwigFunction('listItems', $this->customListItems(...), ['needs_context' => true]),
+            new TwigFunction('list_items', $this->customListItems(...), ['needs_context' => true]),
+            new TwigFunction('li', $this->customListItems(...), ['needs_context' => true]),
+
+
+            new TwigFunction('page', $this->page(...), ['needs_context' => true]),
+            new TwigFunction('articles', $this->articles(...), ['needs_context' => true]),
         ];
     }
 
@@ -144,7 +162,7 @@ class FrontendTwigExtension extends AbstractExtension
     public function form($context, string $form_slug, bool $ajax = false): string
     {
 
-        if (!$this->currentForm || ((string) $this->currentForm->public_id !== $form_slug && (string) $this->currentForm->slug !== $form_slug)) {
+        if (!$this->currentForm || ((string)$this->currentForm->public_id !== $form_slug && (string)$this->currentForm->slug !== $form_slug)) {
             //Não foi o ultimo utilizado, Verificar no cache
             $this->currentForm = $this->forms->firstWhere('public_id', $form_slug) ?? $this->forms->firstWhere('slug', $form_slug);
 
@@ -185,16 +203,14 @@ class FrontendTwigExtension extends AbstractExtension
             //Debugbar::debug($template->blade_file);
 
             return View::make($template->blade_file, [
-                'form' => $this->currentForm,
-                'template' => $template
-            ])->render();
-;
+                'form'     => $this->currentForm,
+                'template' => $template,
+            ])->render();;
 
         }
 
 
         //Se estiver sem content, compilar
-
 
 
         return $this->currentSiteWidget->content->html;
@@ -246,9 +262,8 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function customList($context, $public_id)
+    public function customList($context, $public_id): CustomList
     {
-
 
         //Verificar no cache
         $customList = $this->customLists->firstWhere('public_id', $public_id) ?? $this->customLists->firstWhere('slug', $public_id);
@@ -256,7 +271,11 @@ class FrontendTwigExtension extends AbstractExtension
         //Não encontrou, buscar no banco
         if (!$customList) {
 
-            $customList = $this->currentSite->lists()->where('public_id', $public_id)->orWhere('slug', $public_id)->first();
+            $customList = $this->currentSite->lists()
+                                            ->where('public_id', $public_id)
+                                            ->orWhere('slug', $public_id)
+                                            ->with(['items' => fn($query) => $query->ordered()])
+                                            ->first();
 
             if ($customList) {
                 /**
@@ -285,6 +304,66 @@ class FrontendTwigExtension extends AbstractExtension
 
 
         return $customList ?? new CustomList();
+
+    }
+
+    public function customListItems($context, $public_id, $perPage = 50, $pageNumber = 1)
+    {
+        return $this->customList($context, $public_id)->items()->ordered()->paginate(
+            perPage: $perPage,
+            columns: ['*'],
+            page:    $pageNumber
+        ) ?? collect();
+
+    }
+
+    public function articles($context, ?string $page = null, $perPage = 50, $pageNumber = 1)
+    {
+
+        if(!$page){
+            $page = $this->currentSite->pages()->whereHas('articles')->first();
+        }else{
+            $page = $this->page($context, $page);
+        }
+
+        return $page instanceof Page ? $page->articles()->ordered()->paginate(
+            perPage: $perPage,
+            columns: ['*'],
+            page:    $pageNumber
+        ) : collect();
+
+    }
+
+    public function page($context, ?string $page = null)
+    {
+
+        if (!$page) {
+            //Pega home page
+            $page = $this->currentSite->pages()->where('is_home', true)->first();
+        }
+        else if (!($page instanceof Page)) {
+
+            $searchTerm = $page;
+
+            //Verificar no cache
+            $page = $this->pages->firstWhere('public_id', $searchTerm) ?? $this->pages->firstWhere('slug', $searchTerm);
+
+            if (!$page) {
+                $page = $this->currentSite->pages()
+                                          ->where(fn($builder) => $builder->where('public_id', $searchTerm)->orWhere('slug', $searchTerm))
+                                          ->first();
+            }
+        }
+
+        if (!$page) {
+            return null;
+        }
+
+
+        $this->pages->add($page);
+
+
+        return $page;
 
     }
 }

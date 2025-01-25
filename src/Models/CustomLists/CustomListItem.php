@@ -32,6 +32,7 @@ use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Observers\OwneredModelObserver;
 use Adminx\Common\Observers\PublicIdModelObserver;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
@@ -120,6 +121,18 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
 
         self::observe([OwneredModelObserver::class, PublicIdModelObserver::class]);
     }
+
+    //region Scopes
+    public function scopeOrdered(Builder $query): Builder
+    {
+        return $query->orderBy('position')->orderBy('title')->orderByDesc('created_at');
+    }
+
+    public function scopeOrderedDesc(Builder $query): Builder
+    {
+        return $query->orderByDesc('position')->orderBy('created_at')->orderBy('title');
+    }
+    //endregion
 
     //region HELPERS
 
