@@ -72,9 +72,12 @@ class ThemeRepository extends Repository
 
         if($this->data['publish_theme'] ?? false){
             $this->generateBundles($this->model);
+        }else{
+
+            $this->model->generateBuild();
         }
 
-        //$this->model->saveAndBuild();
+        $this->model->save();
 
         return $this->model;
     }
