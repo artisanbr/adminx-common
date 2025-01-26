@@ -418,7 +418,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                                                                                                                                                                                           ]));
 
             foreach ($cssIncludeResources as $cssFile) {
-                $package->addStyle(str($cssFile->url)->afterLast('/'), $cssFile->url, $cssFile->defer ? [
+                $package->addStyle(str($cssFile->url)->slug()->toString(), $cssFile->url, $cssFile->defer ? [
                     'rel'    => 'preload',
                     'as'     => 'style',
                     //'media'  => 'print',
@@ -431,7 +431,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
                                                                                                                                                                                           ]));
 
             foreach ($headJsResources as $headFile) {
-                $package->addScript(str($headFile->url)->afterLast('/'), $headFile->url, $headFile->defer ? ['defer'] : [], Meta::PLACEMENT_HEAD);
+                $package->addScript(str($headFile->url)->slug()->toString(), $headFile->url, $headFile->defer ? ['defer'] : [], Meta::PLACEMENT_HEAD);
             }
 
             $bodyJsResources = $this->assets->resources->js->listToOrder()
@@ -443,7 +443,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
             //dd($this->assets->resources->js->listToOrder()->toArray(), $bodyJsResources);
 
             foreach ($bodyJsResources as $bodyFile) {
-                $package->addScript(str($bodyFile->url)->afterLast('/'), $bodyFile->url, $bodyFile->defer ? ['defer'] : []);
+                $package->addScript(str($bodyFile->url)->slug()->toString(), $bodyFile->url, $bodyFile->defer ? ['defer'] : []);
             }
 
             //region Pos

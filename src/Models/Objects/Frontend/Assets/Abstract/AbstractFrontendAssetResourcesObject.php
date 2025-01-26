@@ -220,7 +220,7 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
             $file->append('id');
 
             return $file;
-        })/*->unique('url')*/->sortBy('position')->values();
+        })->unique('url')->sortBy('position')->values();
     }
 
     public function bundleList(): Collection
