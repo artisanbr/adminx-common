@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -220,7 +220,7 @@ abstract class AbstractFrontendAssetResourcesObject extends GenericModel
             $file->append('id');
 
             return $file;
-        })->unique('url')->sortBy('position')->values();
+        })/*->unique('url')*/->sortBy('position')->values();
     }
 
     public function bundleList(): Collection
