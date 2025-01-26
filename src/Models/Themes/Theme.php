@@ -143,7 +143,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
     public function cdnUploadUrlTo(string $path = ''): string
     {
 
-        return $this->cdnUrlTo("upload/{$path}");
+        return str($path)->startsWith($this->cdnUrlTo("upload/"))->toString();
 
     }
 
