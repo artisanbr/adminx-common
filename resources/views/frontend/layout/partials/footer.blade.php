@@ -57,7 +57,10 @@
 
 <script type="text/javascript" async>
     document.addEventListener('DOMContentLoaded', (event) => {
-        moment.locale("pt-br");
+
+        if(moment !== undefined){
+            moment.locale("pt-br");
+        }
     });
 
     // Ajax calls should always have the CSRF token attached to them, otherwise they won't work
