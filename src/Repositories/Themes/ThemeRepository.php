@@ -192,8 +192,10 @@ class ThemeRepository extends Repository
         $cssMainBundleContent = $cssMainResources->map(fn($fileUrl) => $this->getAssetFileContent($fileUrl))->implode("\n");
         $cssDeferBundleContent = $cssDeferResources->map(fn($fileUrl) => $this->getAssetFileContent($fileUrl))->implode("\n");
 
-        $cssDeferBundleContent .= "\n" . $this->getAssetFileContent(FrontendUtils::asset('css/theme.main.css'));
-        $cssDeferBundleContent .= "\n" . $this->getAssetFileContent(FrontendUtils::asset('css/theme.custom.css'));
+        if($this->model->config->bundle_stuffs) {
+            $cssDeferBundleContent .= "\n" . $this->getAssetFileContent(FrontendUtils::asset('css/theme.main.css'));
+            $cssDeferBundleContent .= "\n" . $this->getAssetFileContent(FrontendUtils::asset('css/theme.custom.css'));
+        }
 
         //endregion
 
@@ -212,18 +214,21 @@ class ThemeRepository extends Repository
         $headJsDeferBundleContent = $headJsDeferResources->map(fn($fileUrl) => $this->getAssetFileContent($fileUrl))->implode("\n");
 
 
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent(appAsset('js/functions.js'));
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent(appAsset('js/plugins/jquery/jquery.formHelper.js'));
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent(FrontendUtils::asset('js/modules.bundle.js'));
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent(FrontendUtils::asset('js/theme.main.js'));
+        if($this->model->config->bundle_stuffs){
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent(appAsset('js/functions.js'));
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent(appAsset('js/plugins/jquery/jquery.formHelper.js'));
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent(FrontendUtils::asset('js/modules.bundle.js'));
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent(FrontendUtils::asset('js/theme.main.js'));
 
-        //CDN Padrão
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js");
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js");
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js");
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js");
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/br.min.js");
-        $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/pt-br.min.js");
+            //CDN Padrão
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js");
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js");
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/wnumb/1.2.0/wNumb.min.js");
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js");
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/br.min.js");
+            $bodyJsMainBundleContent .= "\n" . $this->getAssetFileContent("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/locale/pt-br.min.js");
+        }
+
 
         //endregion
 
@@ -302,30 +307,31 @@ class ThemeRepository extends Repository
         $this->remoteStorage->put($deferHeadJsBundle->file_path, $headJsDeferBundleContent);
         $this->remoteStorage->put($deferHeadJsBundle->file_path_minified, $headJsDeferBundleContentMin);
 
+        $mainCssBundle->save();
+        $deferCssBundle->save();
+        $mainBodyJsBundle->save();
+        $deferBodyJsBundle->save();
+        $mainHeadJsBundle->save();
+        $deferHeadJsBundle->save();
 
-        if (!blank($mainCssBundle->content)) {
+        /*if (!blank($mainCssBundle->content)) {
 
-            $mainCssBundle->save();
+
         }
         if (!blank($deferCssBundle->content)) {
-            $deferCssBundle->save();
         }
 
         if (!blank($mainBodyJsBundle->content)) {
-            $mainBodyJsBundle->save();
         }
 
         if (!blank($deferBodyJsBundle->content)) {
-            $deferBodyJsBundle->save();
         }
 
         if (!blank($mainHeadJsBundle->content)) {
-            $mainHeadJsBundle->save();
         }
 
         if (!blank($deferHeadJsBundle->content)) {
-            $deferHeadJsBundle->save();
-        }
+        }*/
         //endregion
 
 

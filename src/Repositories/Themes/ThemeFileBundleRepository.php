@@ -20,7 +20,12 @@ class ThemeFileBundleRepository
     public function saveList(Theme &$theme, $data): bool
     {
 
-        $theme->config->bundles_after = $data['bundles_after'] ?? [];
+        $theme->fill([
+                         'config' => [
+                             'bundles_after' => $data['bundles_after'] ?? [],
+                             'bundle_stuffs' => $data['bundle_stuffs'] ?? false,
+                         ],
+                     ]);
         $theme->save();
 
 
@@ -56,14 +61,12 @@ class ThemeFileBundleRepository
             $theme->assets->resources->{$collect}->setAttribute('items', $this->traitRequestDataList($data, $collect)->toArray());
 
 
-
-
         }
 
 
         return DB::table('themes')->where('id', $theme->id)->update([
-            'assets->resources' => $theme->assets->resources->toJson(),
-        ]) > 0;
+                                                                        'assets->resources' => $theme->assets->resources->toJson(),
+                                                                    ]) > 0;
         /*return $theme->update([
                            'assets->resources' => $theme->assets->resources->toArray(),
                        ]);*/

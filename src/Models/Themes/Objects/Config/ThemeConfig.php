@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -19,7 +19,7 @@ class ThemeConfig extends GenericModel
         //'framework',
 
         'bundles_after',
-
+        'bundle_stuffs',
 
         /*'bootstrap_enable',
         'bootstrap_version',
@@ -54,12 +54,14 @@ class ThemeConfig extends GenericModel
 
         'plugins' => ['modernizr','magnific-popup','animations'],
         'breadcrumb' => [],
+        'bundle_stuffs' => true,
         'libs' => [],
         'bundles_after' => [],
     ];
 
     protected $casts = [
         'bundles_after' => 'collection',
+        'bundle_stuffs' => 'boolean',
 
 
         //'no_framework' => 'bool',
