@@ -69,6 +69,7 @@ class ThemeRepository extends Repository
 
 
         $this->processUploads();
+        $this->model->save();
 
         if($this->data['publish_theme'] ?? false){
             $this->generateBundles($this->model);
@@ -77,7 +78,6 @@ class ThemeRepository extends Repository
             $this->model->generateBuild();
         }
 
-        $this->model->save();
 
         return $this->model;
     }

@@ -60,6 +60,7 @@ class ThemeFileBundleRepository
 
         }
 
+
         return DB::table('themes')->where('id', $theme->id)->update([
             'assets->resources' => $theme->assets->resources->toJson(),
         ]) > 0;
