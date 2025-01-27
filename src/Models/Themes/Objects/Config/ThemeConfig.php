@@ -8,31 +8,15 @@ namespace Adminx\Common\Models\Themes\Objects\Config;
 
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use ArtisanLabs\GModel\GenericModel;
-use ArtisanLabs\GModel\Traits\NonRecursiveGenericModel;
 
 class ThemeConfig extends GenericModel
 {
-    use NonRecursiveGenericModel;
+    //use NonRecursiveGenericModel;
 
     protected $fillable = [
-        //'no_framework',
-        //'framework',
 
         'bundles_after',
         'bundle_stuffs',
-
-        /*'bootstrap_enable',
-        'bootstrap_version',
-        'bootstrap_strict',
-
-
-        'jquery',
-
-        'jquery_enable',
-        'jquery_version',
-        'jquery_ui_enable',
-        'jquery_ui_version',
-        'jquery_ui_strict',*/
 
 
         'breadcrumb',
@@ -41,22 +25,12 @@ class ThemeConfig extends GenericModel
     ];
 
     protected $attributes = [
-        //'no_framework' => false,
-        //'framework' => 'bootstrap:5',
 
-        //'bootstrap_enable' => false,
-        //'bootstrap_strict' => false,
-
-        //'jquery_enable' => true,
-        //'jquery_version' => '3.6.3',
-        //'jquery_ui_enable' => true,
-        //'jquery_ui_version' => '1.13.2',
-
-        'plugins' => ['modernizr','magnific-popup','animations'],
+        //'plugins' => ['modernizr','magnific-popup','animations'],
         'breadcrumb' => [],
-        'bundle_stuffs' => true,
-        'libs' => [],
-        'bundles_after' => [],
+        //'bundle_stuffs' => true,
+        //'libs' => [],
+        //'bundles_after' => [],
     ];
 
     protected $casts = [
@@ -64,13 +38,6 @@ class ThemeConfig extends GenericModel
         'bundle_stuffs' => 'boolean',
 
 
-        //'no_framework' => 'bool',
-        //'framework' => ThemeFramework::class,
-
-        //'jquery_enable' => 'bool',
-        //'jquery_version' => 'string',
-        //'jquery_ui_enable' => 'bool',
-        //'jquery_ui_version' => 'string',
 
         'plugins' => 'collection',
         'breadcrumb' => BreadcrumbConfig::class,

@@ -46,10 +46,12 @@ class ThemeRepository extends Repository
         //$this->model->header->is_html_advanced = $this->data['header']['is_html_advanced'];
         //$this->model->footer->is_html_advanced = $this->data['footer']['is_html_advanced'] ?? false;
 
-        //dd($this->data);
+
+        //dump($this->model->config);
 
         $this->model->fill($this->data);
 
+        //dd($this->data['config'], $this->model->config);
         //dd($this->model->media);
 
         if (!$this->model->config->breadcrumb) {
