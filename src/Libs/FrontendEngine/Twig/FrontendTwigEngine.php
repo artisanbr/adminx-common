@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -36,6 +36,7 @@ use Twig\Extension\StringLoaderExtension;
 use Twig\Loader\ArrayLoader;
 use Twig\Loader\ChainLoader;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
 use voku\helper\HtmlMin;
 
 class FrontendTwigEngine extends FrontendEngineBase
@@ -256,6 +257,9 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $this->twig->addExtension(new FrontendTwigExtension($this->twig, $this->currentSite));
         $this->twig->addExtension(new StringLoaderExtension());
+
+        $this->twig->addFilter(new TwigFilter('entity_decode', 'html_entity_decode'));
+
 
         Debugbar::stopMeasure('prepareTwig');
 
