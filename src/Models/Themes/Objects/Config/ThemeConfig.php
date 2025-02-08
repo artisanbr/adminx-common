@@ -28,9 +28,9 @@ class ThemeConfig extends GenericModel
 
         //'plugins' => ['modernizr','magnific-popup','animations'],
         'breadcrumb' => [],
-        //'bundle_stuffs' => true,
+        'bundle_stuffs' => true,
         //'libs' => [],
-        //'bundles_after' => [],
+        'bundles_after' => [],
     ];
 
     protected $casts = [
