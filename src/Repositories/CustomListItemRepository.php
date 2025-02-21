@@ -75,10 +75,11 @@ class CustomListItemRepository extends Repository
                     'value'  => $sendValueForSchema,
                 ];
 
-                $dataItem = $this->model
-                    ->getSchemaValueForColumn($schemaColumn)
-                    //Sincronizar com os dados atuais da Coluna
-                    ->fill($fillData);
+                $dataItem = clone ($this->model
+                                         ->getSchemaValueForColumn($schemaColumn) ?? new CustomListItemSchemaValue());
+
+                $dataItem->fill($fillData);
+
 
                 if ($schemaColumn->type->isAny(CustomListSchemaType::Image, CustomListSchemaType::PDF)) {
 
@@ -89,48 +90,11 @@ class CustomListItemRepository extends Repository
 
                     if ($uploadedFile instanceof UploadedFile) {
                         $dataItem = $this->processUploadedValue($uploadedFile, $dataItem, $renameFileTo);
-                    }else if(!blank($renameFileTo)){
+                    }
+                    else if (!blank($renameFileTo)) {
                         $dataItem = $this->renameFileValue($dataItem, $renameFileTo);
                     }
 
-
-                    /*//Arquivo enviado
-                    if ($uploadedFile instanceof UploadedFile) {
-
-
-                        $mediaFile = FileUpload::upload($uploadedFile, $this->uploadPathBase, $renameFileTo ?: $uploadedFile->getClientOriginalName());
-
-                        if (!$mediaFile) {
-                            abort(500);
-                        }
-
-                        //$this->model->data->image_url = $mediaFile->url;
-
-                        $dataItem->value->fill([
-                                                   'external'      => false,
-                                                   'url'           => $mediaFile->url,
-                                                   'uploaded_file' => null,
-                                               ]);
-
-                    }
-                    //Arquivo para renomear
-                    if (!blank($renameFileTo)) {
-
-
-
-                        $renameResult = FileManager::rename($dataItem->value->path, $renameFileTo);
-
-                        if ($renameResult) {
-
-                            $dataItem->value->fill([
-                                                       'external'  => false,
-                                                       'url'       => $renameResult,
-                                                       'rename_to' => null,
-                                                   ]);
-
-                        }
-
-                    }*/
                 }
 
                 if ($schemaColumn->type->is(CustomListSchemaType::SEO)) {
@@ -142,7 +106,7 @@ class CustomListItemRepository extends Repository
                     if ($uploadedFile instanceof UploadedFile) {
 
 
-                        $mediaFile = FileUpload::upload($uploadedFile, $this->uploadPathBase, $uploadedFile->getClientOriginalName());
+                        $mediaFile = FileUpload::upload($uploadedFile, $this->uploadPathBase . $schemaColumn->id, $uploadedFile->getClientOriginalName());
 
                         if (!$mediaFile) {
                             abort(500);
@@ -170,9 +134,7 @@ class CustomListItemRepository extends Repository
                         }*/
                     }
                     //Arquivo para renomear
-                    if (!blank($renameFileTo)) {
-
-                        /*$dataItem = $this->model->schema->firstWhere('slug', $sendDataForSchema['slug']);*/
+                    /*if (!blank($renameFileTo)) {
 
 
                         $renameResult = FileManager::rename($dataItem->value->path, $renameFileTo);
@@ -185,7 +147,7 @@ class CustomListItemRepository extends Repository
                                                        'rename_to' => null,
                                                    ]);
 
-                            /*$transformValue = function (CustomListItemSchemaValue $item, $key) use ($renameResult) {
+                            $transformValue = function (CustomListItemSchemaValue $item, $key) use ($renameResult) {
                                 $item->value = $item->value->fill([
                                                                       'external'  => false,
                                                                       'url'       => $renameResult,
@@ -199,14 +161,14 @@ class CustomListItemRepository extends Repository
 
                             if ($saveFile) {
                                 $this->model->save();
-                            }*/
+                            }
 
                         }
 
 
                         //FileManager::rename()
 
-                    }
+                    }*/
                 }
 
                 $schema->push($dataItem);
@@ -235,11 +197,14 @@ class CustomListItemRepository extends Repository
     protected function processUploadedValue(UploadedFile $uploadedFile, CustomListItemSchemaValue &$dataItem, $renameFileTo = null): CustomListItemSchemaValue
     {
 
-        if(!blank($dataItem->value->path)){
-            Storage::disk('ftp')->delete($dataItem->value->path);
+        $oldDataItem = $this->model
+            ->getSchemaValueForColumn($dataItem->column);
+
+        if (!blank($oldDataItem->value->path)) {
+            Storage::disk('ftp')->delete($oldDataItem->value->path);
         }
 
-        $mediaFile = FileUpload::upload($uploadedFile, $this->uploadPathBase, $renameFileTo ?: $uploadedFile->getClientOriginalName());
+        $mediaFile = FileUpload::upload($uploadedFile, $this->uploadPathBase . $dataItem->column->id, $renameFileTo ?: $uploadedFile->getClientOriginalName());
 
         if (!$mediaFile) {
             abort(500);
@@ -282,7 +247,7 @@ class CustomListItemRepository extends Repository
     /**
      * @throws Exception
      */
-    public function processUploads(): void
+    /*public function processUploads(): void
     {
 
         if (!$this->model || !$this->model->site) {
@@ -377,26 +342,8 @@ class CustomListItemRepository extends Repository
         }
 
 
-        //$this->uploadPathBase = "lists/{$this->model->list->public_id}/items";
-
-
-        //Media
-        /*if ($this->data['data']['image']['file_upload'] ?? false) {
-
-            //$mediaFile = FileHelper::saveRequestToSite($this->model->site, $this->data['data']['image']['file_upload'], $this->uploadPathBase, $this->model->public_id, $this->model->data->image->file ?? null);
-
-            $mediaFile = FileUpload::upload($this->data['data']['image']['file_upload'], $this->uploadPathBase, $this->model->public_id);
-
-            if (!$mediaFile) {
-                abort(500);
-            }
-
-            $this->model->data->image_url = $mediaFile->url;
-        }*/
-
-
         //Todo: Assets
-    }
+    }*/
 
     /**
      * @param array{id: string, order: string, parentId?: string} $items

@@ -12,17 +12,29 @@ class PDFValue extends GenericModel
 {
 
     protected $fillable = [
-        'url',
+        //'url',
+        'title',
+        'description',
         'path',
         'position',
     ];
 
     protected $casts = [
         'url'             => 'string',
+        'title'             => 'string',
+        'description'             => 'string',
         'path'             => 'string',
         'position' => 'int',
     ];
 
     protected $attributes = [];
+
+    protected $appends = ['url'];
+
+
+    protected function getUrlAttribute(): string|null
+    {
+        return "/storage/{$this->path}";
+    }
 
 }

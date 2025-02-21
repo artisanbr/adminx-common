@@ -85,7 +85,7 @@ class FileManager
             $path = str($path);
 
             $extension = $path->afterLast('.')->toString();
-            $rename_to = str($rename_to)->start('/')->finish(".{$extension}")->toString();
+            $rename_to = str($rename_to)->slug()->start('/')->finish(".{$extension}")->toString();
 
 
             $newPath = $path->beforeLast('/')->append($rename_to);

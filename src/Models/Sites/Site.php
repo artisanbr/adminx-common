@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -134,7 +134,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
     protected function convertStorageUrlToCdn(?string $storageUrl = ''): string
     {
-        $storageUrl = str($storageUrl)->start('/');
+        $storageUrl = str($storageUrl)->remove($this->uri)->start('/');
 
         if ($storageUrl->startsWith('/storage')) {
             $storageUrl = $storageUrl->after('/storage/sites/' . $this->public_id);

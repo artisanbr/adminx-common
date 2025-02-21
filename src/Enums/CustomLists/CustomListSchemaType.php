@@ -69,7 +69,10 @@ enum CustomListSchemaType: string
     {
 
         return match ($this) {
-            self::ButtonCollection, self::PDFCollection => "elements.custom-lists.custom-list-items.custom-fields." . $this->viewName(),
+            self::ButtonCollection,
+            self::ImageCollection,
+            self::PDFCollection => "elements.custom-lists.custom-list-items.custom-fields." . $this->viewName(),
+
             default => "livewire.elements.custom-lists.custom-list-items.custom-fields." . $this->viewName()
         };
     }

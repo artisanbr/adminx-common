@@ -25,7 +25,7 @@ class FileUploadManager extends FileManager
 
         //Remover caracteres indesejados
         //Remover extensão e tratar para URL amigavel
-        $fileName = str($fileName)->beforeLast('.'.$requestFile->getClientOriginalExtension())->slug();
+        $fileName = str($fileName)->basename('.'.$requestFile->getClientOriginalExtension())->slug();
 
 
 

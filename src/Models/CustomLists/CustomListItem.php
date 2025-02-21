@@ -146,6 +146,8 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
 
         return str($this->list ? $this->list->uploadPathTo('items') : 'items')
             ->finish('/')
+            ->append($this->public_id)
+            ->finish('/')
             ->when(!empty($path), fn($str) => $str->append(str($path)->replaceStart('/', '')))
             ->toString();
     }
@@ -166,7 +168,7 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         }
 
         if (!($column instanceof CustomListSchemaColumn)) {
-            return null;
+           return null;
         }
 
         return $this->findSchemaValue($column->slug) ?? $column->generateSchemaValue($defaultData);
