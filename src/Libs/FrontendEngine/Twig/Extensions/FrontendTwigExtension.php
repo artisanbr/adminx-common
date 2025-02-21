@@ -102,6 +102,7 @@ class FrontendTwigExtension extends AbstractExtension
 
             new TwigFunction('page', $this->page(...), ['needs_context' => true]),
             new TwigFunction('articles', $this->articles(...), ['needs_context' => true]),
+            new TwigFunction('article', $this->getArticle(...), ['needs_context' => true]),
         ];
     }
 
@@ -343,6 +344,22 @@ class FrontendTwigExtension extends AbstractExtension
             columns: ['*'],
             page:    $pageNumber
         ) : collect();
+
+    }
+
+    public function getArticle($context, $article, ?string $page = null)
+    {
+
+        if(!$page){
+            $page = $this->currentSite->pages()->whereHas('articles')->first();
+        }else{
+            $page = $this->page($context, $page);
+        }
+
+
+        return $page?->articles()->where(function ($query) use ($article) {
+            $query->where('public_id', $article)->orWhere('slug',$article);
+        })->first() ?? null;
 
     }
 
