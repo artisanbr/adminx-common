@@ -93,7 +93,11 @@ class FrontendTwigExtension extends AbstractExtension
 
             new TwigFunction('listItems', $this->customListItems(...), ['needs_context' => true]),
             new TwigFunction('list_items', $this->customListItems(...), ['needs_context' => true]),
-            new TwigFunction('li', $this->customListItems(...), ['needs_context' => true]),
+            new TwigFunction('lis', $this->customListItems(...), ['needs_context' => true]),
+
+            new TwigFunction('listItem', $this->getListItem(...), ['needs_context' => true]),
+            new TwigFunction('list_item', $this->getListItem(...), ['needs_context' => true]),
+            new TwigFunction('li', $this->getListItem(...), ['needs_context' => true]),
 
 
             new TwigFunction('page', $this->page(...), ['needs_context' => true]),
@@ -262,18 +266,18 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function customList($context, $public_id): CustomList
+    public function customList($context, $list): CustomList
     {
 
         //Verificar no cache
-        $customList = $this->customLists->firstWhere('public_id', $public_id) ?? $this->customLists->firstWhere('slug', $public_id);
+        $customList = $this->customLists->firstWhere('public_id', $list) ?? $this->customLists->firstWhere('slug', $list);
 
         //Não encontrou, buscar no banco
         if (!$customList) {
 
             $customList = $this->currentSite->lists()
-                                            ->where('public_id', $public_id)
-                                            ->orWhere('slug', $public_id)
+                                            ->where('public_id', $list)
+                                            ->orWhere('slug', $list)
                                             ->with(['items' => fn($query) => $query->ordered()])
                                             ->first();
 
@@ -307,13 +311,21 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function customListItems($context, $public_id, $perPage = 50, $pageNumber = 1)
+    public function customListItems($context, $list, $perPage = 50, $pageNumber = 1)
     {
-        return $this->customList($context, $public_id)->items()->ordered()->paginate(
+        return $this->customList($context, $list)->items()->ordered()->paginate(
             perPage: $perPage,
             columns: ['*'],
             page:    $pageNumber
         ) ?? collect();
+
+    }
+
+    public function getListItem($context, $list, $item)
+    {
+        return $this->customList($context, $list)?->items()->where(function ($query) use ($item) {
+            $query->where('public_id', $item)->orWhere('slug',$item);
+        })->first() ?? null;
 
     }
 
