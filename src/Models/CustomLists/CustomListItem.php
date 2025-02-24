@@ -228,22 +228,22 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         return false;
     }
 
-    /*public static function findAndMount($id = null, $type = null): CustomListItemAbstract
+
+    public function nextItem($orderColumn = 'position'): ?static
     {
-        if ($id) {
-            $listType = DB::table('custom_list_items')->where('id', $id)->select('type')->first()->type ?? $type ?? null;
-        }
-        else {
-            $listType = $type;
-        }
-
-        $mountClass = $listType ? CustomListItemType::from($listType)->dataClass() : CustomListItem::class;
-
-        return ($mountClass)::find($id);
-
+        return self::where('list_id', $this->list_id)
+                   ->where($orderColumn, '>', $this->{$orderColumn})
+                   ->orderBy('id', 'asc')
+                   ->first();
     }
 
-    */
+    public function previousItem($orderColumn = 'position'): ?static
+    {
+        return self::where('list_id', $this->list_id)
+                   ->where($orderColumn, '<', $this->{$orderColumn})
+                   ->orderBy($orderColumn, 'desc')
+                   ->first();
+    }
 
     //endregion
 
@@ -363,6 +363,7 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         return $value;
     }
     //endregion
+
 
     //region RELATIONS
     public function list()
