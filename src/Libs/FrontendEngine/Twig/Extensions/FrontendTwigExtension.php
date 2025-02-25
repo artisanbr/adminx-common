@@ -318,7 +318,7 @@ class FrontendTwigExtension extends AbstractExtension
             perPage: $perPage,
             columns: ['*'],
             page:    $pageNumber
-        ) ?? collect();
+        )->collect() ?? collect();
 
     }
 
@@ -343,7 +343,7 @@ class FrontendTwigExtension extends AbstractExtension
             perPage: $perPage,
             columns: ['*'],
             page:    $pageNumber
-        ) : collect();
+        )->collect() : collect();
 
     }
 

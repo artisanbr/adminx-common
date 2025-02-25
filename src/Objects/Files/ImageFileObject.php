@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -164,11 +164,11 @@ class ImageFileObject extends FileObject
     protected function getUrlAttribute(): ?string
     {
 
-        if ($this->empty()) {
-            return null;
-        }
+        if ($this->empty()) return null;
 
-        return $this->attributes['url'] ?? "/storage/" . $this->getPathAttribute();
+        if (blank($this->attributes['url'] ?? null)) return "/storage/" . $this->getPathAttribute();
+
+        return $this->attributes['url'];
     }
 
     protected function getUrlPathAttribute(): ?string
