@@ -148,7 +148,7 @@ class ImageFileObject extends FileObject
 
     protected function getPathAttribute(): ?string
     {
-        if ($this->external) {
+        if ($this->external || blank($this->attributes['path'] ?? $this->getUrlPathAttribute())) {
             return null;
         }
 
@@ -166,7 +166,7 @@ class ImageFileObject extends FileObject
 
         if ($this->empty()) return null;
 
-        if (blank($this->attributes['url'] ?? null)) return "/storage/" . $this->getPathAttribute();
+        if (blank($this->attributes['url'] ?? null) && !blank($this->getPathAttribute())) return "/storage/" . $this->getPathAttribute();
 
         return $this->attributes['url'];
     }
