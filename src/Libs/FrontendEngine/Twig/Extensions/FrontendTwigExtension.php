@@ -312,13 +312,18 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function customListItems($context, $list, $perPage = 50, $pageNumber = 1)
+    public function customListItems($context, $list, $perPage = 0, $pageNumber = 1)
     {
-        return $this->customList($context, $list)->items()->ordered()->paginate(
+
+        $query = $this->customList($context, $list)->items()->ordered();
+
+        $result = $perPage > 0 ? $query->paginate(
             perPage: $perPage,
             columns: ['*'],
             page:    $pageNumber
-        )->collect() ?? collect();
+        )->collect() : $query->get();
+
+        return $result ?? collect();
 
     }
 
