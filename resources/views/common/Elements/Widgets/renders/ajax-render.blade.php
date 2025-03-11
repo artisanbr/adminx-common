@@ -7,7 +7,7 @@
     <div class="col-12 {{ $siteWidget->css_class ?? '' }} widget-portal widget-{{ $siteWidget->public_id }}"
          id="widget-{{ $siteWidget->public_id }}">
         <div class="w-100 d-flex justify-content-center my-5 py-5 fa-3x"><i
-                    class="fa-solid fa-circle-notch fa-spin fa-spin-pulse"></i></div>
+                    class="fa fas fa-solid fa-circle-notch fa-spin fa-spin-pulse"></i></div>
     </div>
     <script defer>
         const WidgetModule_{{ $siteWidget->public_id }} = function () {
