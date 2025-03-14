@@ -55,7 +55,6 @@
         "spatie/laravel-tags": "^4.3",
         "tucker-eric/eloquentfilter": "^3.0",
         "creativeorange/gravatar": "^1.0",
-        "arcanedev/log-viewer": "^10.0",
         "cybercog/laravel-ban": "^4.7",
         "spatie/laravel-html": "^3.2",
         "questocat/laravel-referral": "^1.0",
