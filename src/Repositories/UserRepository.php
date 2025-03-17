@@ -1,12 +1,13 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Repositories;
 
 use Adminx\Common\Facades\FileManager\FileUpload;
+use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Users\AccessRules\Role;
 use Adminx\Common\Models\Users\User;
 use Adminx\Common\Repositories\Base\Repository;
@@ -54,40 +55,52 @@ class UserRepository extends Repository
 
         $this->model->sites()->sync($this->data['sites'] ?? []);
 
-        Artisan::call('passport:install');
 
         //Permissions
-        if(Auth::user()->can(['update permission'])){
+        if (Auth::user()->hasRole('root')) {
+            //Artisan::call('passport:install');
 
-            if($this->model->config->custom_permissions){
+            if ($this->model->config->custom_permissions) {
 
                 //Permissões Customizadas
                 //$this->model->syncRoles([]);
                 $this->model->syncPermissions($this->data['permissions_list'] ?? []);
 
-            }else{
+            }
+            else {
                 $this->model->syncPermissions([]);
             }
 
-            if($this->data['roles'] ?? false){
+            if ($this->data['roles'] ?? false) {
 
                 //Grupo de Permissões
                 $selected_roles = Role::whereIn("id", array_values($this->data['roles']))->get();
                 $this->model->syncRoles($selected_roles);
 
 
-            }else if(!($this->data['id'] ?? false)){
+            }
+            else if (!($this->data['id'] ?? false)) {
 
                 //Novo usuário
                 $this->model->syncPermissions([]);
                 $this->model->syncRoles(['guest']);
-            }else{
+            }
+            else {
                 $this->model->syncPermissions($this->data['permissions_list'] ?? []);
                 $this->model->syncRoles([]);
             }
+            Artisan::call("permission:cache-reset");
         }
 
-        Artisan::call("permission:cache-reset");
+
+        return $this->model;
+    }
+
+    public function renewApiToken(): ?User
+    {
+
+        $this->model->api_token = trim(chunk_split(Str::ulid(), 10, '-'), '-');
+        $this->model->save();
 
         return $this->model;
     }

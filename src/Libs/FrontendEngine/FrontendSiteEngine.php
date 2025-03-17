@@ -10,7 +10,6 @@ namespace Adminx\Common\Libs\FrontendEngine;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Sites\Site;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -30,9 +29,9 @@ class FrontendSiteEngine extends FrontendEngineBase
     public function loadCurrent(): Site|null
     {
 
-        if (app('auth') && Auth::check() && (Auth::user()->site_id ?? false)) {
+        /*if (app('auth') && Auth::check() && (Auth::user()->site_id ?? false)) {
             return Auth::user()->site;
-        }
+        }*/
 
         //Pegar dominio atual e remover o WWW
         //header("Host: {$this->currentDomain}");

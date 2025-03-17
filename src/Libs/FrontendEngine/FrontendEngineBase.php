@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -14,7 +14,7 @@ abstract class FrontendEngineBase
 
     protected ?Site $currentSite = null;
 
-    protected int $cacheMinutes = 60 * 24 * 3;
+    protected int $cacheMinutes = 60 * 24 * 2;
     protected int $cacheHours   = 6;
 
     protected ?string $cacheName = null;

@@ -242,7 +242,7 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
     protected function domain(): Attribute
     {
-        return Attribute::make(get: fn() => Str::of($this->url)->explode('/')->first());
+        return Attribute::make(get: fn() => Str::of($this->url)->before('/')->toString());
     }
 
     protected function domainTrustHostRegex(): Attribute
