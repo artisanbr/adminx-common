@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -164,7 +164,7 @@ class FrontendPageEngine extends FrontendEngineBase
         return $this->currentPage?->articles()->whereUrl($url)->first();
     }
 
-    public function getSiteRouteByUrl(string $url): ?SiteRoute
+    public function getSiteRouteByUrl(?string $url): ?SiteRoute
     {
         return FrontendSite::current()->routes()->where('url', $url)->first();
     }
