@@ -49,7 +49,6 @@
         "twig/twig": "^3.5",
         "scssphp/scssphp": "^1.11",
         "prologue/alerts": "^1.0",
-        "genealabs/laravel-model-caching": "^0.13.2",
         "spatie/laravel-permission": "^5.8",
         "voku/html-min": "^4.5",
         "spatie/laravel-tags": "^4.3",
