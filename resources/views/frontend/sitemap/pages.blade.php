@@ -24,12 +24,9 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
         <url>
             <loc>{{ $page->uri }}</loc>
             <lastmod>{{ $page->updated_at->toIso8601String() }}</lastmod>
-            @if($page->using_articles && $page->articles()->count())
+            @if($page->articles()->count())
                 <changefreq>always</changefreq>
                 <priority>{{ $page->is_home ? '1.0' : '0.8' }}</priority>
-            @elseif($page->data_sources->count())
-                <changefreq>daily</changefreq>
-                <priority>{{ $page->is_home ? '1.0' : '0.7' }}</priority>
             @else
                 <changefreq>daily</changefreq>
                 <priority>{{ $page->is_home ? '1.0' : '0.5' }}</priority>
@@ -43,20 +40,38 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
             @endif
         </url>
 
-        @foreach($page->page_internals as $pageInternal)
+        @foreach($page->children as $childrenPage)
 
-            @if($pageInternal->model?->items ?? false)
-                @foreach($pageInternal->model->items as $modelItem)
-                    @if($modelItem->url ?? false)
+            <url>
+                <loc>{{ $childrenPage->uri }}</loc>
+                <lastmod>{{ $childrenPage->updated_at->toIso8601String() }}</lastmod>
+                @if($childrenPage->articles()->count())
+                    <changefreq>always</changefreq>
+                    <priority>{){ $childrenPage->is_home ? '1.0' : '0.8' }}</priority>
+                @else
+                    <changefreq>daily</changefreq>
+                    <priority>{){ $childrenPage->is_home ? '1.0' : '0.5' }}</priority>
+                @endif
+
+                @if(!empty($childrenPage->seoImage()))
+                    <image:image>
+                        <image:loc>{{ FrontendUtils::url($childrenPage->seoImage()) }}</image:loc>
+                    </image:image>
+                @endif
+            </url>
+
+            @if(($childrenPage->pageable ?? false) && ($childrenPage->pageable->items?->count() ?? false))
+                @foreach($childrenPage->pageable->items()->paginate(100, ['*'], 'page', 1) as $pageableItem)
+                    @if($pageableItem->url ?? false)
                         <url>
-                            <loc>{{ $site->uriTo($modelItem->url) }}</loc>
+                            <loc>{{ $site->uriTo($pageableItem->url) }}</loc>
                             <changefreq>weekly</changefreq>
-                            <lastmod>{{ $modelItem->updated_at->toIso8601String() }}</lastmod>
+                            <lastmod>{{ $pageableItem->updated_at->toIso8601String() }}</lastmod>
                             <priority>0.5</priority>
 
-                            @if($modelItem->data->image_url ?? false)
+                            @if($pageableItem->data->image_url ?? false)
                                 <image:image>
-                                    <image:loc>{{ FrontendUtils::url($modelItem->data->image_url) }}</image:loc>
+                                    <image:loc>{{ FrontendUtils::url($pageableItem->image_url) }}</image:loc>
                                     {{--<image:title>{{ $article->seoTitle() }}</image:title>--}}
                                 </image:image>
                             @endif

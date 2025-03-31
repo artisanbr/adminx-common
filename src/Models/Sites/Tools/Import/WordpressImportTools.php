@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -257,7 +257,7 @@ class WordpressImportTools
 
         if (get_class($wpItem) === WpPage::class) {
             $wpItem->local_page = Page::where('slug', $wpItem->slug)->first();
-            $wpItem->local_type = $wpItem->local_page?->type_name ?? null;
+            $wpItem->local_type = $wpItem->local_page?->type ?? null;
 
             if (!$wpItem->local_type) {
                 if (Str::contains($wpItem->slug, ['blog', 'artigos'])) {
@@ -458,7 +458,7 @@ class WordpressImportTools
 
                         $wpRedirect->fill([
                                               'site_id' => $customListItem->site_id,
-                                              'page_id' => $customList->page_internal?->page_id,
+                                              'page_id' => $customList->page?->id,
                                               'url'     => $wpItemURl,
                                               'type'    => SiteRouteType::Model->value,
                                               'model_type' => MorphHelper::getMorphTypeTo($customListItem),

@@ -4,12 +4,12 @@
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
-namespace Adminx\Common\Models\Generics\Forms;
+namespace Adminx\Common\Models\Generics\Configs;
 
 use Adminx\Common\Enums\Forms\FormCaptchaType;
 use ArtisanLabs\GModel\GenericModel;
 
-class FormCaptcha extends GenericModel
+class CaptchaConfig extends GenericModel
 {
 
     protected $fillable = [

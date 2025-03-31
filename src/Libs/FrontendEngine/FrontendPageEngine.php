@@ -20,7 +20,6 @@ use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Pages\Types\Manager\Facade\PageTypeManager;
 use Adminx\Common\Models\Sites\SiteRoute;
 use App\Http\Controllers\Frontend\Page\ArticlesController;
-use App\Http\Controllers\Frontend\Page\PageInternalController;
 use App\Http\Controllers\Frontend\Page\PagesController;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -139,7 +138,7 @@ class FrontendPageEngine extends FrontendEngineBase
 
         if ($expectedTypes) {
             $expectedPageTypes = PageTypeManager::whereCanUseAnyModule($expectedTypes);
-            $pages = $pages->whereIn('type_name', $expectedPageTypes->keys()->toArray());
+            $pages = $pages->whereIn('type', $expectedPageTypes->keys()->toArray());
 
             $typesCollection = Collection::wrap($expectedTypes);
             /*if ($typesCollection->contains('articles')) {
@@ -184,40 +183,17 @@ class FrontendPageEngine extends FrontendEngineBase
         if ($this->currentPage) {
 
             return $this->getInternalModel($url, $this->currentPage);
-
-            if ($this->currentPage->can_use_articles) {
-                $article = $this->getArticleByUrl($url);
-
-                if ($article) {
-                    $this->firstModel = $article;
-
-                    return $article;
-                }
-            }
-
-            if ($this->currentPage->page_internals()->count()) {
-
-
-                $pageInternal = $this->getPageInternalByUrl($url);
-                if ($pageInternal) {
-                    $this->firstModel = $pageInternal;
-
-                    return $pageInternal;
-                }
-
-
-            }
         }
 
         return null;
     }
 
-    public function getInternalModel($url, Article|PageInternal|FrontendModel|EloquentModelBase|Page $mainModel): Article|PageInternal|FrontendModel|CustomListItem|null
+    public function getInternalModel($url, Article|PageInternal|FrontendModel|EloquentModelBase|Page $mainModel): Article|FrontendModel|CustomListItem|null
     {
 
         //Validar pelo tipo da página
 
-        if ((@$mainModel->can_use_articles ?? false) && method_exists($mainModel, 'articles') && ($article = $mainModel->articles()->whereUrl($url)->first()) && $article?->id) {
+        if ((@$mainModel->using_articles ?? false) && method_exists($mainModel, 'articles') && ($article = $mainModel->articles()->whereUrl($url)->first()) && $article?->id) {
             $this->firstModel = $article;
 
             return $article;
@@ -247,7 +223,7 @@ class FrontendPageEngine extends FrontendEngineBase
         return match (get_class($model)) {
             Page::class => PagesController::class,
             Article::class => ArticlesController::class,
-            PageInternal::class => PageInternalController::class
+            //PageInternal::class => PageInternalController::class
         };
     }
 

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -14,7 +14,6 @@ use Adminx\Common\Models\Category;
 use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Pages\Modules\Manager\PageModuleManagerEngine;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Pages\Types\Manager\PageTypeManagerEngine;
 use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Templates\Global\Manager\GlobalTemplateManagerEngine;
@@ -242,52 +241,6 @@ class FrontendPageServiceProvider extends ServiceProvider
                 ->setKeywords($seo->keywords)
                 ->registerPackage($metaOg)
                 //->setCanonical($article->uri)
-                ->registerPackage($metaTwitter);
-        });
-
-        MetaFacade::macro('registerSeoForPageInternal', function (PageInternal $pageInternal, $modelItem) {
-
-            $metaOg = new OpenGraphPackage('site_og_page_internal');
-            $metaTwitter = new TwitterCardPackage('site_tt_page_internal');
-
-            if ($pageInternal->page->site->seo->config->show_parent_title) {
-                $this->prependTitle("{{ site.seoTitle() }} - {{ page.seoTitle() }}");
-            }
-
-            $seoFullTitle = @$modelItem->seoTitle() ?? @$modelItem->title ?? null; //$pageInternal->page->site->seoTitle($pageInternal->page->seoTitle(@$modelItem->seoTitle() ?? @$modelItem->title ?? null));
-
-            $seoDescription = @$modelItem->seoDescription() ?? @$modelItem->description ?? $pageInternal->page->seoDescription();
-            $seoKeywords = @$modelItem->seoKeywords() ?? @$modelItem->keywords ?? $pageInternal->page->seoKeywords();
-
-            $metaOg
-                ->setType('article')
-                ->setTitle($seoFullTitle)
-                ->setDescription($seoDescription)
-                ->setUrl($modelItem->uri);
-
-            $metaTwitter
-                ->setTitle($seoFullTitle)
-                ->setDescription($seoDescription);
-
-            $seoImg = @$modelItem->cover_url ?? @$modelItem->image_url ?? $pageInternal->breadcrumb_config->background_url ?? null;
-
-            if ($seoImg) {
-                $metaTwitter
-                    ->setType('summary_large_image')
-                    ->setImage($seoImg)
-                    ->addMeta('image:alt', $modelItem->title ?? $pageInternal->page->title);
-
-                $metaOg->addImage($seoImg, [
-                    'type' => @$pageInternal->breadcrumb_config->background->type ?? 'image',
-                    'alt'  => $modelItem->title ?? $pageInternal->page->title,
-                ]);
-            }
-
-            $this
-                ->setTitle($seoFullTitle)
-                ->setDescription($seoDescription)
-                ->setKeywords($seoKeywords)
-                ->registerPackage($metaOg)
                 ->registerPackage($metaTwitter);
         });
     }

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -9,6 +9,7 @@ namespace Adminx\Common\Models\Traits;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Sites\Site;
 use ArtisanLabs\GModel\GenericModel;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -16,49 +17,74 @@ use Illuminate\Database\Eloquent\Model;
  */
 trait HasUriAttributes
 {
+    protected function uri(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->generateUri(),
+        );
+
+    }
+
+    protected function url(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->generateUrl(),
+        );
+
+    }
 
     //region GETS
-    protected function getUriAttribute()
+    protected function generateUri()
     {
-        if(empty($this->url)) {
-            return null;
+        if (empty($this->url)) {
+           return null;
         }
 
-        if(Str::startsWith($this->url, '#')) {
-            return  $this->url;
+        if (Str::startsWith($this->url, '#')) {
+            return $this->url;
         }
 
         return "{$this->http_protocol}:{$this->dynamic_uri}";
+
     }
 
     protected function getDynamicUriAttribute()
     {
-        if(empty($this->url)) {
-            return null;
-        }
-        if(Str::startsWith($this->url, '#')) {
-            return  $this->url;
+
+        if (blank($this->attributes['dynamic_uri'] ?? null)) {
+            if (empty($this->url)) {
+                $this->attributes['dynamic_uri'] = null;
+            }
+            else if (Str::startsWith($this->url, '#')) {
+                $this->attributes['dynamic_uri'] = $this->url;
+            }
+            else if (get_class($this) === Site::class) {
+                $this->attributes['dynamic_uri'] = '//' . $this->url;
+            }
+            else {
+                $this->attributes['dynamic_uri'] = (($this->attributes['site_id'] ?? false) && $this->site ? $this->site->dynamic_uri : '') . $this->url;
+            }
         }
 
-        if(get_class($this) === Site::class){
-            return '//'.$this->url;
-        }
-
-        return (($this->attributes['site_id'] ?? false) && $this->site ? $this->site->dynamic_uri : '').$this->url;
+        return $this->attributes['dynamic_uri'];
     }
 
-    protected function getUrlAttribute()
+    protected function generateUrl()
     {
-        if(empty($this->attributes['url'])) {
+        if (empty($this->attributes['url'] ?? null)) {
             return null;
         }
 
-        return (Str::of($this->attributes['url'])->startsWith('/') ? '' : '/') . $this->attributes['url'] . '/';
+        return str($this->attributes['url'])->start('/')->finish('/')->toString();
     }
 
     protected function getHttpProtocolAttribute()
     {
-        return ($this->site->config->is_https ?? $this->config->is_https ?? false) ? 'https' : 'http';
+        if (blank($this->attributes['http_protocol'] ?? null)) {
+            $this->attributes['http_protocol'] = ($this->site->config->is_https ?? $this->config->is_https ?? false) ? 'https' : 'http';
+        }
+
+        return $this->attributes['http_protocol'];
     }
     //endregion
 
@@ -95,26 +121,26 @@ trait HasUriAttributes
     protected function traitPath(?string $path, $endWithDash = true, $comparesWithAttr = 'url'): string
     {
         //$path = (Str::startsWith($path, '/') && Str::endsWith($this->{$comparesWithAttr}, '/')) ? Str::substr($path, 0, 1) : $path;
-        $pathCollection = collect(explode('/', (string) $path))->filter();
-        $path = $pathCollection->implode('/');
+        $pathCollection = collect(explode('/', (string)$path))->filter();
+        $path = str($pathCollection->implode('/'));
 
         //Check if is file
-        $lastPath = $pathCollection->last();
+        $lastPath = str($pathCollection->last());
 
-        if(!empty($path) && ($endWithDash || !Str::contains($lastPath,'.'))){
-            //$path .= !Str::endsWith($this->{$path}, '/') ? '/' : '';
-            $path .= '/';
+        if ($path->isNotEmpty() && ($endWithDash || !$lastPath->contains('.'))) {
+            $path = $path->finish('/');
         }
 
-        if(!empty($path) && !Str::endsWith($this->{$comparesWithAttr}, '/') && !Str::startsWith($path, '/')){
+        if ($path->isNotEmpty() && !Str::endsWith($this->{$comparesWithAttr}, '/') && !Str::startsWith($path, '/')) {
             //$path .= !Str::endsWith($this->{$path}, '/') ? '/' : '';
-            $path = '/'.$path;
+            $path = $path->start('/');
         }
+
         /*else{
             $path = Str::endsWith($path, '/') ? Str::substr($path, 0, -1) : $path;
         }*/
 
-        return $path;
+        return $path->toString();
     }
     //endregion
 }

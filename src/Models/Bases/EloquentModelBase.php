@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -15,8 +15,7 @@ abstract class EloquentModelBase extends Model
     public $timestamps = true;
 
     protected array  $ownerTypes         = ['user', 'site', 'account'];
-    protected string $htmlCacheAttribute = 'html';
-    protected string $htmlRawAttribute   = 'html_raw';
+    protected array $temporaryAttributes = [];
 
     protected function serializeDate(DateTimeInterface $date): string
     {

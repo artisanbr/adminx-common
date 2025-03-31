@@ -639,12 +639,22 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         MetaTags::removePackage($this->meta_pkg_name);
         MetaTags::removePackage('frontend.pos');
     }
+
+    public function getBuildViewData(array $merge_data = []): array
+    {
+
+        return [
+            'theme'      => $this,
+            'breadcrumb' => $this->config->breadcrumb,
+            ...$merge_data,
+        ];
+    }
     //endregion
 
     //region ATTRIBUTES
     protected function isMain(): Attribute
     {
-        $isMain = $this->id && $this->site && (int)$this->site?->theme_id === $this->id;
+        $isMain = $this->id && $this->site && $this->site?->theme_id == $this->id;
 
         return Attribute::make(get: fn() => $isMain);
     }

@@ -44,7 +44,8 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, UploadModel
 {
-    use HasUriAttributes, HasValidation, HasSEO, /*HasFiles,*/ HasArticles, BelongsToUser, HasOwners, HasPublicIdAttribute, HasRelatedCache;
+    use HasUriAttributes, HasValidation, HasSEO, /*HasFiles,*/
+        HasArticles, BelongsToUser, HasOwners, HasPublicIdAttribute, HasRelatedCache;
 
     protected $connection = 'mysql';
 
@@ -169,26 +170,13 @@ class Site extends EloquentModelBase implements PublicIdModel, OwneredModel, Upl
 
     public function getBuildViewData(array $merge_data = []): array
     {
-        $requestData = request()->all() ?? [];
 
-        $this->load(['theme']);
-
-        $viewData = [
+        return [
             'site'       => $this,
-            'theme'      => $this->theme,
             'searchTerm' => '',
-            'breadcrumb' => $this->theme->config->breadcrumb,
+            'recaptcha'  => '<div class="g-recaptcha mb-3" data-sitekey="' . $this->config->recaptcha_site_key . '"></div>',
+            ...$merge_data,
         ];
-
-        if ($requestData['q'] ?? false) {
-            $viewData['searchTerm'] = $requestData['q'];
-            $viewData['breadcrumbs'] = ["Resultados da pesquisa: " . $requestData['q']];
-        }
-
-
-        //Meta::registerSeoForPage($this);
-
-        return [...$viewData, ...$merge_data];
     }
 
     public function frontendBuild(): FrontendBuildObject

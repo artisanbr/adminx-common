@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -25,7 +25,7 @@ return [
             'article'             => 'general/gen005.svg',
             'tag'              => 'general/gen056.svg',
             'category'         => 'general/gen025.svg',
-            'blog'             => 'layouts/lay009.svg',
+            'articles'             => 'layouts/lay009.svg',
             'list'             => 'general/gen010.svg',
             'site'             => 'files/fil020.svg',
             'home'             => 'general/gen001.svg',

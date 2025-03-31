@@ -1,13 +1,12 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Enums\ContentEditorType;
-use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\Interfaces\FrontendModel;
@@ -29,9 +28,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Http\FormRequest;
 
-/**
- * @property EloquentModelBase|CustomListAbstract $model
- */
+
 class PageInternal extends EloquentModelBase implements PublicIdModel, UploadModel, FrontendModel
 
 {
@@ -172,7 +169,8 @@ class PageInternal extends EloquentModelBase implements PublicIdModel, UploadMod
     protected function slug(): Attribute
     {
         return Attribute::make(
-            set: static fn($value) => Str::contains($value, ' ') ? Str::slug(Str::ucfirst($value)) : Str::ucfirst($value),
+            set: static fn($value) => str($value)->slug()->toString(),
+            get: static fn($value) => $value,
         );
     }
 

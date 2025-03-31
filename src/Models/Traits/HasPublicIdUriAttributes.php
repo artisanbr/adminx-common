@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -18,29 +18,82 @@ trait HasPublicIdUriAttributes
     //region GETS
     protected function getPublicIdUriAttribute()
     {
-        if(empty($this->public_id_url)) {
-            return null;
-        }
-
-        return "{$this->http_protocol}:{$this->public_id_dynamic_uri}";
-    }
-
-    protected function getPublicIdDynamicUriAttribute(): ?string
-    {
-        if(empty($this->public_id_url)) {
-            return null;
-        }
-
-        return str($this->site->dynamic_uri)->append($this->public_id_url)->toString();
-    }
-
-    protected function getPublicIdUrlAttribute(): ?string
-    {
         if(empty($this->public_id)) {
             return null;
         }
 
-        return str($this->public_id)->start('/')->finish('/')->toString();
+        return "{$this->http_protocol}:{$this->getPublicIdDynamicUriAttribute()}";
+    }
+
+    protected function getPublicIdDynamicUriAttribute(): ?string
+    {
+
+        if (blank($this->attributes['dynamic_permanent_uri'] ?? null)) {
+
+            if(empty($this->public_id) && !($this->site ?? false) && blank($this->dynamic_uri ?? null)) {
+                return null;
+            }
+
+            $this->attributes['dynamic_permanent_uri'] = str($this->site?->dynamic_uri ?? $this->dynamic_uri ?? '')->append($this->getPermanentUrlAttribute())->toString();
+
+        }
+
+
+
+        return $this->attributes['dynamic_permanent_uri'] ?? null;
+    }
+
+    protected function getPublicIdUrlAttribute(): ?string
+    {
+        return $this->getPermanentUrlAttribute();
+    }
+
+    protected function getPermanentUriAttribute()
+    {
+
+        if (blank($this->attributes['permanent_uri'] ?? null)) {
+
+            if (blank($this->parent_id) && $this->is_home) {
+
+                $this->attributes['permanent_uri'] = $this->site->uri;
+
+            }
+            else {
+
+                if ($this->parent_id && $this->parent->exists()) {
+
+                    $urlId = str($this->parent->slug)->finish('/')->append($this->slug);
+
+                }else{
+                    $urlId = str($this->slug);
+                }
+
+                $this->attributes['permanent_uri'] = $this->site->uriTo($urlId->toString());
+            }
+
+        }
+
+        return $this->attributes['uri'] ?? '';
+
+
+    }
+
+    protected function getPermanentUrlAttribute()
+    {
+
+        if (blank($this->attributes['permanent_url'] ?? null)) {
+
+            if (empty($this->public_id)) {
+                $this->attributes['permanent_url'] = null;
+            }
+            else {
+                $this->attributes['permanent_url'] = str($this->public_id)->start('/')->finish('/')->toString();
+            }
+        }
+
+        return $this->attributes['permanent_url'] ?? '';
+
+
     }
     //endregion
 

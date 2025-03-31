@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -18,8 +18,6 @@ use Adminx\Common\Models\CustomLists\Object\Schemas\CustomListSchemaColumn;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Interfaces\UploadModel;
-use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
@@ -31,6 +29,7 @@ use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasCategoriesMorph;
+use Adminx\Common\Models\Traits\Relations\Pageable;
 use Adminx\Common\Observers\OwneredModelObserver;
 use Adminx\Common\Observers\PublicIdModelObserver;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -52,7 +51,7 @@ class CustomList extends EloquentModelBase implements PublicIdModel, OwneredMode
         HasPublicIdUriAttributes,
         HasSelect2,
         HasUriAttributes,
-        HasValidation, HasCategoriesMorph, SoftDeletes;
+        HasValidation, HasCategoriesMorph, SoftDeletes, Pageable;
 
     protected $table = 'custom_lists';
 
@@ -92,9 +91,11 @@ class CustomList extends EloquentModelBase implements PublicIdModel, OwneredMode
         'updated_at'       => 'datetime:d/m/Y H:i:s',
     ];
 
-    protected $appends = [
-        //'text',
-    ];
+    /*protected $guarded = [
+        'url',
+        'uri',
+    ];*/
+
 
     //protected $with = ['page'];
 
@@ -191,47 +192,34 @@ class CustomList extends EloquentModelBase implements PublicIdModel, OwneredMode
         );
     }
 
+    protected function getUriAttribute()
+    {
+
+        if(blank($this->attributes['uri'] ?? null)){
+
+            $this->attributes['uri'] = $this->page?->uri ?? '';
+        }
+        return $this->attributes['uri'] ?? '';
+    }
+
     protected function getUrlAttribute()
     {
-        if (!$this->page_internal) {
-            $this->load(['page_internal']);
+
+        if(blank($this->attributes['url'] ?? null)){
+
+            $this->attributes['url'] = $this->page?->url ?? '';
         }
 
-        return $this->page_internal?->url ?? '';
-        //return ($this->page_internal->url ?? '') . '/' . ($this->slug ?? $this->public_id);
+        return $this->attributes['url'] ?? '';
     }
     //endregion
 
-    //region RELATIONS
+
     public function items()
     {
-        return $this->hasMany($this->listItemClass, 'list_id', 'id')->orderBy('position');
+        return $this->hasMany(CustomListItem::class, 'list_id', 'id')->ordered();//->orderBy('position');
     }
 
-    /*public function pages(){
-        return $this->morphEagerTo(Page::class, 'model', 'page_internals', 'model_id', 'page_id')->where('page_internals.model_type', 'list');
-    }*/
-
-    public function page_internal()
-    {
-        return $this->hasOne(PageInternal::class, 'model_id')->where('model_type', 'list')->latestOfMany();
-    }
-
-    public function page()
-    {
-        return $this->hasOneThrough(Page::class, PageInternal::class, 'model_id', 'id', 'id', 'page_id')->where('model_type', 'list');
-    }
-
-
-    public function page_internals()
-    {
-        return $this->hasMany(PageInternal::class, 'model_id')->where('model_type', 'list');
-    }
-
-    public function pages()
-    {
-        return $this->hasManyThrough(Page::class, PageInternal::class, 'model_id', 'id', 'id', 'page_id')->where('model_type', 'list');
-    }
 
     public function getCategoriesAttribute()
     {

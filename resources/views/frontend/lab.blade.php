@@ -11,5 +11,5 @@
 ])
 
 @section('content')
-    {!! $page->built_html !!}
+    {!! $page->builtHtml() !!}
 @endsection

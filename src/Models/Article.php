@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -266,14 +266,12 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         return ($this->page ? $this->page->uploadPathTo($uploadPath) : $uploadPath) . ($path ? "/{$path}" : '');
     }
 
-    //region ATTRIBUTES
-
-    protected function builtHtml(): Attribute
+    public function builtHtml()
     {
-        return Attribute::make(
-            get: fn() => FrontendTwig::article($this),
-        );
+        return FrontendTwig::article($this);
     }
+
+    //region ATTRIBUTES
 
     protected function getSeoAttribute(): Seo
     {
@@ -469,6 +467,10 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     //endregion
 
     //region SCOPES
+    public function scopeWithRelations(Builder $query): Builder
+    {
+        return $query->with(['site','page']);
+    }
 
     public function scopeWhereUrl(Builder $query, string $url): Builder
     {

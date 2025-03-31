@@ -150,10 +150,11 @@
                                     {!! JsValidator::formRequest(\App\Http\Requests\StoreCommentFrontendRequest::class, "#form-comment").render() !!}
                                 @endpush #}
                             <form id="form-comment" class="feedback-form"
-                                  action="/send-comment"
+                                  action="/{{ page.public_id }}/send-comment/{{ article.public_id }}"
                                   method="POST" data-grecaptcha-action="comment">
                                 <input type="hidden" name="_method" value="POST">
                                 <input type="hidden" name="public_id" value="{{ article.public_id }}">
+                                <input type="hidden" name="page_public_id" value="{{ page.public_id }}">
                                 {# {{ recaptcha }} #}
                                 <div class="row mb-5">
                                     <div class="col-12">
