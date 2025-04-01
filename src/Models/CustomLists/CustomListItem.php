@@ -126,6 +126,35 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
     }
 
     //region Scopes
+    public function scopeSearch(Builder $query,
+                                string  $searchTerm,
+                                array   $columns = [
+                                    'public_id',
+                                    'title',
+                                    'slug',
+                                    'schema',
+                                ],
+                                bool    $searchInCategories = true,
+                                array   $categoryColumns = [
+                                    'title',
+                                    'slug',
+                                    'description',
+                                ]): Builder
+    {
+
+        if (!blank($searchTerm)) {
+            $query = $query->whereLike($columns, $searchTerm);
+
+            if ($searchInCategories) {
+                $query = $query->orWhereHas(
+                    'categories',
+                    fn(Builder $query) => $query->whereLike($categoryColumns, $searchTerm));
+            }
+        }
+
+        return $query;
+    }
+
     public function scopeWhereUrl(Builder $query, string $url): Builder
     {
 
@@ -134,10 +163,10 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
                                                         'id'        => $url,
                                                     ]);
     }
-    
+
     public function scopeWithRelations(Builder $query): Builder
     {
-        return $query->with(['list','list.page']);
+        return $query->with(['list', 'list.page']);
     }
 
     public function scopeOrdered(Builder $query): Builder

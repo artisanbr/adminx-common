@@ -658,7 +658,7 @@ blade, [
 
         //Meta::registerSeoForArticle($article);
         $this->addViewData($article->getBuildViewData([
-                           'customPageTemplate' => $page->page_template ? '@template/article.twig' : false,
+                                                          'customPageTemplate' => $page->page_template ? '@template/article.twig' : false,
                                                       ]));
 
         //dd($this->themeBuild);
@@ -711,7 +711,7 @@ blade, [
         return $renderedTemplate;
     }
 
-    public function pageable(Page $page, $pageable, $currentItem): string
+    public function pageable(Page $page, $pageable, $currentItem, $viewData = []): string
     {
         /**
          * @var EloquentModelBase|CustomListItem $currentItem
@@ -721,10 +721,9 @@ blade, [
 
         $this->currentSite = FrontendSite::current() ?? $page->site;
 
-        if(blank($page->breadcrumb_config->background_url ?? null) && !blank($currentItem->image_url ?? null)){
+        if (blank($page->breadcrumb_config->background_url ?? null) && !blank($currentItem->image_url ?? null)) {
             $page->breadcrumb_config->background_url = $currentItem->image_url;
         }
-
 
 
         if (blank($page->title ?? null)) {
@@ -741,6 +740,7 @@ blade, [
 
 
         $this->addViewData($page->getBuildViewData([
+                                                       ...$viewData,
                                                        'pageable'    => $pageable,
                                                        'currentItem' => $currentItem,
                                                        'breadcrumb'  => $page->breadcrumb($breadcrumb),
@@ -761,8 +761,6 @@ blade, [
         if ($currentItem->seo ?? null) {
             $this->registerFrontendSeo(array_filter($currentItem->seo->toArray()));
         }
-
-
 
 
         $useCache = $this->cacheEnabled($this->currentSite);
@@ -828,7 +826,6 @@ blade, [
         );
 
     }
-
 
 
     /**
