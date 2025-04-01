@@ -1,25 +1,19 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Pages\Objects;
 
 use Adminx\Common\Enums\ContentEditorType;
-use Adminx\Common\Models\Casts\AsCollectionOf;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
-use Adminx\Common\Models\Generics\DataSource;
-use Adminx\Common\Models\Pages\Modules\Traits\HasPageModulesManager;
+use Adminx\Common\Models\Generics\Configs\CaptchaConfig;
 use ArtisanLabs\GModel\GenericModel;
-use Illuminate\Support\Collection;
 
-/**
- * @property Collection|DataSource[] $sources
- */
+
 class PageConfig extends GenericModel
 {
-    use HasPageModulesManager;
 
     /*public const MODULE_LIST = [
         'articles', 'forms', 'widgets', 'list', //todo: 'products'
@@ -27,43 +21,23 @@ class PageConfig extends GenericModel
 
     protected $fillable = [
         'breadcrumb',
-        'allowed_modules',
-        'enabled_modules',
         'editor_type',
 
-        //todo: remove
-        'modules',
-        'sources',
-        'allowed_source_types',
-        'require_source',
-        'internal_html_raw',
-        //todo: template
+        'captcha',
     ];
 
     protected $attributes = [
-        'allowed_modules'      => [],
-        'enabled_modules'      => [],
+        'captcha' => [],
 
-        //todo: remove
-        'source'               => [],
-        'sources'              => [],
-        'allowed_source_types' => [],
-        'require_source'       => false,
-        'editor_type'          => null,
+        'editor_type' => null,
     ];
 
     protected $casts = [
-        'allowed_modules'      => 'collection',
-        'enabled_modules'      => 'collection',
-        'modules'              => 'collection', //todo: change to mutator
         'breadcrumb'           => BreadcrumbConfig::class,
         'editor_type'          => ContentEditorType::class,
-        //todo: remove
-        //'source' => DataSource::class,
-        'sources'              => AsCollectionOf::class . ':' . DataSource::class,
         'allowed_source_types' => 'collection',
         'require_source'       => 'bool',
-        'internal_html_raw'    => 'string',
+        'captcha'              => CaptchaConfig::class,
     ];
 
     //region Attributes

@@ -1,20 +1,17 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Widgets;
 
-use Adminx\Common\Enums\CustomLists\CustomListType;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Generics\DataSource;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
-use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Templates\Enums\TemplateRenderEngine;
 use Adminx\Common\Models\Traits\HasOwners;
 use Adminx\Common\Models\Traits\HasPublicIdAttribute;
@@ -25,8 +22,6 @@ use Adminx\Common\Models\Widget;
 use Adminx\Common\Models\Widgets\Objects\WidgetConfigObject;
 use Adminx\Common\Models\Widgets\Objects\WidgetContentObject;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 
 class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredModel
@@ -54,7 +49,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
     protected $casts = [
         'config'    => WidgetConfigObject::class,
         'vars'      => 'collection',
-        'source'    => DataSource::class,
+        //'source'    => DataSource::class,
         'public_id' => 'string',
         'title'     => 'string',
         //'sources'    => 'collection',
@@ -80,58 +75,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
     protected array $viewRenderData = [];
 
     //region HELPERS
-    public static function getSourcesByType($source_type, ?Site $site = null): Collection
-    {
-        if (!$site) {
-            $site = Auth::user()->site;
-        }
 
-        $pages = $site->pages->append(['text']);
-
-        $sources = collect();
-
-        switch ($source_type) {
-            //Todo:
-            case 'page':
-                //Página
-                $sources = $sources->merge($pages);
-                break;
-            case 'form':
-                //Formulário
-                $items = $site->forms;
-                $sources = $sources->merge($items);
-                break;
-            case 'page.articles':
-                //Posts da Página
-                $items = $pages->where('using_articles', true);
-                $sources = $sources->merge($items);
-                break;
-            //Todo \/
-            case 'page.products':
-                //Produtos da Página
-
-                break;
-            case 'list':
-                //Listas Customizadas
-                $items = $site->lists;
-                $sources = $sources->merge($items);
-                break;
-            case 'article':
-            case 'address':
-                break;
-
-        }
-
-        //CustomLists Types
-        foreach (CustomListType::array() as $value => $name) {
-            if ($source_type === "list.{$value}") {
-                $items = $site->lists()->whereType($value)->get();
-                $sources = $sources->merge($items);
-            }
-        }
-
-        return $sources;
-    }
 
     public function compile($save = false): static
     {
@@ -167,7 +111,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
             $site = FrontendSite::current() ?? $this->site;
             //Debugbar::startMeasure('start view data');
             $viewData = [
-                'site'      => $site->toArray(),
+                'site'      => $site,
                 //'variables' => $this->variables,
                 'widget'    => $this,
             ];

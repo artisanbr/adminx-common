@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -34,6 +34,7 @@ class PageRepository extends Repository
     public function saveTransaction(): ?Page
     {
 
+
         $this->model->fill($this->data);
 
 
@@ -66,11 +67,9 @@ class PageRepository extends Repository
         //endregion
 
         //Modules
-        $this->model->config->allowed_modules = $this->model->type?->allowed_modules->toArray() ?? [];
 
         //endregion
 
-        //$this->model->config->useModule('data_source', (bool) ($this->model->config->source->id ?? false));
 
         $this->model->save();
 

@@ -1,12 +1,11 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 namespace Adminx\Common\Models\Menus\Objects\Config;
 
-use Adminx\Common\Models\Generics\DataSource;
 use ArtisanLabs\GModel\GenericModel;
 
 class MenuItemConfig extends GenericModel
@@ -26,7 +25,7 @@ class MenuItemConfig extends GenericModel
     protected $casts = [
         'is_source_submenu' => 'bool',
         'use_submenu_url' => 'bool',
-        'submenu_source' => DataSource::class
+        //'submenu_source' => DataSource::class
     ];
 
 }

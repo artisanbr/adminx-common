@@ -8,11 +8,13 @@ namespace Adminx\Common\Libs\FrontendEngine;
 
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Sites\Site;
+use Adminx\Common\Models\Themes\Theme;
 
 abstract class FrontendEngineBase
 {
 
     protected ?Site $currentSite = null;
+    protected ?Theme $currentTheme = null;
 
     protected int $cacheMinutes = 60 * 24 * 2;
     protected int $cacheHours   = 6;

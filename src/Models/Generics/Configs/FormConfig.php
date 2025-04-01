@@ -7,7 +7,6 @@
 namespace Adminx\Common\Models\Generics\Configs;
 
 use Adminx\Common\Models\Casts\AsCollectionOf;
-use Adminx\Common\Models\Generics\Forms\FormCaptcha;
 use Adminx\Common\Models\Generics\Forms\FormRecipient;
 use Adminx\Common\Models\Generics\Forms\FormSendButton;
 use ArtisanLabs\GModel\GenericModel;
@@ -48,7 +47,7 @@ class FormConfig extends GenericModel
 
     protected $casts = [
         'send_mail'              => 'bool',
-        'captcha'                => FormCaptcha::class,
+        'captcha'                => CaptchaConfig::class,
         'enable_redirect'       => 'bool',
         'redirect_url'       => 'string',
         'allow_select_recipient' => 'bool',

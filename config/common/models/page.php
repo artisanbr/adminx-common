@@ -1,13 +1,13 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
 use Adminx\Common\Models\Pages\Modules\ArticlesPageModule;
 use Adminx\Common\Models\Pages\Modules\CustomListsPageModule;
 use Adminx\Common\Models\Pages\Modules\FormsPageModule;
-use Adminx\Common\Models\Pages\Types\BlogPageType;
+use Adminx\Common\Models\Pages\Types\ArticlesPageType;
 use Adminx\Common\Models\Pages\Types\CustomPageType;
 use Adminx\Common\Models\Pages\Types\FormPageType;
 
@@ -21,7 +21,8 @@ return [
 
     'types' => [
         'custom' => CustomPageType::class,
-        'blog'   => BlogPageType::class,
+        'blog'   => ArticlesPageType::class,
+        'articles'   => ArticlesPageType::class,
         'form'   => FormPageType::class,
     ],
 

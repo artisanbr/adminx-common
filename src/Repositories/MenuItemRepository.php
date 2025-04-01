@@ -163,6 +163,8 @@ class MenuItemRepository extends Repository
             }
         }
 
+        if($retorno) $this->menu->save();
+
         return $retorno;
     }
 }

@@ -101,6 +101,8 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         'updated_at' => 'datetime:d/m/Y H:i:s',
     ];
 
+    //protected $guarded = ['url', 'uri'];
+
     //protected $with = ['list'];
 
     public function __construct(array $attributes = [])
@@ -123,9 +125,23 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
     }
 
     //region Scopes
+    public function scopeWhereUrl(Builder $query, string $url): Builder
+    {
+
+        return $query->where('slug', $url)->orWhere([
+                                                        'public_id' => $url,
+                                                        'id'        => $url,
+                                                    ]);
+    }
+    
+    public function scopeWithRelations(Builder $query): Builder
+    {
+        return $query->with(['list','list.page']);
+    }
+
     public function scopeOrdered(Builder $query): Builder
     {
-        return $query->orderBy('position')->orderBy('title')->orderByDesc('created_at');
+        return $query->orderBy('position')->orderByDesc('created_at')->orderBy('title');
     }
 
     public function scopeOrderedDesc(Builder $query): Builder
@@ -168,7 +184,7 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         }
 
         if (!($column instanceof CustomListSchemaColumn)) {
-           return null;
+            return null;
         }
 
         return $this->findSchemaValue($column->slug) ?? $column->generateSchemaValue($defaultData);
@@ -245,6 +261,11 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
                    ->first();
     }
 
+    public function slugOrPublicId()
+    {
+        return !blank($this->slug) ? $this->slug : $this->public_id;
+    }
+
     //endregion
 
     //region ATTRIBUTES
@@ -252,8 +273,8 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
     protected function slug(): Attribute
     {
         return Attribute::make(
-            get: fn($value, array $attributes) => blank($value) ? str($attributes['title'] ?? '')->slug()->toString() : $value,
-            set: fn($value) => $value,
+            get: fn($value, array $attributes) => $value,
+            set: fn($value, array $attributes) => str(!blank($value) ? $value : ($attributes['title'] ?? ''))->slug()->toString(),
         );
     }
 
@@ -271,8 +292,8 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
                     $schemaItem->slug . "_full_html" => $schemaItem->value->full_html,
                 ],
                 $schemaItem->type?->is(CustomListSchemaType::PDF) => [
-                    $schemaItem->slug                => $schemaItem,
-                    $schemaItem->slug . "_url"       => $schemaItem->url,
+                    $schemaItem->slug          => $schemaItem,
+                    $schemaItem->slug . "_url" => $schemaItem->url,
                 ],
                 $schemaItem->slug === 'content' &&
                 $schemaItem->type?->is(CustomListSchemaType::Html) &&
@@ -324,26 +345,29 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         );
     }
 
-    protected function getUrlAttribute()
+    protected function generateUrl()
     {
-        return ($this->list->url ?? '') . ($this->slug ?? $this->public_id);
+
+        return ($this->list?->url ?? '') . $this->slugOrPublicId();
     }
 
-    protected function getUriAttribute()
+    protected function generateUri()
     {
-        return ($this->list->uri ?? '') . ($this->slug ?? $this->public_id);
+
+        return ($this->list?->uri ?? '') . $this->slugOrPublicId();
     }
     //endregion
 
     //region OVERRIDES
     public function getAttribute($key)
     {
+        //Debugbar::debug($key);
         $value = parent::getAttribute($key);
 
         if (is_null($value)
         ) {
 
-            if($key == 'html'){
+            if ($key == 'html') {
                 dd($key);
             }
 

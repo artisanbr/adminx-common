@@ -19,13 +19,14 @@ use Adminx\Common\Models\CustomLists\CustomListItem;
 use Adminx\Common\Models\Objects\Frontend\Builds\FrontendBuildObject;
 use Adminx\Common\Models\Objects\Seo\Seo;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Pages\PageInternal;
+use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
 use Adminx\Common\Models\Themes\Theme;
 use Adminx\Common\Models\Themes\ThemeBuild;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Exception;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -187,14 +188,9 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $this->themeBuild = $themeBuild;
 
-        //Montar Head
-        //$this->templates->put('head', $this->themeBuild->head);
-
-        //Montar Header
-        //$this->templates->put('header', $this->themeBuild->header);
-
-        //Montar footer
-        //$this->templates->put('footer', $this->themeBuild->footer);
+        $this->addViewData([
+                               'theme' => $theme,
+                           ]);
 
         return $this;
     }
@@ -385,6 +381,13 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //$this->frontendBuild->meta->registerSeoForPage($page);
 
+        if ($exception->getCode() === 404) {
+            Debugbar::disable();
+        }
+        else if (config('app.env') === 'local') {
+            Debugbar::enable();
+        }
+
         $theme = $theme ?? $this->currentSite->theme;
 
         $this->applyTheme($theme);
@@ -495,21 +498,6 @@ class FrontendTwigEngine extends FrontendEngineBase
 
     }
 
-    public function useCache()
-    {
-
-        if ($this->currentSite) {
-            //Verifica se está ativo nas configurações
-            $useCacheConfig = $this->currentSite->config->performance->enable_advanced_cache ?? false;
-
-            if ($useCacheConfig) {
-                //Verifica se não está em uma página de busca
-            }
-        }
-
-        return false;
-    }
-
     public function getFromCache($name)
     {
         return Cache::has("site-cache:{$name}") ? Cache::get("site-cache:{$name}") : false;
@@ -517,7 +505,7 @@ class FrontendTwigEngine extends FrontendEngineBase
 
     public function saveCache($name, $content)
     {
-        return Cache::put("site-cache:{$name}", $content, now()->addHours($this->cacheHours));
+        return Cache::remember("site-cache:{$name}", now()->addHours($this->cacheHours), value($content));
     }
 
     public function purgeCache($name): bool
@@ -538,14 +526,16 @@ class FrontendTwigEngine extends FrontendEngineBase
          */
         $this->templateNamePrefix = "@page={$page->public_id}";
 
-        $this->setViewData($page->getBuildViewData($mergeData));
+        $this->currentSite = FrontendSite::current() ?? $page->site;
+        $this->applyTheme(FrontendSite::currentTheme() ?? $this->currentSite->theme);
+
+        $this->addViewData($this->currentSite->getBuildViewData($page->getBuildViewData($mergeData)));
 
         //$this->registerFrontendBuild($page->frontend_build);
         $this->registerFrontendBuild($page->prepareFrontendBuild());
 
         //$this->frontendBuild->meta->registerSeoForPage($page);
 
-        $this->currentSite = $page->site;
 
         //Template Name considerando busca, categoria, etc..
         if (($this->viewData['search'] ?? false) && !empty($this->viewData['searchQuery'] ?? null)) {
@@ -557,14 +547,13 @@ class FrontendTwigEngine extends FrontendEngineBase
         }
 
 
-        $useCache = $this->currentSite->config->performance->enable_advanced_cache ?? false;
+        $useCache = $this->cacheEnabled($this->currentSite);
 
         //Debugbar::debug($this->templateNamePrefix, $useCache);
 
         if ($useCache) {
             $cache = $this->getFromCache($this->templateNamePrefix);
 
-            Debugbar::debug($cache);
             if (!empty($cache)) {
                 return $cache;
             }
@@ -573,9 +562,6 @@ class FrontendTwigEngine extends FrontendEngineBase
             $this->purgeCache($this->templateNamePrefix);
         }
 
-        if ($this->currentSite->theme ?? false) {
-            $this->applyTheme($this->currentSite->theme);
-        }
 
         $pageTemplate = $page->page_template;
 
@@ -616,7 +602,7 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //$renderedBlade = Blade::render($rawBlade, $this->viewData);
 
-        if ($this->currentSite->config->performance->enable_html_minify) {
+        if ($this->minifyEnabled($this->currentSite)) {
             $htmlMin = new HtmlMin();
 
             $renderedTemplate = $htmlMin->minify($renderedTemplate);
@@ -639,8 +625,10 @@ class FrontendTwigEngine extends FrontendEngineBase
         $page = $article->page;
         $this->templateNamePrefix = "@page={$page->public_id}@article={$article->public_id}";
 
+        $this->currentSite = FrontendSite::current() ?? $page->site;
+        $this->applyTheme(FrontendSite::currentTheme() ?? $this->currentSite->theme);
 
-        $useCache = $page->site->config->performance->enable_advanced_cache ?? false;
+        $useCache = $this->cacheEnabled($this->currentSite);
 
         //Debugbar::debug($this->templateNamePrefix, $useCache);
 
@@ -657,15 +645,33 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         //$this->setCurrentSite($article->site, false);
 
+        if ($page->config->captcha->enabled ?? false) {
+            $this->addViewData([
+                                   'recaptcha' => Blade::render(<<<'blade'
+<x-common::recaptcha-v2 :site-key="$page->config->captcha->keys->get('site_key') ??  $site->config->recaptcha_site_key"/>
+blade, [
+                                                                                                                                                                                                    'page' => $page,
+                                                                                                                                                                                                    'site' => $this->currentSite,
+                                                                                                                                                                                                ]),
+                               ]);
+        }
+
         //Meta::registerSeoForArticle($article);
-        $this->setViewData($article->getBuildViewData([
-                                                          'customPageTemplate' => $page->page_template ? '@template/article.twig' : false,
+        $this->addViewData($article->getBuildViewData([
+                           'customPageTemplate' => $page->page_template ? '@template/article.twig' : false,
                                                       ]));
 
         //dd($this->themeBuild);
 
         //$this->registerFrontendBuild($article->meta->frontend_build);
         $this->registerFrontendBuild($article->prepareFrontendBuild());
+
+        $this->registerFrontendSeo([
+                                       'title'        => $article->title,
+                                       'title_prefix' => $this->currentSite->seoTitle($page->title),
+                                       'published_at' => $article->published_at,
+                                       'updated_at'   => $article->updated_at,
+                                   ]);
 
         //$this->frontendBuild->meta->registerSeoForArticle($article);
 
@@ -692,7 +698,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         $renderedTemplate = $this->renderTwig('article');
 
 
-        if ($page->site->config->performance->enable_html_minify ?? false) {
+        if ($this->minifyEnabled($this->currentSite)) {
             $htmlMin = new HtmlMin();
 
             $renderedTemplate = $htmlMin->minify($renderedTemplate);
@@ -704,6 +710,126 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         return $renderedTemplate;
     }
+
+    public function pageable(Page $page, $pageable, $currentItem): string
+    {
+        /**
+         * @var EloquentModelBase|CustomListItem $currentItem
+         */
+
+        $this->templateNamePrefix = "@page={$page->public_id}@pageable={$pageable->public_id}@model=" . (@$currentItem->public_id ?? @$currentItem->slug ?? Str::slug($currentItem?->title ?? ''));
+
+        $this->currentSite = FrontendSite::current() ?? $page->site;
+
+        if(blank($page->breadcrumb_config->background_url ?? null) && !blank($currentItem->image_url ?? null)){
+            $page->breadcrumb_config->background_url = $currentItem->image_url;
+        }
+
+
+
+        if (blank($page->title ?? null)) {
+            $page->title = $currentItem->title;
+        }
+
+        $breadcrumb = [];
+
+        if ($page->parent?->exists()) {
+            $breadcrumb += $page->parent->breadcrumb->items->toArray();
+        }
+
+        $breadcrumb += ['#' => $currentItem->title];
+
+
+        $this->addViewData($page->getBuildViewData([
+                                                       'pageable'    => $pageable,
+                                                       'currentItem' => $currentItem,
+                                                       'breadcrumb'  => $page->breadcrumb($breadcrumb),
+                                                   ]));
+
+
+        if ($page->frontend_build ?? false) {
+            $this->registerFrontendBuild($page->frontend_build);
+        }
+
+        $this->registerFrontendSeo([
+                                       'title'        => $currentItem->title,
+                                       'title_prefix' => $this->currentSite->seoTitle($page->title),
+                                       'published_at' => $currentItem->created_at,
+                                       'updated_at'   => $currentItem->updated_at,
+                                   ]);
+
+        if ($currentItem->seo ?? null) {
+            $this->registerFrontendSeo(array_filter($currentItem->seo->toArray()));
+        }
+
+
+
+
+        $useCache = $this->cacheEnabled($this->currentSite);
+
+
+        if ($useCache) {
+            $cache = $this->getFromCache($this->templateNamePrefix);
+
+            if (!empty($cache)) {
+                return $cache;
+            }
+        }
+        else {
+            $this->purgeCache($this->templateNamePrefix);
+        }
+
+        if ($this->currentSite->theme ?? false) {
+            $this->applyTheme(FrontendSite::currentTheme() ?? $this->currentSite->theme);
+        }
+
+
+        $pageContent = $page->content;
+
+
+        $this->templates->put('page', $this->getPageBaseTemplate($pageContent));
+
+
+        $renderedTemplate = $this->renderTwig('page');
+
+
+        //$renderedBlade = Blade::render($rawBlade, $this->viewData);
+
+        if ($this->minifyEnabled($this->currentSite)) {
+            $htmlMin = new HtmlMin();
+
+            $renderedTemplate = $htmlMin->minify($renderedTemplate);
+        }
+
+        if ($useCache) {
+            $this->saveCache($this->templateNamePrefix, $renderedTemplate);
+        }
+
+        return $renderedTemplate;
+    }
+
+
+    protected function cacheEnabled(Site $site): bool
+    {
+
+        return session()->get(
+            $site->public_id . '__' . 'enabledAdvancedCache',
+            $site->config->performance->enable_advanced_cache
+        );
+
+    }
+
+    protected function minifyEnabled(Site $site): bool
+    {
+
+        return session()->get(
+            $site->public_id . '__' . 'enabledHtmlMinfy',
+            $site->config->performance->enable_html_minify
+        );
+
+    }
+
+
 
     /**
      * @throws FrontendException
@@ -722,13 +848,13 @@ class FrontendTwigEngine extends FrontendEngineBase
         $pageInternal->breadcrumb_config->background_url = $modelItem->image_url;
 
         $this->setViewData($page->getBuildViewData([
-                                                                     'pageInternal' => $pageInternal,
-                                                                     'currentItem'  => $modelItem,
-                                                                     'breadcrumb'   => $pageInternal->breadcrumb([
-                                                                                                                     ...$pageInternal->page->breadcrumb->items->toArray(),
-                                                                                                                     '#' => $modelItem->title,
-                                                                                                                 ]),
-                                                                 ]));
+                                                       'pageInternal' => $pageInternal,
+                                                       'currentItem'  => $modelItem,
+                                                       'breadcrumb'   => $pageInternal->breadcrumb([
+                                                                                                       ...$pageInternal->page->breadcrumb->items->toArray(),
+                                                                                                       '#' => $modelItem->title,
+                                                                                                   ]),
+                                                   ]));
 
 
         //$this->registerFrontendBuild($page->prepareFrontendBuild());

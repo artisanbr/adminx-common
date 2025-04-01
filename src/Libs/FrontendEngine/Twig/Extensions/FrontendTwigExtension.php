@@ -210,7 +210,7 @@ class FrontendTwigExtension extends AbstractExtension
             return View::make($template->blade_file, [
                 'form'     => $this->currentForm,
                 'template' => $template,
-            ])->render();;
+            ])->render();
 
         }
 
@@ -279,7 +279,7 @@ class FrontendTwigExtension extends AbstractExtension
             $customList = $this->currentSite->lists()
                                             ->where('public_id', $list)
                                             ->orWhere('slug', $list)
-                                            ->with(['items' => fn($query) => $query->ordered()])
+                                            ->with(['items' => fn($query) => $query->withRelations()])
                                             ->first();
 
             if ($customList) {
@@ -315,7 +315,7 @@ class FrontendTwigExtension extends AbstractExtension
     public function customListItems($context, $list, $perPage = 0, $pageNumber = 1)
     {
 
-        $query = $this->customList($context, $list)->items()->ordered();
+        $query = $this->customList($context, $list)->items()->withRelations();
 
         $result = $perPage > 0 ? $query->paginate(
             perPage: $perPage,
@@ -323,14 +323,16 @@ class FrontendTwigExtension extends AbstractExtension
             page:    $pageNumber
         )->collect() : $query->get();
 
+        $result = $result->append(['url','uri']);
+
         return $result ?? collect();
 
     }
 
     public function getListItem($context, $list, $item)
     {
-        return $this->customList($context, $list)?->items()->where(function ($query) use ($item) {
-            $query->where('public_id', $item)->orWhere('slug',$item);
+        return $this->customList($context, $list)?->items()->withRelations()->where(function ($query) use ($item) {
+            $query->where('public_id', $item)->orWhere('slug', $item);
         })->first() ?? null;
 
     }
@@ -338,13 +340,14 @@ class FrontendTwigExtension extends AbstractExtension
     public function articles($context, ?string $page = null, $perPage = 50, $pageNumber = 1)
     {
 
-        if(!$page){
-            $page = $this->currentSite->pages()->whereHas('articles')->first();
-        }else{
+        if (!$page) {
+            $page = $this->currentSite->pages()->with(['site'])->whereHas('articles')->first();
+        }
+        else {
             $page = $this->page($context, $page);
         }
 
-        return $page instanceof Page ? $page->articles()->ordered()->paginate(
+        return $page instanceof Page ? $page->articles()->with(['page', 'page.site'])->ordered()->paginate(
             perPage: $perPage,
             columns: ['*'],
             page:    $pageNumber
@@ -355,15 +358,16 @@ class FrontendTwigExtension extends AbstractExtension
     public function getArticle($context, $article, ?string $page = null)
     {
 
-        if(!$page){
-            $page = $this->currentSite->pages()->whereHas('articles')->first();
-        }else{
+        if (!$page) {
+            $page = $this->currentSite->pages()->with(['site'])->whereHas('articles')->first();
+        }
+        else {
             $page = $this->page($context, $page);
         }
 
 
         return $page?->articles()->where(function ($query) use ($article) {
-            $query->where('public_id', $article)->orWhere('slug',$article);
+            $query->where('public_id', $article)->orWhere('slug', $article);
         })->first() ?? null;
 
     }
@@ -373,7 +377,8 @@ class FrontendTwigExtension extends AbstractExtension
 
         if (!$page) {
             //Pega home page
-            $page = $this->currentSite->pages()->where('is_home', true)->first();
+            $page = $this->currentSite->pages()
+                                      ->with(['site','parent'])->where('is_home', true)->first();
         }
         else if (!($page instanceof Page)) {
 
@@ -384,6 +389,7 @@ class FrontendTwigExtension extends AbstractExtension
 
             if (!$page) {
                 $page = $this->currentSite->pages()
+                                          ->with(['site'])
                                           ->where(fn($builder) => $builder->where('public_id', $searchTerm)->orWhere('slug', $searchTerm))
                                           ->first();
             }

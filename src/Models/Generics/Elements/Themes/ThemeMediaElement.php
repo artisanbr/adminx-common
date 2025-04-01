@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2024-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -23,7 +23,6 @@ class ThemeMediaElement extends GenericModel
     ];
 
     protected $attributes = [
-        //'type_name'  => 'name',
     ];
 
     protected $casts = [

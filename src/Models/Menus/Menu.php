@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -118,7 +118,7 @@ class Menu extends EloquentModelBase implements OwneredModel
 
 
     }
-    public function mount(callable $callback = null): SpatieMenu|string
+    /*public function mount(callable $callback = null): SpatieMenu|string
     {
 
         $menuBuilder = SpatieMenu::new()->addClass($this->config->render->menu->class ?? '');
@@ -136,9 +136,6 @@ class Menu extends EloquentModelBase implements OwneredModel
             $submenu->addParentClass($this->config->render->item->class ?? '');
 
             $submenu->each(function (Link $link) {
-                /*$link->prepend($this->config->menu_item_prepend ?? '');
-
-                $link->append($this->config->menu_item_append ?? '');*/
 
                 $link->addParentClass($this->config->render->submenu_item->class ?? '');
 
@@ -156,7 +153,7 @@ class Menu extends EloquentModelBase implements OwneredModel
         });
 
 
-    }
+    }*/
     //endregion
 
     //region ATTRIBUTES

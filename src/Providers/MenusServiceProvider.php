@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -255,7 +255,7 @@ html;
 
                 foreach ($pages as $page) {
 
-                    if ($page->using_articles && auth()->user()->canAny(['create article', 'read article'])) {
+                    if ($page->articles()->count() && auth()->user()->canAny(['create article', 'read article'])) {
                         //Posts
                         $this->itemSubmenu($page->title, function (Menu $submenu) use ($page) {
                             if(auth()->user()->can(['update page'])) {
@@ -271,9 +271,42 @@ html;
 
                     }
                     else if(auth()->user()->can(['update page'])) {
-                        //Default
-                        $this->item($page->title, route('app.pages.cadastro', $page->public_id), $page->is_home ? 'home' : 'file');
+
+                        $childCount = $page->children()->count();
+
+                        if($childCount){
+                            $this->itemSubmenu($page->title . "<span class='badge badge-light-dark fw-semibold fs-8 px-2 ms-2'>{$childCount}</span>", function (Menu $submenu) use ($page) {
+                                if(auth()->user()->can(['update page'])) {
+                                    $submenu->subItem("Configurar Página", route('app.pages.cadastro', $page->public_id), 'notepad-edit');
+                                }
+
+                                $submenu->subItem('Gerenciar Sub-páginas', route('app.pages.children.index', $page->public_id), 'notepad-bookmark')
+                                        ->subItem('Nova Sub-Página', route('app.pages.children.cadastro', $page->public_id), 'add-notepad');
+
+
+                                return $submenu;
+                            },                 $page->is_home ? 'home' : 'file');
+                        }else{
+                            //Default
+                            $this->itemSubmenu($page->title, function (Menu $submenu) use ($page) {
+                                if(auth()->user()->can(['update page'])) {
+                                    $submenu->subItem("Configurar Página", route('app.pages.cadastro', $page->public_id), 'notepad-edit');
+                                }
+
+                                $submenu
+                                        ->subItem('Nova Sub-Página', route('app.pages.children.cadastro', $page->public_id), 'add-notepad');
+
+
+                                return $submenu;
+                            },                 $page->is_home ? 'home' : 'file');
+
+                           /* $this->item($page->title, route('app.pages.cadastro', $page->public_id), $page->is_home ? 'home' : 'file');*/
+                        }
+
+
                     }
+
+
 
                 }
 
