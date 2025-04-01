@@ -31,7 +31,7 @@ use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToPage;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
-use Adminx\Common\Models\Traits\Relations\HasCategoriesMorph;
+use Adminx\Common\Models\Traits\Relations\Categorizable;
 use Adminx\Common\Models\Traits\Relations\HasComments;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
 use Adminx\Common\Rules\HtmlEmptyRule;
@@ -56,7 +56,7 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
         BelongsToPage,
         BelongsToUser,
         BelongsToSite,
-        HasCategoriesMorph, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes,
+        Categorizable, HasTagsMorph, HasComments, HasOwners, HasPublicIdUriAttributes,
         HasSiteRoutes, HasPublicIdAttribute;
 
     protected $table = 'articles';

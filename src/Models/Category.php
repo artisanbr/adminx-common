@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -9,6 +9,8 @@ namespace Adminx\Common\Models;
 use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\CustomLists\CustomList;
+use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
@@ -136,6 +138,11 @@ class Category extends EloquentModelBase implements OwneredModel
         return $query->where('parent_id', null);
     }
 
+    public function scopeParents(Builder $query): Builder
+    {
+        return $this->scopeRoot($query);
+    }
+
     public function scopeChildOf(Builder $query, $parent_id = null): Builder
     {
         return $query->where('parent_id', $parent_id);
@@ -190,6 +197,16 @@ class Category extends EloquentModelBase implements OwneredModel
     {
         return $this->morphedByMany(Page::class, 'categorizable');
     }*/
+
+    public function lists()
+    {
+        return $this->morphedByMany(CustomList::class, 'categorizable');
+    }
+
+    public function list_items()
+    {
+        return $this->morphedByMany(CustomListItem::class, 'categorizable');
+    }
 
     public function menu_items()
     {

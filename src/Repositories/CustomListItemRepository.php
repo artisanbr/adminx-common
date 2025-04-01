@@ -186,8 +186,7 @@ class CustomListItemRepository extends Repository
         //Categories
         if ($this->data['categories'] ?? false) {
             $coreListItem = CustomListItem::find($this->model->id);
-
-            $coreListItem->categoriesMorph()->sync($this->data['categories']);
+            $this->model->categories()->sync(collect($this->data['categories'])->values()->toArray());
         }
 
 

@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2025. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Models;
 
@@ -15,12 +19,12 @@ use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
-use Adminx\Common\Models\Traits\Relations\HasCategoriesMorph;
+use Adminx\Common\Models\Traits\Relations\Categorizable;
 use Illuminate\Database\Eloquent\Builder;
 
 class Report extends EloquentModelBase implements PublicIdModel, OwneredModel
 {
-    use HasUriAttributes, HasSlugAttribute, HasCategoriesMorph, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasOwners, HasValidation;
+    use HasUriAttributes, HasSlugAttribute, Categorizable, BelongsToSite, BelongsToUser, HasPublicIdAttribute, HasPublicIdUriAttributes, HasOwners, HasValidation;
 
     protected $fillable = [
         'site_id',

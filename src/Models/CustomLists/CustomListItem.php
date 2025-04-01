@@ -10,7 +10,6 @@ use Adminx\Common\Enums\CustomLists\CustomListItemType;
 use Adminx\Common\Enums\CustomLists\CustomListSchemaType;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Casts\AsCollectionOf;
-use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\Object\Configs\CustomListItems\CustomListItemConfig;
 use Adminx\Common\Models\CustomLists\Object\Schemas\CustomListItemSchemaValue;
 use Adminx\Common\Models\CustomLists\Object\Schemas\CustomListSchemaColumn;
@@ -28,6 +27,7 @@ use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
+use Adminx\Common\Models\Traits\Relations\Categorizable;
 use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Observers\OwneredModelObserver;
@@ -54,6 +54,7 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         HasPublicIdUriAttributes,
         HasUriAttributes,
         //HasFiles,
+        Categorizable,
         HasSiteRoutes,
         SoftDeletes;
 
@@ -400,16 +401,16 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
         return $this->morphTo(__FUNCTION__, __FUNCTION__ . '_type', __FUNCTION__ . '_id');
     }
 
-    public function getCategoriesAttribute()
+    /*public function getCategoriesAttribute()
     {
         return CustomListItem::find($this->id)->categoriesMorph()->get();
-    }
+    }*/
 
-    public function categoriesMorph()
+    /*public function categoriesMorph()
     {
         //return $this->morphToMany(Category::class, 'categorizable');
         return $this->morphToMany(Category::class, 'categorizable', 'categorizables');
-    }
+    }*/
     //endregion
 
 

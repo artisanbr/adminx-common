@@ -10,7 +10,6 @@ use Adminx\Common\Enums\CustomLists\CustomListSchemaType;
 use Adminx\Common\Enums\CustomLists\CustomListType;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Casts\AsCollectionOf;
-use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
 use Adminx\Common\Models\CustomLists\Object\Configs\CustomListConfig;
@@ -28,7 +27,7 @@ use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
-use Adminx\Common\Models\Traits\Relations\HasCategoriesMorph;
+use Adminx\Common\Models\Traits\Relations\Categorizable;
 use Adminx\Common\Models\Traits\Relations\Pageable;
 use Adminx\Common\Observers\OwneredModelObserver;
 use Adminx\Common\Observers\PublicIdModelObserver;
@@ -51,7 +50,7 @@ class CustomList extends EloquentModelBase implements PublicIdModel, OwneredMode
         HasPublicIdUriAttributes,
         HasSelect2,
         HasUriAttributes,
-        HasValidation, HasCategoriesMorph, SoftDeletes, Pageable;
+        HasValidation, Categorizable, SoftDeletes, Pageable;
 
     protected $table = 'custom_lists';
 
@@ -180,8 +179,8 @@ class CustomList extends EloquentModelBase implements PublicIdModel, OwneredMode
     protected function slug(): Attribute
     {
         return Attribute::make(
-            //get: fn($value, array $attributes) => str($value)->trim()->toString(),
-            set: fn($value) => str($value)->trim()->toString(),
+            get: fn($value) => !blank($value) ? $value : null,
+            set: fn($value, array $attributes) => str(!blank($value) ? $value : ($attributes['title'] ?? ''))->trim()->toString(),
         );
     }
 
@@ -220,7 +219,7 @@ class CustomList extends EloquentModelBase implements PublicIdModel, OwneredMode
         return $this->hasMany(CustomListItem::class, 'list_id', 'id')->ordered();//->orderBy('position');
     }
 
-
+/*
     public function getCategoriesAttribute()
     {
         return CustomList::find($this->id)->categoriesMorph()->get();
@@ -230,7 +229,7 @@ class CustomList extends EloquentModelBase implements PublicIdModel, OwneredMode
     {
         //return $this->morphToMany(Category::class, 'categorizable');
         return $this->morphToMany(Category::class, 'categorizable', 'categorizables');
-    }
+    }*/
     //endregion
 
 }
