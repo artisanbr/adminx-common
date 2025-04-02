@@ -134,7 +134,7 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
                                     'slug',
                                     'schema',
                                 ],
-                                bool    $searchInCategories = true,
+                                bool    $searchInCategories = false,
                                 array   $categoryColumns = [
                                     'title',
                                     'slug',
@@ -158,10 +158,23 @@ class CustomListItem extends EloquentModelBase implements OwneredModel, PublicId
     public function scopeWhereUrl(Builder $query, string $url): Builder
     {
 
-        return $query->where('slug', $url)->orWhere([
-                                                        'public_id' => $url,
-                                                        'id'        => $url,
-                                                    ]);
+        return $query->where(function (Builder $q) use ($url) {
+            return $q->where('slug', $url)
+                     ->orWhere('public_id', $url)
+                     ->orWhere('id', $url);
+        });
+    }
+
+    public function scopeWhereUrlIn(Builder $query, string|array $urls): Builder
+    {
+
+        $urls = is_array($urls) ? $urls : [$urls];
+
+        return $query->where(function (Builder $q) use ($urls) {
+            return $q->whereIn('slug', $urls)
+                     ->orWhereIn('public_id', $urls)
+                     ->orWhereIn('id', $urls);
+        });
     }
 
     public function scopeWithRelations(Builder $query): Builder

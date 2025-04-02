@@ -7,6 +7,7 @@
 namespace Adminx\Common\Models\Traits\Relations;
 
 use Adminx\Common\Models\Category;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -14,8 +15,39 @@ use Illuminate\Database\Eloquent\Model;
  */
 trait Categorizable
 {
+    public function scopeHasCategory(Builder $query, string $category): Builder
+    {
+        return $query->whereHas('categories', fn(Builder $query) => $query->whereUrl('slug', $category));
+    }
+
+    public function scopeHasAnyCategory(Builder $query, array $categories): Builder
+    {
+        return $query->whereHas(
+            'categories',
+            fn(Builder $query) => $query
+                ->orWhereIn('id', $categories)
+                ->whereIn('slug', $categories)
+        );
+    }
+
+    public function scopeHasAllCategories(Builder $query, array $categories): Builder
+    {
+        return $query->whereHas(
+            'categories',
+            function (Builder $query) use ($categories) {
+
+                foreach ($categories as $category) {
+                    $query = $query->whereUrl($category);
+                }
+
+                return $query;
+            }
+        );
+    }
+
     public function categories()
     {
         return $this->morphToMany(Category::class, 'categorizable');
     }
+
 }

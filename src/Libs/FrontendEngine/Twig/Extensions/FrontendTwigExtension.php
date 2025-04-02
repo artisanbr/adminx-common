@@ -8,6 +8,7 @@ namespace Adminx\Common\Libs\FrontendEngine\Twig\Extensions;
 
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\CustomLists\CustomList;
+use Adminx\Common\Models\CustomLists\CustomListItem;
 use Adminx\Common\Models\Form;
 use Adminx\Common\Models\Menus\Menu;
 use Adminx\Common\Models\Pages\Page;
@@ -94,6 +95,11 @@ class FrontendTwigExtension extends AbstractExtension
             new TwigFunction('listItems', $this->customListItems(...), ['needs_context' => true]),
             new TwigFunction('list_items', $this->customListItems(...), ['needs_context' => true]),
             new TwigFunction('lis', $this->customListItems(...), ['needs_context' => true]),
+
+
+            new TwigFunction('listCategories', $this->customListCategories(...), ['needs_context' => true]),
+            new TwigFunction('list_categories', $this->customListCategories(...), ['needs_context' => true]),
+            new TwigFunction('lcs', $this->customListCategories(...), ['needs_context' => true]),
 
             new TwigFunction('listItem', $this->getListItem(...), ['needs_context' => true]),
             new TwigFunction('list_item', $this->getListItem(...), ['needs_context' => true]),
@@ -312,10 +318,23 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function customListItems($context, $list, $perPage = 0, $pageNumber = 1)
+    public function customListItems($context, $list, $perPage = 0, $pageNumber = 1, null|string|array $category = null, ?string $search = null)
     {
 
+        //dd($context, $list, $perPage, $pageNumber, $category, $search);
+
         $query = $this->customList($context, $list)->items()->withRelations();
+
+        if(!blank($category)){
+            $categories = is_array($category) ? $category : str($category)->explode('|')->toArray();
+            $categories = collect($categories)->filter()->values()->toArray();
+            $query = $query->hasAnyCategory($categories);
+        }
+
+        if(!blank($search)){
+            $query = $query->search($search);
+        }
+
 
         $result = $perPage > 0 ? $query->paginate(
             perPage: $perPage,
@@ -329,15 +348,43 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function getListItem($context, $list, $item)
+    public function customListCategories($context, $list, $perPage = 0, $pageNumber = 1, null|string|array $parent = null, ?string $search = null)
     {
-        return $this->customList($context, $list)?->items()->withRelations()->where(function ($query) use ($item) {
-            $query->where('public_id', $item)->orWhere('slug', $item);
-        })->first() ?? null;
+
+        $query = $this->customList($context, $list)->categories()->with('children');
+
+        if(!blank($parent)){
+            $parents = is_array($parent) ? $parent : str($parent)->explode('|')->toArray();
+            $parents = collect($parents)->filter()->values()->toArray();
+            $query = $query->whereHas('parent', fn($parentQuery) => $parentQuery->whereUrlIn($parents));
+        }
+
+        if(!blank($search)){
+            $query = $query->search($search);
+        }
+
+
+        $result = $perPage > 0 ? $query->paginate(
+            perPage: $perPage,
+            columns: ['*'],
+            page:    $pageNumber
+        )->collect() : $query->get();
+
+        $result = $result->append(['url','uri']);
+
+        return $result ?? collect();
 
     }
 
-    public function articles($context, ?string $page = null, $perPage = 50, $pageNumber = 1)
+    public function getListItem($context, $list, $item): CustomListItem
+    {
+        return $this->customList($context, $list)?->items()->withRelations()->where(function ($query) use ($item) {
+            $query->where('public_id', $item)->orWhere('slug', $item);
+        })->first() ?? new CustomListItem();
+
+    }
+
+    public function articles($context, ?string $page = null, $perPage = 50, $pageNumber = 1, null|string|array $category = null, ?string $search = null)
     {
 
         if (!$page) {
@@ -347,13 +394,31 @@ class FrontendTwigExtension extends AbstractExtension
             $page = $this->page($context, $page);
         }
 
-        return $page instanceof Page ? $page->articles()->with(['page', 'page.site'])->ordered()->paginate(
+        if(!($page instanceof Page)){
+            return collect();
+        }
+
+        $query = $page->articles()->with(['page', 'page.site'])->ordered();
+
+        if(!blank($category)){
+            $categories = is_array($category) ? $category : str($category)->explode('|')->toArray();
+            $categories = collect($categories)->filter()->values()->toArray();
+            $query = $query->hasAnyCategory($categories);
+        }
+
+        if(!blank($search)){
+            $query = $query->search($search);
+        }
+
+
+        return  $query->paginate(
             perPage: $perPage,
             columns: ['*'],
             page:    $pageNumber
-        )->collect() : collect();
+        )->collect();
 
     }
+    //todo: Articles categories
 
     public function getArticle($context, $article, ?string $page = null)
     {

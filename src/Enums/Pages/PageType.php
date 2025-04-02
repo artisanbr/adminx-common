@@ -58,4 +58,9 @@ enum PageType: string
         ));
     }
 
+    public static function selectOptions(): array
+    {
+        return collect(self::titles())->except(['blog','form'])->toArray();
+    }
+
 }

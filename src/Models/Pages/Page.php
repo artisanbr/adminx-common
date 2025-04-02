@@ -288,9 +288,7 @@ class Page extends EloquentModelBase implements BuildableModel,
             if ($categorySlug) {
                 $category = $this->categories()->where('slug', $categorySlug)->orWhere('id', $categorySlug)->first();
                 if ($category) {
-                    $articles = $articles->whereHas('categories', function (Builder $query) use ($category) {
-                        $query->where('id', $category->id);
-                    });
+                    $articles = $articles->hasCategory($category->id);
                     $viewData['category'] = $category;
 
                     $breadcrumbAdd = $breadcrumbAdd->merge([$category->url => $category->title]);
@@ -593,6 +591,9 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     public function generateUri()
     {
+        if(!$this->site){
+            
+        }
 
         if (blank($this->parent_id) && $this->is_home) {
 
@@ -674,11 +675,21 @@ class Page extends EloquentModelBase implements BuildableModel,
         return $query->when(empty($url), static function (Builder $q) {
             $q->emptySlug()->orWhere('is_home', true);
         })->when($url, static function (Builder $q) use ($url) {
-            $q->where('slug', $url);
-            $q->orWhere([
-                            'public_id' => $url,
-                            'id'        => $url,
-                        ]);
+            return $q->where('slug', $url)
+              ->orWhere('public_id', $url)
+              ->orWhere('id', $url);
+        });
+    }
+
+    public function scopeWhereUrlIn(Builder $query, string|array $urls): Builder
+    {
+
+        $urls = is_array($urls) ? $urls : [$urls];
+
+        return $query->where(function (Builder $q) use ($urls) {
+            return $q->whereIn('slug', $urls)
+                     ->orWhereIn('public_id', $urls)
+                     ->orWhereIn('id', $urls);
         });
     }
 

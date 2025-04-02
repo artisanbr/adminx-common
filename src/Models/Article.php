@@ -467,6 +467,36 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     //endregion
 
     //region SCOPES
+    public function scopeSearch(Builder $query,
+                                string  $searchTerm,
+                                array   $columns = [
+                                    'public_id',
+                                    'title',
+                                    'slug',
+                                    'description',
+                                    'content',
+                                ],
+                                bool    $searchInCategories = false,
+                                array   $categoryColumns = [
+                                    'title',
+                                    'slug',
+                                    'description',
+                                ]): Builder
+    {
+
+        if (!blank($searchTerm)) {
+            $query = $query->whereLike($columns, $searchTerm);
+
+            if ($searchInCategories) {
+                $query = $query->orWhereHas(
+                    'categories',
+                    fn(Builder $query) => $query->whereLike($categoryColumns, $searchTerm));
+            }
+        }
+
+        return $query;
+    }
+
     public function scopeWithRelations(Builder $query): Builder
     {
         return $query->with(['site','page']);
@@ -475,12 +505,22 @@ class Article extends EloquentModelBase implements PublicIdModel, OwneredModel, 
     public function scopeWhereUrl(Builder $query, string $url): Builder
     {
 
-        return $query->where(static function (Builder $q) use ($url) {
-            $q->where('slug', $url);
-            $q->orWhere([
-                            'public_id' => $url,
-                            'id'        => $url,
-                        ]);
+        return $query->where(function (Builder $q) use ($url) {
+            return $q->where('slug', $url)
+                     ->orWhere('public_id', $url)
+                     ->orWhere('id', $url);
+        });
+    }
+
+    public function scopeWhereUrlIn(Builder $query, string|array $urls): Builder
+    {
+
+        $urls = is_array($urls) ? $urls : [$urls];
+
+        return $query->where(function (Builder $q) use ($urls) {
+            return $q->whereIn('slug', $urls)
+                     ->orWhereIn('public_id', $urls)
+                     ->orWhereIn('id', $urls);
         });
     }
 

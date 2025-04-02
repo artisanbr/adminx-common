@@ -317,7 +317,10 @@ class FrontendTwigEngine extends FrontendEngineBase
         try {
             return $this->twig->render($this->getTemplateName($template), $this->getRenderViewData());
         } catch (Exception $e) {
-            dump($template, $this->viewData, $this->templates->toArray());
+            if(env('APP_ENV') == 'local') {
+                Debugbar::enable();
+                dump($template, $this->viewData, $this->templates->toArray());
+            }
             throw $e;
         }
     }

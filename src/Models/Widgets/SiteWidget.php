@@ -9,6 +9,7 @@ namespace Adminx\Common\Models\Widgets;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
+use Adminx\Common\Models\Generics\DataSource;
 use Adminx\Common\Models\Interfaces\OwneredModel;
 use Adminx\Common\Models\Interfaces\PublicIdModel;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
@@ -49,7 +50,7 @@ class SiteWidget extends EloquentModelBase implements PublicIdModel, OwneredMode
     protected $casts = [
         'config'    => WidgetConfigObject::class,
         'vars'      => 'collection',
-        //'source'    => DataSource::class,
+        'source'    => DataSource::class,
         'public_id' => 'string',
         'title'     => 'string',
         //'sources'    => 'collection',
