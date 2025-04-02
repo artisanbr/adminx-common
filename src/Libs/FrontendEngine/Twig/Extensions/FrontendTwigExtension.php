@@ -288,6 +288,7 @@ class FrontendTwigExtension extends AbstractExtension
         if(!$list){
             return $context['list'] ?? new CustomList();
         }
+
         $customList = $this->customLists->firstWhere('public_id', $list) ?? $this->customLists->firstWhere('slug', $list);
 
         //Não encontrou, buscar no banco
@@ -399,11 +400,24 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function getListItem($context, $list, $item): CustomListItem
+    public function getListItem($context, $list = null, $item = null): CustomListItem
     {
-        return $this->customList($context, $list)?->items()->withRelations()->where(function ($query) use ($item) {
-            $query->where('public_id', $item)->orWhere('slug', $item);
-        })->first() ?? new CustomListItem();
+
+        $list = $this->customList($context, $list);
+
+        if(!$list?->id){
+            return new CustomListItem();
+        }
+
+        if(!$item){
+            return $context['currentItem'] ?? new CustomListItem();
+        }
+
+        $query = $list->items()->withRelations()->where(function ($query) use ($item) {
+            $query->whereUrl($item);
+        });
+
+        return $query->first() ?? new CustomListItem();
 
     }
 
