@@ -281,10 +281,13 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function customList($context, $list): CustomList
+    public function customList($context, $list = null): CustomList
     {
 
         //Verificar no cache
+        if(!$list){
+            return $context['list'] ?? new CustomList();
+        }
         $customList = $this->customLists->firstWhere('public_id', $list) ?? $this->customLists->firstWhere('slug', $list);
 
         //Não encontrou, buscar no banco
@@ -326,12 +329,18 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function customListItems($context, $list, $perPage = 0, $pageNumber = 1, null|string|array $category = null, ?string $search = null)
+    public function customListItems($context, $list = null, $perPage = 0, $pageNumber = 1, null|string|array $category = null, ?string $search = null)
     {
 
         //dd($context, $list, $perPage, $pageNumber, $category, $search);
 
-        $query = $this->customList($context, $list)->items()->withRelations();
+        $list = $this->customList($context, $list);
+
+        if(!$list?->id){
+            return collect();
+        }
+
+        $query = $list->items()->withRelations();
 
         if (!blank($category)) {
             $categories = is_array($category) ? $category : str($category)->explode('|')->toArray();
@@ -356,10 +365,16 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function customListCategories($context, $list, $perPage = 0, $pageNumber = 1, null|string|array $parent = null, ?string $search = null)
+    public function customListCategories($context, $list = null, $perPage = 0, $pageNumber = 1, null|string|array $parent = null, ?string $search = null)
     {
 
-        $query = $this->customList($context, $list)->categories()->with('children');
+        $list = $this->customList($context, $list);
+
+        if(!$list?->id){
+            return collect();
+        }
+
+        $query = $list->categories()->with('children');
 
         if (!blank($parent)) {
             $parents = is_array($parent) ? $parent : str($parent)->explode('|')->toArray();
