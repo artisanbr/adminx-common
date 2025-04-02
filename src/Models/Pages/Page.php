@@ -664,6 +664,11 @@ class Page extends EloquentModelBase implements BuildableModel,
     //endregion
 
     //region SCOPES
+    public function scopeParents(Builder $query): Builder
+    {
+        return $query->whereNull('parent_id')->without('parent');
+    }
+
     public function scopeWithRelations(Builder $query): Builder
     {
         return $query->with(['site','parent','pageable']);
@@ -695,9 +700,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     public function scopeHomePage(Builder $query): Builder
     {
-        return $query->whereNull('parent_id')->isHome()->orWhere(function (Builder $q) {
-            $q->emptySlug();
-        });
+        return $query->where(fn(Builder $q) => $q->parents()->isHome())->orWhere(fn(Builder $q) => $q->parents()->emptySlug());
     }
 
     public function scopeIsHome(Builder $query, $is_home = true): Builder

@@ -6,6 +6,7 @@
 
 namespace Adminx\Common\Libs\FrontendEngine\Twig\Extensions;
 
+use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItem;
@@ -107,6 +108,13 @@ class FrontendTwigExtension extends AbstractExtension
 
 
             new TwigFunction('page', $this->page(...), ['needs_context' => true]),
+            new TwigFunction('parent', $this->parent(...), ['needs_context' => true]),
+            new TwigFunction('parentPage', $this->parent(...), ['needs_context' => true]),
+            new TwigFunction('parents', $this->parents(...), ['needs_context' => true]),
+            new TwigFunction('getParents', $this->parents(...), ['needs_context' => true]),
+            new TwigFunction('children', $this->children(...), ['needs_context' => true]),
+            new TwigFunction('subPages', $this->children(...), ['needs_context' => true]),
+
             new TwigFunction('articles', $this->articles(...), ['needs_context' => true]),
             new TwigFunction('article', $this->getArticle(...), ['needs_context' => true]),
         ];
@@ -325,13 +333,13 @@ class FrontendTwigExtension extends AbstractExtension
 
         $query = $this->customList($context, $list)->items()->withRelations();
 
-        if(!blank($category)){
+        if (!blank($category)) {
             $categories = is_array($category) ? $category : str($category)->explode('|')->toArray();
             $categories = collect($categories)->filter()->values()->toArray();
             $query = $query->hasAnyCategory($categories);
         }
 
-        if(!blank($search)){
+        if (!blank($search)) {
             $query = $query->search($search);
         }
 
@@ -342,7 +350,7 @@ class FrontendTwigExtension extends AbstractExtension
             page:    $pageNumber
         )->collect() : $query->get();
 
-        $result = $result->append(['url','uri']);
+        $result = $result->append(['url', 'uri']);
 
         return $result ?? collect();
 
@@ -353,13 +361,13 @@ class FrontendTwigExtension extends AbstractExtension
 
         $query = $this->customList($context, $list)->categories()->with('children');
 
-        if(!blank($parent)){
+        if (!blank($parent)) {
             $parents = is_array($parent) ? $parent : str($parent)->explode('|')->toArray();
             $parents = collect($parents)->filter()->values()->toArray();
             $query = $query->whereHas('parent', fn($parentQuery) => $parentQuery->whereUrlIn($parents));
         }
 
-        if(!blank($search)){
+        if (!blank($search)) {
             $query = $query->search($search);
         }
 
@@ -370,7 +378,7 @@ class FrontendTwigExtension extends AbstractExtension
             page:    $pageNumber
         )->collect() : $query->get();
 
-        $result = $result->append(['url','uri']);
+        $result = $result->append(['url', 'uri']);
 
         return $result ?? collect();
 
@@ -384,7 +392,10 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function articles($context, ?string $page = null, $perPage = 50, $pageNumber = 1, null|string|array $category = null, ?string $search = null)
+    /**
+     * Recupera os artigos de uma pagina
+     */
+    public function articles($context, null|string|Page $page = null, $perPage = 50, $pageNumber = 1, null|string|array $category = null, ?string $search = null)
     {
 
         if (!$page) {
@@ -394,33 +405,34 @@ class FrontendTwigExtension extends AbstractExtension
             $page = $this->page($context, $page);
         }
 
-        if(!($page instanceof Page)){
+        if (!($page instanceof Page)) {
             return collect();
         }
 
         $query = $page->articles()->with(['page', 'page.site'])->ordered();
 
-        if(!blank($category)){
+        if (!blank($category)) {
             $categories = is_array($category) ? $category : str($category)->explode('|')->toArray();
             $categories = collect($categories)->filter()->values()->toArray();
             $query = $query->hasAnyCategory($categories);
         }
 
-        if(!blank($search)){
+        if (!blank($search)) {
             $query = $query->search($search);
         }
 
 
-        return  $query->paginate(
+        return $query->paginate(
             perPage: $perPage,
             columns: ['*'],
             page:    $pageNumber
         )->collect();
 
     }
+
     //todo: Articles categories
 
-    public function getArticle($context, $article, ?string $page = null)
+    public function getArticle($context, $article, null|string|Page $page = null)
     {
 
         if (!$page) {
@@ -437,15 +449,20 @@ class FrontendTwigExtension extends AbstractExtension
 
     }
 
-    public function page($context, ?string $page = null)
+    /**
+     * Recupera uma página pelo slug ou public_id
+     */
+    public function page($context, null|string|Page $page = null, ?string $parent = null)
     {
 
         if (!$page) {
             //Pega home page
-            $page = $this->currentSite->pages()
-                                      ->with(['site','parent'])->where('is_home', true)->first();
+            $page = $context['page'] ?? FrontendPage::current() ?? $this->currentSite->pages()
+                                                                                     ->with([
+                                                                                                'site',
+                                                                                            ])->homePage()->first();
         }
-        else if (!($page instanceof Page)) {
+        else if (is_string($page)) {
 
             $searchTerm = $page;
 
@@ -454,21 +471,52 @@ class FrontendTwigExtension extends AbstractExtension
 
             if (!$page) {
                 $page = $this->currentSite->pages()
-                                          ->with(['site'])
-                                          ->where(fn($builder) => $builder->where('public_id', $searchTerm)->orWhere('slug', $searchTerm))
-                                          ->first();
+                                          ->with(['site','parent'])
+                                          ->whereUrl($searchTerm);
+
+                if($parent) {
+                    $page = $page->whereHas('parent', fn($parentQuery) => $parentQuery->whereUrl($parent));
+                }
+
+                $page = $page->first();
+
+                if(!$parent){
+                    $this->pages->add($page);
+                }
             }
         }
 
-        if (!$page) {
-            return null;
-        }
+        return $page ?? null;
 
+    }
 
-        $this->pages->add($page);
+    /**
+     * Recupera a página pai de uma página pelo slug ou public_id
+     */
+    public function parent($context, null|string|Page $page = null)
+    {
 
+        $page = $this->page($context, $page);
+        return $page?->parent ?? null;
 
-        return $page;
+    }
+
+    /**
+     * Recupera as páginas pai do site
+     */
+    public function parents($context, $perPage = 50, $pageNumber = 1)
+    {
+        return $this->currentSite->pages()->parents()->paginate($perPage, ['*'], $pageNumber)->collect() ?? collect();
+
+    }
+
+    /**
+     * Recupera as sub-páginas de uma página pelo slug ou public_id
+     */
+    public function children($context, null|string|Page $page = null, $perPage = 50, $pageNumber = 1)
+    {
+        $page = $this->page($context, $page);
+        return $page?->children()->paginate($perPage, ['*'], $pageNumber)->collect() ?? collect();
 
     }
 }
