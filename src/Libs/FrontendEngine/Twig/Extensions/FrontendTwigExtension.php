@@ -395,7 +395,7 @@ class FrontendTwigExtension extends AbstractExtension
     /**
      * Recupera os artigos de uma pagina
      */
-    public function articles($context, null|string|Page $page = null, $perPage = 50, $pageNumber = 1, null|string|array $category = null, ?string $search = null)
+    public function articles($context, null|string|Page $page = null, $perPage = 0, $pageNumber = 1, null|string|array $category = null, ?string $search = null)
     {
 
         if (!$page) {
@@ -422,11 +422,11 @@ class FrontendTwigExtension extends AbstractExtension
         }
 
 
-        return $query->paginate(
+        return $perPage > 0 ? $query->paginate(
             perPage: $perPage,
             columns: ['*'],
             page:    $pageNumber
-        )->collect();
+        )->collect() : ($query->get() ?? collect());
 
     }
 
@@ -471,16 +471,16 @@ class FrontendTwigExtension extends AbstractExtension
 
             if (!$page) {
                 $page = $this->currentSite->pages()
-                                          ->with(['site','parent'])
+                                          ->with(['site', 'parent'])
                                           ->whereUrl($searchTerm);
 
-                if($parent) {
+                if ($parent) {
                     $page = $page->whereHas('parent', fn($parentQuery) => $parentQuery->whereUrl($parent));
                 }
 
                 $page = $page->first();
 
-                if(!$parent){
+                if (!$parent) {
                     $this->pages->add($page);
                 }
             }
@@ -497,6 +497,7 @@ class FrontendTwigExtension extends AbstractExtension
     {
 
         $page = $this->page($context, $page);
+
         return $page?->parent ?? null;
 
     }
@@ -504,19 +505,23 @@ class FrontendTwigExtension extends AbstractExtension
     /**
      * Recupera as páginas pai do site
      */
-    public function parents($context, $perPage = 50, $pageNumber = 1)
+    public function parents($context, $perPage = 0, $pageNumber = 1)
     {
-        return $this->currentSite->pages()->parents()->paginate($perPage, ['*'], $pageNumber)->collect() ?? collect();
+        $query = $this->currentSite->pages()->parents();
+
+        return $perPage > 0 ? $query->paginate($perPage, ['*'], $pageNumber)->collect() : ($query->get() ?? collect());
 
     }
 
     /**
      * Recupera as sub-páginas de uma página pelo slug ou public_id
      */
-    public function children($context, null|string|Page $page = null, $perPage = 50, $pageNumber = 1)
+    public function children($context, null|string|Page $page = null, $perPage = 0, $pageNumber = 1)
     {
         $page = $this->page($context, $page);
-        return $page?->children()->paginate($perPage, ['*'], $pageNumber)->collect() ?? collect();
+        $query = $page?->children();
+
+        return $perPage > 0 ? $query->paginate($perPage, ['*'], $pageNumber)->collect() : ($query->get() ?? collect());
 
     }
 }
