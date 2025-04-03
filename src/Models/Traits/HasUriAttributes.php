@@ -51,22 +51,22 @@ trait HasUriAttributes
     protected function getDynamicUriAttribute()
     {
 
-        if (blank($this->attributes['dynamic_uri'] ?? null)) {
+        if (blank($this->temporaryAttributes['dynamic_uri'] ?? null)) {
             if (empty($this->url)) {
-                $this->attributes['dynamic_uri'] = null;
+                $this->temporaryAttributes['dynamic_uri'] = null;
             }
             else if (Str::startsWith($this->url, '#')) {
-                $this->attributes['dynamic_uri'] = $this->url;
+                $this->temporaryAttributes['dynamic_uri'] = $this->url;
             }
             else if (get_class($this) === Site::class) {
-                $this->attributes['dynamic_uri'] = '//' . $this->url;
+                $this->temporaryAttributes['dynamic_uri'] = '//' . $this->url;
             }
             else {
-                $this->attributes['dynamic_uri'] = (($this->attributes['site_id'] ?? false) && $this->site ? $this->site->dynamic_uri : '') . $this->url;
+                $this->temporaryAttributes['dynamic_uri'] = (($this->attributes['site_id'] ?? false) && $this->site ? $this->site->dynamic_uri : '') . $this->url;
             }
         }
 
-        return $this->attributes['dynamic_uri'];
+        return $this->temporaryAttributes['dynamic_uri'];
     }
 
     protected function generateUrl()
@@ -80,11 +80,11 @@ trait HasUriAttributes
 
     protected function getHttpProtocolAttribute()
     {
-        if (blank($this->attributes['http_protocol'] ?? null)) {
-            $this->attributes['http_protocol'] = ($this->site->config->is_https ?? $this->config->is_https ?? false) ? 'https' : 'http';
+        if (blank($this->temporaryAttributes['http_protocol'] ?? null)) {
+            $this->temporaryAttributes['http_protocol'] = ($this->site->config->is_https ?? $this->config->is_https ?? false) ? 'https' : 'http';
         }
 
-        return $this->attributes['http_protocol'];
+        return $this->temporaryAttributes['http_protocol'];
     }
     //endregion
 
