@@ -7,11 +7,11 @@
 namespace Adminx\Common\Models\Pages;
 
 use Adminx\Common\Enums\ContentEditorType;
+use Adminx\Common\Enums\Pages\PageType;
 use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\Frontend\FrontendTwig;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementCSS;
 use Adminx\Common\Models\Generics\Assets\GenericAssetElementJS;
@@ -30,7 +30,6 @@ use Adminx\Common\Models\Pages\Objects\PageConfig;
 use Adminx\Common\Models\Pages\Objects\PageContent;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Sites\SiteRoute;
-use Adminx\Common\Models\Templates\Global\Abstract\AbstractTemplate;
 use Adminx\Common\Models\Templates\Global\Manager\Facade\GlobalTemplateManager;
 use Adminx\Common\Models\Traits\HasBreadcrumbs;
 use Adminx\Common\Models\Traits\HasGenericConfig;
@@ -48,6 +47,7 @@ use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasVisitCounter;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
+use Adminx\Common\Models\Traits\Relations\Categorizable;
 use Adminx\Common\Models\Traits\Relations\HasArticles;
 use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\Relations\HasTagsMorph;
@@ -64,7 +64,6 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
 
 /**
- * @var AbstractTemplate        $template_global
  * @var BreadcrumbConfig        $breadcrumb_config
  */
 class Page extends EloquentModelBase implements BuildableModel,
@@ -77,6 +76,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 {
     use BelongsToSite,
         BelongsToUser,
+        Categorizable,
         HasArticles,
         HasBreadcrumbs,
         //HasFiles,
@@ -104,16 +104,14 @@ class Page extends EloquentModelBase implements BuildableModel,
         'user_id',
         'account_id',
         'parent_id',
-        //'type_id',
+
         'type',
         'model_id',
         'template_name',
-        //'form_id',
         'title',
         'slug',
 
         'content',
-        'content_old',
         'assets',
 
         'pageable_type',
@@ -121,8 +119,6 @@ class Page extends EloquentModelBase implements BuildableModel,
 
 
         'html',
-        /*'html_raw',
-        'internal_html',*/
         'css',
         'js',
 
@@ -132,7 +128,6 @@ class Page extends EloquentModelBase implements BuildableModel,
         'seo',
         'published_at',
         'unpublished_at',
-        //'elements',
     ];
 
     protected $casts = [
@@ -146,13 +141,12 @@ class Page extends EloquentModelBase implements BuildableModel,
         'assets'      => FrontendAssetsBundle::class,
 
 
-        'type'         => \Adminx\Common\Enums\Pages\PageType::class,
+        'type'         => PageType::class,
         'config'         => PageConfig::class,
         'seo'            => Seo::class,
         'css'            => GenericAssetElementCSS::class,
         'js'             => GenericAssetElementJS::class,
         'frontend_build' => FrontendBuildObject::class,
-        //'elements' => PageElements::class,
         'html'           => 'string',
         'html_raw'       => 'string',
 
@@ -575,19 +569,11 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     }
 
-    protected function getUrlAttribute()
+    protected function getUrlAttribute(): string
     {
         return $this->generateUrl();
 
-        /*if (blank($this->temporaryAttributes['url'] ?? null)) {
-
-        }
-
-        return $this->temporaryAttributes['url'] ?? '';*/
-
-
     }
-
 
     public function generateUri()
     {
@@ -615,7 +601,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     }
 
-    public function generateUrl()
+    public function generateUrl(): string
     {
 
         if (blank($this->parent_id) && $this->is_home) {
@@ -771,10 +757,10 @@ class Page extends EloquentModelBase implements BuildableModel,
     }
 
 
-    public function categories()
+    /*public function categories()
     {
         return $this->hasMany(Category::class);
-    }
+    }*/
 
     public function pageable(): MorphTo
     {

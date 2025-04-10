@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright (c) 2025. Tanda Interativa - Todos os Direitos Reservados
+ * Desenvolvido por Renalcio Carlos Jr.
+ */
 
 namespace Adminx\Common\Repositories;
 
@@ -126,5 +130,15 @@ class CategoryRepository
             'categorizable_type' => $model_type,
             'categorizable_id' => $model_id
         ]));
+    }
+
+    public function destroy($id): bool
+    {
+        return !blank($id) ? DB::transaction(function() use($id){
+            $category = Category::find($id);
+            //Delete categorizables
+            //$category->categorizables()->delete();
+            return $category?->delete() ?? false;
+        }) : false;
     }
 }

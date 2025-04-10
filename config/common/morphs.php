@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -13,7 +13,6 @@ use Adminx\Common\Models\FormAnswer;
 use Adminx\Common\Models\Menus\Menu;
 use Adminx\Common\Models\Menus\MenuItem;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Report;
 use Adminx\Common\Models\Sites\Site;
 use Adminx\Common\Models\Themes\Theme;
@@ -27,7 +26,6 @@ return [
         'site'          => Site::class,
         'article'       => Article::class,
         'page'          => Page::class,
-        'page_internal' => PageInternal::class,
         'category'      => Category::class,
         'menu'          => Menu::class,
         'menu_item'     => MenuItem::class, //todo: change to .

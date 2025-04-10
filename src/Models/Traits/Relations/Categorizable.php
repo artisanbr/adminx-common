@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @var Model $this ;
+ * @var Model $this
  */
 trait Categorizable
 {

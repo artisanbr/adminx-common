@@ -87,9 +87,7 @@ class MenuItem extends EloquentModelBase
                 ],
                 'menuable_type_article_id'  => [Rule::requiredIf($menuable_type === 'article')],
                 'menuable_type_category_id' => [Rule::requiredIf($menuable_type === 'category')],
-                //'menuable_type_page_internal_id' => [Rule::requiredIf(($request?->menuable_type ?? '') === 'page_internal')],
-                //'url'                            => [Rule::requiredIf($menuable_type === 'link')],
-            ];
+                ];
         }
 
 
@@ -108,9 +106,7 @@ class MenuItem extends EloquentModelBase
             'menuable_type_page_id.required'     => 'Selecione uma página.',
             'menuable_type_article_id.required'  => 'Selecione um Post.',
             'menuable_type_category_id.required' => 'Selecione uma Categoria.',
-            //'menuable_type_page_internal_id.required' => 'Selecione uma Página Interna.',
-            //'url.required'                            => 'Insira um Link para seu Item.',
-        ];
+            ];
     }
     //endregion
 
@@ -251,82 +247,6 @@ class MenuItem extends EloquentModelBase
 
         return $menuBuilder;
     }
-
-    /*public function mount(SpatieMenu $menuBuilder, ?Menu $menu = null): SpatieMenu
-    {
-        if (!$menu) {
-            $menu = $this->menu;
-        }
-
-        if ($this->type === MenuItemType::Submenu) {
-
-            $useUrl = ($this->config->use_submenu_url && $this->url);
-
-            $itemLink = Link::to($useUrl ? $this->url : '#', $this->title)
-                            ->setAttributes([
-                                                'data-toggle' => 'dropdown',
-                                                ...(!$useUrl ? [
-                                                    'role' => 'button',
-                                                ] : []),
-                                            ])
-                            ->addParentClass($menu->config->render->item->class ?? '')
-                            ->addClass($menu->config->render->item_link->class ?? '');
-
-            if (!$this->parent_id) {
-                $itemLink->addClass($menu->config->render->parent_item_link->class ?? '');
-                $itemLink->addParentClass($menu->config->render->parent_item->class ?? '');
-            }
-
-            $menuBuilder->submenu(
-                $itemLink,
-                function (SpatieMenu $subMenu) use ($menu) {
-
-                    $subMenu->addClass($menu->config->render->submenu->class ?? '');
-
-                    if ($this->menuable_type === 'page_internal' && $this->menuable && $this->menuable->model && method_exists($this->menuable->model, 'items')) {
-
-
-                        $customList = $this->menuable->model;
-
-
-                        foreach ($customList->items as $modelItem) {
-                            $listItemLink = Link::to($modelItem->url, $modelItem->title)
-                                                ->addParentClass($menu->config->render->item->class ?? '')
-                                                ->addParentClass($menu->config->render->submenu_item->class ?? '')
-                                                ->addClass($menu->config->render->item_link->class ?? '')
-                                                ->addClass($menu->config->render->submenu_item_link->class ?? '');
-
-                            $subMenu->add($listItemLink);
-                        }
-
-                    }
-                    else if ($this->children->count()) {
-                        //Subitens cadastrados
-                        foreach ($this->children as $childMenuItem) {
-                            $subMenu = $childMenuItem->mount($subMenu, $menu);
-                        }
-                    }
-                }
-            );
-
-
-
-        }
-        else {
-            $itemLink = Link::to($this->url, $this->title)
-                            ->addParentClass($menu->config->render->item->class ?? '')
-                            ->addClass($menu->config->render->item_link->class ?? '');
-
-            if (!$this->parent_id) {
-                $itemLink->addClass($menu->config->render->parent_item_link->class ?? '');
-                $itemLink->addParentClass($menu->config->render->parent_item->class ?? '');
-            }
-
-            $menuBuilder->add($itemLink);
-        }
-
-        return $menuBuilder;
-    }*/
 
     public function loadUrlFromMenuable(): static
     {

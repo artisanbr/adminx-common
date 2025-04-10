@@ -660,9 +660,9 @@ blade, [
         }
 
         //Meta::registerSeoForArticle($article);
-        $this->addViewData($article->getBuildViewData([
+        $this->addViewData($this->currentSite->getBuildViewData($article->getBuildViewData([
                                                           'customPageTemplate' => $page->page_template ? '@template/article.twig' : false,
-                                                      ]));
+                                                      ])));
 
         //dd($this->themeBuild);
 
@@ -828,113 +828,5 @@ blade, [
             $site->config->performance->enable_html_minify
         );
 
-    }
-
-
-    /**
-     * @throws FrontendException
-     * @throws SyntaxError
-     * @throws RuntimeError
-     * @throws LoaderError
-     */
-    public function pageInternal(Page $page, PageInternal $pageInternal, $modelItem): string
-    {
-        /**
-         * @var EloquentModelBase|CustomListItem $modelItem
-         */
-
-        $this->templateNamePrefix = "@page={$page->public_id}@internal={$pageInternal->public_id}@model=" . (@$modelItem->public_id ?? @$modelItem->slug ?? Str::slug($modelItem?->title ?? ''));
-
-        $pageInternal->breadcrumb_config->background_url = $modelItem->image_url;
-
-        $this->setViewData($page->getBuildViewData([
-                                                       'pageInternal' => $pageInternal,
-                                                       'currentItem'  => $modelItem,
-                                                       'breadcrumb'   => $pageInternal->breadcrumb([
-                                                                                                       ...$pageInternal->page->breadcrumb->items->toArray(),
-                                                                                                       '#' => $modelItem->title,
-                                                                                                   ]),
-                                                   ]));
-
-
-        //$this->registerFrontendBuild($page->prepareFrontendBuild());
-
-
-        if ($pageInternal->frontend_build ?? false) {
-            $this->registerFrontendBuild($pageInternal->frontend_build);
-        }
-        /*if ($modelItem->schema->frontend_build ?? false) {
-            $this->registerFrontendBuild($modelItem->schema->frontend_build);
-        }*/
-
-        //$this->frontendBuild->meta->registerSeoForPage($page);
-
-        $this->registerFrontendSeo([
-                                       'title'        => $modelItem->title,
-                                       'title_prefix' => '{{ site.seoTitle() }} - {{ page.seoTitle() }}',
-                                       'published_at' => $modelItem->created_at,
-                                       'updated_at'   => $modelItem->updated_at,
-                                   ]);
-
-        if ($modelItem->seo ?? null) {
-            $this->registerFrontendSeo(array_filter($modelItem->seo->toArray()));
-        }
-
-
-        $this->currentSite = $pageInternal->page->site;
-
-
-        $useCache = $this->currentSite->config->performance->enable_advanced_cache ?? false;
-
-        //Debugbar::debug($this->templateNamePrefix, $useCache);
-
-        if ($useCache) {
-            $cache = $this->getFromCache($this->templateNamePrefix);
-
-            if (!empty($cache)) {
-                return $cache;
-            }
-        }
-        else {
-            $this->purgeCache($this->templateNamePrefix);
-        }
-
-        if ($this->currentSite->theme ?? false) {
-            $this->applyTheme($this->currentSite->theme);
-        }
-
-        //$pageTemplate = $pageInternal->page_template;
-
-        $pageContent = $pageInternal->content;
-
-        /* if ($pageTemplate) {
-             //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
-             $this->twigFileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
-             $pageContent .= "{{ include('@template/index.twig') }}";
-         }*/
-
-
-        //$pageContent = $page->page_template ? "{{ include('@template/index.twig') }}" : '';
-
-
-        $this->templates->put('page', $this->getPageBaseTemplate($pageContent));
-
-
-        $renderedTemplate = $this->renderTwig('page');
-
-
-        //$renderedBlade = Blade::render($rawBlade, $this->viewData);
-
-        if ($this->currentSite->config->performance->enable_html_minify) {
-            $htmlMin = new HtmlMin();
-
-            $renderedTemplate = $htmlMin->minify($renderedTemplate);
-        }
-
-        if ($useCache) {
-            $this->saveCache($this->templateNamePrefix, $renderedTemplate);
-        }
-
-        return $renderedTemplate;
     }
 }

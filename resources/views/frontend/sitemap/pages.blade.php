@@ -45,12 +45,13 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
             <url>
                 <loc>{{ $childrenPage->uri }}</loc>
                 <lastmod>{{ $childrenPage->updated_at->toIso8601String() }}</lastmod>
+
                 @if($childrenPage->articles()->count())
                     <changefreq>always</changefreq>
-                    <priority>{){ $childrenPage->is_home ? '1.0' : '0.8' }}</priority>
+                    <priority>0.8</priority>
                 @else
                     <changefreq>daily</changefreq>
-                    <priority>{){ $childrenPage->is_home ? '1.0' : '0.5' }}</priority>
+                    <priority>0.5</priority>
                 @endif
 
                 @if(!empty($childrenPage->seoImage()))
@@ -82,27 +83,4 @@ print '<?xml version="1.0" encoding="UTF-8" ?>'; ?>
 
         @endforeach
     @endforeach
-
-
-
-    {{--@foreach(\Adminx\Common\Models\Artigo::orderBy("updated_at", "asc")->take(20)->get() as $artigo)
-        <url>
-            <loc>{{ $artigo->full_url }}</loc>
-            <news:news>
-                <news:publication>
-                    <news:name>Artigos Use Digital</news:name>
-                    <news:language>pt</news:language>
-                </news:publication>
-                <news:publication_date>{{ $artigo->updated_at->format(DateTime::W3C) }}</news:publication_date>
-                <news:title>{{ $artigo->titulo }}</news:title>
-                <news:keywords>{{ implode(",", $artigo->meta->tags ?? []) }}</news:keywords>
-            </news:news>
-            @if(@$artigo->meta->image)
-                <image:image>
-                    <image:loc>{{ url("uploads/{$artigo->meta->image}") }}</image:loc>
-                    <image:title>{{ $artigo->meta->titulo ?? $artigo->titulo }}</image:title>
-                </image:image>
-            @endif
-        </url>
-    @endforeach--}}
 </urlset>

@@ -447,7 +447,7 @@ class WordpressImportTools
                     $localArticle->categories()->sync($localCategoriesIds->toArray());*/
 
                     //Rotas alternativas
-                    if ($customList->page_internal && $importPost->url !== $customListItem->uri) {
+                    if ($customList->page && $importPost->url !== $customListItem->uri) {
 
                         //Adicionar redirecionamento do URL do Wordpress
                         $wpItemURl = $this->convertUrls($importPost->url, false);

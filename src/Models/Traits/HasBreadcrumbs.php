@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -10,11 +10,10 @@ use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\Generics\Configs\BreadcrumbConfig;
 use Adminx\Common\Models\Pages\Objects\PageBreadcrumb;
 use Adminx\Common\Models\Pages\Objects\PageConfig;
-use Adminx\Common\Models\Pages\Objects\PageInternalConfig;
 
 /**
  * @var EloquentModelBase                  $this
- * @property PageConfig|PageInternalConfig $config
+ * @property PageConfig $config
  */
 trait HasBreadcrumbs
 {

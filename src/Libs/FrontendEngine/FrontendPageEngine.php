@@ -11,16 +11,11 @@ use Adminx\Common\Exceptions\FrontendException;
 use Adminx\Common\Facades\Frontend\FrontendSite;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Bases\EloquentModelBase;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListItemAbstract\CustomListItemAbstract;
+use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItem;
-use Adminx\Common\Models\Interfaces\FrontendModel;
 use Adminx\Common\Models\Pages\Page;
-use Adminx\Common\Models\Pages\PageInternal;
 use Adminx\Common\Models\Pages\Types\Manager\Facade\PageTypeManager;
 use Adminx\Common\Models\Sites\SiteRoute;
-use App\Http\Controllers\Frontend\Page\ArticlesController;
-use App\Http\Controllers\Frontend\Page\PagesController;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -28,8 +23,8 @@ class FrontendPageEngine extends FrontendEngineBase
 {
     public function __construct(
         protected ?Page                                                                                      $currentPage = null,
-        protected EloquentModelBase|Page|Article|CustomListItemAbstract|CustomListAbstract|PageInternal|null $firstModel = null,
-        protected EloquentModelBase|Page|Article|CustomListItemAbstract|PageInternal|null                    $secondModel = null
+        protected EloquentModelBase|Page|Article|CustomListItem|CustomList|null $firstModel = null,
+        protected EloquentModelBase|Page|Article|CustomListItem|null                    $secondModel = null
     )
     {
         if (!$this->currentSite) {
@@ -168,62 +163,12 @@ class FrontendPageEngine extends FrontendEngineBase
         return FrontendSite::current()->routes()->where('url', $url)->first();
     }
 
-    /***
-     * Encontrar PageInternal da Página através da URL (slug ou public_id)
-     */
-    public function getPageInternalByUrl(string $url): ?PageInternal
-    {
-        return $this->currentPage?->page_internals()->whereUrl('slug', $url)->first() ?? $this->currentPage?->page_internals()->whereNot('slug')->first();
-    }
-
-    public function getFirstInternalUrl($url): Article|PageInternal|null
-    {
-
-        //Validar pelo tipo da página
-        if ($this->currentPage) {
-
-            return $this->getInternalModel($url, $this->currentPage);
-        }
-
-        return null;
-    }
-
-    public function getInternalModel($url, Article|PageInternal|FrontendModel|EloquentModelBase|Page $mainModel): Article|FrontendModel|CustomListItem|null
-    {
-
-        //Validar pelo tipo da página
-
-        if ((@$mainModel->using_articles ?? false) && method_exists($mainModel, 'articles') && ($article = $mainModel->articles()->whereUrl($url)->first()) && $article?->id) {
-            $this->firstModel = $article;
-
-            return $article;
-        }
-
-        //Custom List Item
-        if (get_class($mainModel) === PageInternal::class && method_exists($mainModel->model, 'items')) {
-
-            $customList = $mainModel->model;
-
-            return $customList->items()->where('slug', $url)->orWhere('public_id', $url)->first();
-        }
-
-        //$pageInternal = $mainModel->page_internals()->whereUrl($url)->first();
-        if (get_class($mainModel) === Page::class && ($pageInternal = $mainModel->page_internals()->whereUrl($url)->first() ?? $mainModel->page_internals()->whereNot('slug')->first()) && $pageInternal?->id) {
-            $this->firstModel = $pageInternal;
-
-            return $pageInternal;
-        }
-
-        return null;
-    }
-
 
     public function getModelController($model): string
     {
         return match (get_class($model)) {
-            Page::class => PagesController::class,
-            Article::class => ArticlesController::class,
-            //PageInternal::class => PageInternalController::class
+            Page::class => 'App\Http\Controllers\Frontend\Page\PagesController',
+            Article::class => 'App\Http\Controllers\Frontend\Page\ArticlesController'
         };
     }
 
