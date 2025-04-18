@@ -10,8 +10,9 @@ use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
-use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItem;
+use Adminx\Common\Models\CustomLists\CustomListItem;
 use Adminx\Common\Models\Interfaces\OwneredModel;
+use Adminx\Common\Models\Menus\MenuItem;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Scopes\WhereSiteScope;
 use Adminx\Common\Models\Traits\HasOwners;
@@ -19,7 +20,6 @@ use Adminx\Common\Models\Traits\HasSelect2;
 use Adminx\Common\Models\Traits\HasUriAttributes;
 use Adminx\Common\Models\Traits\HasValidation;
 use Adminx\Common\Models\Traits\Relations\BelongsToAccount;
-use Adminx\Common\Models\Traits\Relations\BelongsToPage;
 use Adminx\Common\Models\Traits\Relations\BelongsToSite;
 use Adminx\Common\Models\Traits\Relations\BelongsToUser;
 use Adminx\Common\Models\Traits\Relations\HasMorphAssigns;
@@ -27,6 +27,7 @@ use Adminx\Common\Models\Traits\Relations\HasParent;
 use Adminx\Common\Models\Traits\ScopeOrganize;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -34,19 +35,24 @@ use Illuminate\Validation\Rule;
 
 class Category extends EloquentModelBase implements OwneredModel
 {
-    use HasSelect2, HasUriAttributes, ScopeOrganize, HasUriAttributes, HasMorphAssigns, HasValidation, BelongsToSite, BelongsToAccount, HasParent, BelongsToUser, HasOwners, BelongsToPage, SoftDeletes;
+    use HasSelect2, HasUriAttributes, ScopeOrganize, HasUriAttributes, HasMorphAssigns, HasValidation, BelongsToSite, BelongsToAccount, HasParent, BelongsToUser, HasOwners, SoftDeletes;
 
     protected $fillable = [
         'site_id',
         'account_id',
         'user_id',
-        'page_id',
         'title',
         'slug',
         'description',
         'seo',
         'parent_id',
     ];
+
+    protected $appends = [
+        'text',
+    ];
+
+    protected $hidden = ['user_id','account_id','site_id'];
 
     //region VALIDATION
     public static function createRules(FormRequest $request = null): array
@@ -69,9 +75,6 @@ class Category extends EloquentModelBase implements OwneredModel
     //endregion
 
     //region APPENDS
-    protected $appends = [
-        'text',
-    ];
 
     public function text(): Attribute
     {
@@ -93,15 +96,16 @@ class Category extends EloquentModelBase implements OwneredModel
     //region GETS
     protected function getUrlAttribute()
     {
+
         $url = "/category/{$this->slug}";
 
-        if ($this->page_id && $this->page) {
+        /*if ($this->page) {
             return $this->page->urlTo($url);
-        }
+        }*/
 
         //Get by currentPage our relatedPage / todo: remove later
 
-        $currentPage = @FrontendPage::current() ?? null;
+        $currentPage = FrontendPage::current() ?? null;
 
 
         if (!$currentPage && @$this->pivot->pivotParent) {
@@ -113,6 +117,10 @@ class Category extends EloquentModelBase implements OwneredModel
             else if (method_exists($model, 'page') && get_class($model->page) === Page::class) {
                 $currentPage = $model->page;
             }
+        }
+
+        if(!$currentPage){
+            $currentPage = $this->pages()->first();
         }
 
         if ($currentPage) {
@@ -219,29 +227,29 @@ class Category extends EloquentModelBase implements OwneredModel
         return $this->hasMany(Categorizable::class, 'category_id', 'id');
     }
 
-    public function articles()
+    public function articles(): MorphToMany
     {
         return $this->morphedByMany(Article::class, 'categorizable');
     }
 
-    /*public function pages()
+    public function pages(): MorphToMany
     {
         return $this->morphedByMany(Page::class, 'categorizable');
-    }*/
+    }
 
-    public function lists()
+    public function lists(): MorphToMany
     {
         return $this->morphedByMany(CustomList::class, 'categorizable');
     }
 
-    public function list_items()
+    public function list_items(): MorphToMany
     {
         return $this->morphedByMany(CustomListItem::class, 'categorizable');
     }
 
-    public function menu_items()
+    public function menu_items(): MorphToMany
     {
-        return $this->morphMany(\Adminx\Common\Models\Menus\MenuItem::class, 'menuable');
+        return $this->morphedByMany(MenuItem::class, 'menuable');
     }
 
     //endregion

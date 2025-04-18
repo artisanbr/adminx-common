@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023-2024. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -8,8 +8,6 @@ namespace Adminx\Common\Enums\CustomLists;
 
 use Adminx\Common\Enums\Traits\EnumBase;
 use Adminx\Common\Enums\Traits\EnumWithTitles;
-use App\DataTables\APP\Elements\CustomLists\CustomListItems\CustomListItemDataTable;
-use App\DataTables\APP\Elements\CustomLists\CustomListItems\CustomListItemTestimonialDataTable;
 
 enum CustomListType: string
 {
@@ -49,19 +47,6 @@ enum CustomListType: string
         return match ($type) {
             self::HTML => 'adminx.Elements.CustomLists.cadastro.CustomListItem.list-draggable',
             default => 'adminx.Elements.CustomLists.cadastro.CustomListItem.list-datatables'
-        };
-    }
-
-    public function datatableClass(): string
-    {
-        return self::getDatatableClassTo($this);
-    }
-
-    public static function getDatatableClassTo($type): string
-    {
-        return match ($type) {
-            self::Testimonials => CustomListItemTestimonialDataTable::class,
-            default => CustomListItemDataTable::class
         };
     }
 

@@ -185,8 +185,9 @@ class CustomListItemRepository extends Repository
 
         //Categories
         if ($this->data['categories'] ?? false) {
-            $coreListItem = CustomListItem::find($this->model->id);
             $this->model->categories()->sync(collect($this->data['categories'])->values()->toArray());
+            //Sync com o da Lista
+            ///$this->model->list->categories()->syncWithoutDetaching(collect($this->data['categories'])->values()->toArray());
         }
 
 

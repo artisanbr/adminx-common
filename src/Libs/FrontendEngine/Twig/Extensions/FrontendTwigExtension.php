@@ -8,6 +8,7 @@ namespace Adminx\Common\Libs\FrontendEngine\Twig\Extensions;
 
 use Adminx\Common\Facades\Frontend\FrontendPage;
 use Adminx\Common\Facades\Frontend\FrontendSite;
+use Adminx\Common\Models\Category;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItem;
 use Adminx\Common\Models\Form;
@@ -375,7 +376,7 @@ class FrontendTwigExtension extends AbstractExtension
             return collect();
         }
 
-        $query = $list->categories()->with('children');
+        $query = $list->categories()->with(['children']);
 
         if (!blank($parent)) {
             $parents = is_array($parent) ? $parent : str($parent)->explode('|')->toArray();
@@ -394,7 +395,28 @@ class FrontendTwigExtension extends AbstractExtension
             page:    $pageNumber
         )->collect() : $query->get();
 
-        $result = $result->append(['url', 'uri']);
+        //['user_id','account_id','site_id']
+
+        //dd($result->append(['url', 'uri'])->withoutRelationships());
+
+            $result = $result->append(['url'])->map(function (Category $category): Category {
+
+
+                //return $category->withoutRelations();
+
+
+                $categoryData = $category->only(['id','site_id', 'title', 'slug', 'description', 'parent_id','url']);
+                $categoryModel = new Category($categoryData);
+
+                $categoryModel->setAttribute('id', $categoryData['id'] ?? null);
+                $categoryModel->setAttribute('url', $categoryData['url'] ?? null);
+                //$categoryModel->setAttribute('uri', $categoryData['uri'] ?? null);
+
+                return $categoryModel;
+            });
+
+
+            //dd($result);
 
         return $result ?? collect();
 

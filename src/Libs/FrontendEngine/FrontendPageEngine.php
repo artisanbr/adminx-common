@@ -28,14 +28,14 @@ class FrontendPageEngine extends FrontendEngineBase
     )
     {
         if (!$this->currentSite) {
-            $this->currentSite = FrontendSite::current();
+            $this->currentSite = FrontendSite::current() ?? null;
         }
     }
 
     public function getHomePage(): ?Page
     {
 
-        if (!$this->currentPage || !$this->currentPage->is_home) {
+        if ($this->currentSite && !$this->currentPage || !$this->currentPage->is_home) {
 
             $this->currentPage = Cache::remember($this->currentSite->relatedCacheName('home'), $this->cacheMinutes, function () {
                 return $this->currentSite->home_page;
@@ -48,7 +48,7 @@ class FrontendPageEngine extends FrontendEngineBase
 
     public function getCurrentPage(): ?Page
     {
-        return $this->currentPage;
+        return $this->currentPage ?? null;
     }
 
     public function setCurrentPage(Page $page): Page
@@ -68,7 +68,7 @@ class FrontendPageEngine extends FrontendEngineBase
     public function loadCurrentPageFromUrlByTypes($pageUrl = null, array|string|null $expectedTypes = null): ?Page
     {
 
-        if ($this->currentSite->config->performance->enable_advanced_cache) {
+        if ($this->currentSite?->config->performance->enable_advanced_cache ?? false) {
 
             $this->currentPage = Cache::remember($this->currentSite->relatedCacheName($pageUrl ?? 'home'), $this->cacheMinutes * 60, fn() => $this->getPageByUrl($pageUrl, $expectedTypes));
 
@@ -83,7 +83,7 @@ class FrontendPageEngine extends FrontendEngineBase
     public function loadCurrentPageFromUrl(?String $slug = null): ?Page
     {
 
-        if ($this->currentSite->config->performance->enable_advanced_cache) {
+        if ($this->currentSite?->config->performance->enable_advanced_cache ?? false) {
 
             $this->currentPage = Cache::remember($this->currentSite->relatedCacheName($slug ?? 'home'), $this->cacheMinutes * 60, fn() => $this->getPageByUrl($slug));
 
@@ -107,13 +107,13 @@ class FrontendPageEngine extends FrontendEngineBase
 
 
         //Se não for informada URL retornar a home
-        if (empty($pageUrl)) {
+        if ($this->currentSite && empty($pageUrl)) {
             return $this->currentSite->home_page;
         }
 
         //Se não for informada URL e a pagina atual não existir, ou não for a home, definir e retornar a home
 
-        return $this->currentSite->pages()->whereUrl($pageUrl)->first();
+        return $this->currentSite?->pages()->whereUrl($pageUrl)->first() ?? null;
     }
 
     public function getPageByUrlByTypes(?string $pageUrl = null, array|string|null $expectedTypes = null): ?Page

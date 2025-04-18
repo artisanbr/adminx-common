@@ -11,7 +11,6 @@ use Adminx\Common\Libs\Helpers\MorphHelper;
 use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Article;
 use Adminx\Common\Models\Category;
-use Adminx\Common\Models\CustomLists\Abstract\CustomListAbstract;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemHtml;
 use Adminx\Common\Models\CustomLists\CustomListItems\CustomListItemTestimonials;
 use Adminx\Common\Models\Objects\Seo\Seo;

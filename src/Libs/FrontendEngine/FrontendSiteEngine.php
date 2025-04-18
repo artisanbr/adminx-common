@@ -30,7 +30,12 @@ class FrontendSiteEngine extends FrontendEngineBase
         //Se o site ainda não foi carregado, ou estiver com outro endereço, carregar o atual via cache.
         if (!$this->currentSite || $this->currentSite->url !== $this->currentDomain) {
 
+
             $this->currentSite = $this->getCachedSiteByDomain();
+        }
+
+        if(!$this->currentSite && auth()->check() && auth()->user()->has('site')){
+            $this->currentSite = auth()->user()->site;
         }
 
 
@@ -58,7 +63,7 @@ class FrontendSiteEngine extends FrontendEngineBase
         $cachedTheme = Cache::get($chaceName);
 
         if (!$cachedTheme || get_class($cachedTheme) !== Theme::class || $cachedTheme->id !== $this->currentSite->theme_id) {
-            $cachedTheme = Cache::remember($chaceName, $this->cacheMinutes, fn() => $this->currentSite()->theme);
+            $cachedTheme = Cache::remember($chaceName, $this->cacheMinutes, fn() => $this->currentSite?->theme ?? null);
         }
 
         return $cachedTheme;

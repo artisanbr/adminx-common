@@ -85,6 +85,14 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         'text',
     ];
 
+    protected $hidden = [
+        'id',
+        'user_id',
+        'account_id',
+        'site_id',
+        'parent_id'
+    ];
+
     //protected $with = ['site'];
 
     //region VALIDATION

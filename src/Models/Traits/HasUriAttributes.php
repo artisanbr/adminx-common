@@ -52,6 +52,7 @@ trait HasUriAttributes
     {
 
         if (blank($this->temporaryAttributes['dynamic_uri'] ?? null)) {
+
             if (empty($this->url)) {
                 $this->temporaryAttributes['dynamic_uri'] = null;
             }
@@ -62,11 +63,11 @@ trait HasUriAttributes
                 $this->temporaryAttributes['dynamic_uri'] = '//' . $this->url;
             }
             else {
-                $this->temporaryAttributes['dynamic_uri'] = (($this->attributes['site_id'] ?? false) && $this->site ? $this->site->dynamic_uri : '') . $this->url;
+                $this->temporaryAttributes['dynamic_uri'] = (($this->site_id ?? false) && $this->site ? $this->site->dynamic_uri : '') . $this->url;
             }
         }
 
-        return $this->temporaryAttributes['dynamic_uri'];
+        return $this->temporaryAttributes['dynamic_uri'] ?? null;
     }
 
     protected function generateUrl()
