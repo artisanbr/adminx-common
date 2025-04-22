@@ -247,9 +247,9 @@ class Category extends EloquentModelBase implements OwneredModel
         return $this->morphedByMany(CustomListItem::class, 'categorizable');
     }
 
-    public function menu_items(): MorphToMany
+    public function menu_items()
     {
-        return $this->morphedByMany(MenuItem::class, 'menuable');
+        return $this->morphMany(MenuItem::class, 'menuable');
     }
 
     //endregion
