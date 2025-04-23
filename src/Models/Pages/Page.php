@@ -272,7 +272,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         $requestData = request()->all() ?? [];
 
         //region Prepare categories
-        $categorySlug = Route::current()->parameter('categorySlug') ?? $requestData['categorySlug'] ?? $merge_data['categorySlug'] ?? $requestData['category'] ?? $requestData['categories'] ?? false;
+        $categorySlug = Route::current()->parameter('categorySlug') ?? $requestData['categorySlug'] ?? $merge_data['categorySlug'] ?? $requestData['category'] ?? $requestData['categories'] ?? $merge_data['categorySlug'] ?? false;
 
         $categories = !is_array($categorySlug) ? str($categorySlug)->explode(',') : collect($categorySlug);
 
@@ -371,7 +371,7 @@ class Page extends EloquentModelBase implements BuildableModel,
             if ($categories->count()) {
                 $listItemsQuery = $listItemsQuery->hasAnyCategory($categories->toArray());
                 $viewData['items_categories'] = $viewData['categories'] ?? null;
-                $viewData['categorySlug'] = $categorySlug;
+                $viewData['category_slugs'] = $categorySlug;
             }
 
             if ($hasSearch) {

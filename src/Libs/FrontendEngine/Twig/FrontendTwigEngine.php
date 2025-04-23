@@ -749,13 +749,7 @@ blade, [
         $breadcrumb += ['#' => $currentItem->title];
 
 
-        $this->addViewData($page->getBuildViewData([
-                                                       ...$viewData,
-                                                       'pageable'    => $pageable,
-                                                       'currentItem' => $currentItem,
-                                                       'current_item' => $currentItem,
-                                                       'breadcrumb'  => $page->breadcrumb($breadcrumb),
-                                                   ]));
+
 
 
         if ($page->frontend_build ?? false) {
@@ -791,6 +785,16 @@ blade, [
         if ($this->currentSite->theme ?? false) {
             $this->applyTheme(FrontendSite::currentTheme() ?? $this->currentSite->theme);
         }
+
+        $this->addViewData([
+                               ...$viewData,
+                               'pageable'    => $pageable,
+                               'currentItem' => $currentItem,
+                               'current_item' => $currentItem,
+                               'breadcrumb'  => $page->breadcrumb($breadcrumb),
+                           ]);
+
+        $this->addViewData($page->getBuildViewData());
 
 
         $pageContent = $page->content;
