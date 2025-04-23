@@ -281,11 +281,11 @@ class Page extends EloquentModelBase implements BuildableModel,
         if ($categories->count()) {
 
             if ($this->has_pageable) {
-                $categoryQuery = $this->pageable->categories()->whereUrl($categorySlug);
+                $categoryQuery = $this->pageable->categories()->whereUrlIn($categorySlug);
 
             }
             else{
-                $categoryQuery = $this->categories()->whereUrl($categorySlug);
+                $categoryQuery = $this->categories()->whereUrlIn($categorySlug);
             }
 
             if ($categories->count() === 1) {
