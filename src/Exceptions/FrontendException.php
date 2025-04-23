@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright (c) 2023. Tanda Interativa - Todos os Direitos Reservados
+ * Copyright (c) 2023-2025. Tanda Interativa - Todos os Direitos Reservados
  * Desenvolvido por Renalcio Carlos Jr.
  */
 
@@ -50,7 +50,7 @@ class FrontendException extends Exception
                                     ], $this->getCode());
         }
 
-        return response()->make(FrontendTwig::error($this), $this->getCode());
+        return response()->make(FrontendTwig::error($this, $this->title), $this->getCode());
 
         /*return response()->view(['common-frontend::errors.' . $this->getCode(), 'common-frontend::errors.error'], [
             'exception' => $this,

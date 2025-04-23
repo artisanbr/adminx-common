@@ -64,7 +64,8 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
 
 /**
- * @var BreadcrumbConfig        $breadcrumb_config
+ * @var BreadcrumbConfig $breadcrumb_config
+ * @property ?CustomList $pageable
  */
 class Page extends EloquentModelBase implements BuildableModel,
                                                 FrontendModel,
@@ -141,7 +142,7 @@ class Page extends EloquentModelBase implements BuildableModel,
         'assets'      => FrontendAssetsBundle::class,
 
 
-        'type'         => PageType::class,
+        'type'           => PageType::class,
         'config'         => PageConfig::class,
         'seo'            => Seo::class,
         'css'            => GenericAssetElementCSS::class,
@@ -184,9 +185,9 @@ class Page extends EloquentModelBase implements BuildableModel,
     public static function createRules(?FormRequest $request = null): array
     {
         return [
-            'type' => ['required'],
+            'type'  => ['required'],
             //'model_id' => ['required'],
-            'title'     => ['required'],
+            'title' => ['required'],
         ];
     }
 
@@ -194,8 +195,8 @@ class Page extends EloquentModelBase implements BuildableModel,
     public static function createMessages(): array
     {
         return [
-            'title.required'     => 'O título da página é obrigatório',
-            'type.required' => 'Selecione o tipo da página',
+            'title.required' => 'O título da página é obrigatório',
+            'type.required'  => 'Selecione o tipo da página',
             //'model_id.required' => 'Selecione o modelo da página',
         ];
     }
@@ -270,28 +271,64 @@ class Page extends EloquentModelBase implements BuildableModel,
 
         $requestData = request()->all() ?? [];
 
+        //region Prepare categories
+        $categorySlug = Route::current()->parameter('categorySlug') ?? $requestData['categorySlug'] ?? $merge_data['categorySlug'] ?? $requestData['category'] ?? $requestData['categories'] ?? false;
+
+        $categories = !is_array($categorySlug) ? str($categorySlug)->explode(',') : collect($categorySlug);
+
+        $categories = $categories->filter()->values();
+
+        if ($categories->count()) {
+
+            if ($this->type->is(PageType::ArticlesPage)) {
+                $categoryQuery = $this->categories()->whereUrl($categorySlug);
+            }
+            else if ($this->has_pageable) {
+                $categoryQuery = $this->pageable->categories()->whereUrl($categorySlug);
+            }
+
+            if ($categories->count() === 1) {
+                if ($category = $categoryQuery->first()) {
+                    $viewData['category'] = $category;
+                    $breadcrumbAdd = $breadcrumbAdd->merge(['' => $category->title]);
+                }
+                else if (Route::current()->parameter('categorySlug')) {
+                    throw new FrontendException('Categoria não encontrada');
+                }
+
+
+            }
+            else {
+
+                $viewData['categories'] = $categoryQuery->get();
+            }
+        }
+
+        //endregion
+
+        ////region Busca e paginação
+        $requestSearch = $requestData['q'] ?? $requestData['search'] ?? null;
+        $viewData['search'] = $hasSearch = !blank($requestSearch);
+        if ($hasSearch) {
+            $viewData['searchTerm'] = $requestSearch;
+        }
+
+        $paginationPage = $requestData['page'] ?? 1;
+        $paginationPerPage = $requestData['per_page'] ?? $requestData['perPage'] ?? null;
+        //endregion
+
+
         if ($this->articles()->published()->count()) {
+
+            $paginationPerPage = $paginationPerPage ?? $this->config->items_per_page ?? 9; //Definir default na pagina
 
             //Posts
             $articles = $this->articles()->published();
 
-            //Categorias
-            //dd(Route::current()->parameter('categorySlug'));
-            $categorySlug = Route::current()->parameter('categorySlug') ?? $requestData['categorySlug'] ?? $merge_data['categorySlug'] ?? false;
+            if ($categories->count()) {
 
-            if ($categorySlug) {
-                $category = $this->categories()->where('slug', $categorySlug)->orWhere('id', $categorySlug)->first();
-                if ($category) {
-                    $articles = $articles->hasCategory($category->id);
-                    $viewData['category'] = $category;
+                $articles = $articles->hasAnyCategory($categories->toArray());
 
-                    $breadcrumbAdd = $breadcrumbAdd->merge([$category->url => $category->title]);
-
-                    //Meta::registerSeoMetaTagsForCategory($this, $category);
-                }
-                else {
-                    throw new FrontendException('Categoria não encontrada');
-                }
             }
 
             //Tags
@@ -302,41 +339,52 @@ class Page extends EloquentModelBase implements BuildableModel,
                 });
             }
 
-            //Busca
-            $viewData['search'] = false;
-            if ($requestData['q'] ?? false) {
-                $viewData['search'] = true;
-                $viewData['searchQuery'] = $requestData['q'];
-                $articles = $articles->whereLike(['title', 'description', 'content', 'slug'], $requestData['q']);
+
+            if ($hasSearch) {
+                $articles = $articles->whereLike(['title', 'description', 'content', 'slug'], $requestSearch);
 
 
                 $breadcrumbAdd->put($this->uri . '?' . http_build_query([
-                                                                            'q' => $requestData['q'],
-                                                                        ]), 'Buscando por: "' . $requestData['q'] . '"');
+                                                                            'q' => $requestSearch,
+                                                                        ]), 'Buscando por: "' . $requestSearch . '"');
             }
 
-            $viewData['articles'] = $articles->paginate(9);
+            $viewData['articles'] = $articles->paginate(perPage: $paginationPerPage, page: $paginationPage);
             //Meta::setPaginationLinks($articles);
         }
         else {
             $viewData['articles'] = [];
         }
-        //todo: remove
-        /*else if ($this->config->sources && $this->config->sources->count()) {
 
-            $sourceData = [];
+        if ($this->pageable_id && $this->pageable_type && $this->pageable?->exists()) {
 
-            foreach ($this->config->sources as $source) {
-                $sourceData[$source->name] = $source->data;
+            $paginationPerPage = $viewData['items_page'] = $paginationPerPage ?? $this->config->items_per_page ?? 0;
+
+            $viewData['items_per_page'] = $paginationPerPage;
+
+            $viewData['list'] = $this->pageable;
+
+            $listItemsQuery = $this->pageable->items();
+
+
+            if ($categories->count()) {
+                $listItemsQuery = $listItemsQuery->hasAnyCategory($categories->toArray());
             }
 
-            $viewData['data'] = $sourceData;
-        }*/
+            if ($hasSearch) {
+                $listItemsQuery = $listItemsQuery->search(searchTerm: $requestSearch, searchInCategories: true);
+            }
+
+            $viewData['list_items'] = $listItems = $paginationPerPage ? $listItemsQuery->paginate(perPage: $paginationPerPage, page: $paginationPage) : $listItemsQuery->get();
+
+
+            $viewData['items_page_count'] = $listItems->count();
+            $viewData['items_last_page'] = $paginationPerPage ? $listItems->lastPage() : 1;
+            $viewData['items_total_count'] = $paginationPerPage ? $listItems->total() : $listItems->count();
+            $viewData['items_categories'] = $viewData['categories'] ?? collect();
+        }
 
         $viewData['breadcrumb'] = $this->show_breadcrumb ? $this->breadcrumb($breadcrumbAdd->toArray()) : false;
-
-        //dd($breadcrumbAdd->toArray());
-
 
         return [...$viewData, ...$merge_data];
     }
@@ -406,11 +454,18 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     //region ATTRIBUTES
 
+    protected function hasPageable(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value, array $attributes) => $this->pageable_id && $this->pageable_type && $this->pageable?->exists(),
+        );
+    }
+
     protected function slug(): Attribute
     {
         return Attribute::make(
             get: fn($value, array $attributes) => $value,
-            set: fn($value, array $attributes) => match(true){
+            set: fn($value, array $attributes) => match (true) {
                 $this->is_home => null,
                 !blank($value) => str($value)->slug()->toString(),
                 default => str($attributes['title'] ?? '')->slug()->toString(),
@@ -504,12 +559,12 @@ class Page extends EloquentModelBase implements BuildableModel,
 
         $textHtml .= "<small class='text-muted fw-bold w-100 mb-1'>{$this->uri}</small><div class=\"w-100 d-flex align-items-center gap-2\">";
 
-        if($this->parent_id){
+        if ($this->parent_id) {
             $this->load('parent');
             $textHtml .= "<span><small>Sub-Página de:</small> <b class=\"badge badge-light-info\">{$this->parent->title}</b></span>";
         }
 
-        if($this->pageable?->exists()){
+        if ($this->pageable?->exists()) {
             $this->load('parent');
             $textHtml .= "<span><small>Fonte de Dados:</small> <b class=\"badge badge-light-info\">{$this->pageable->title}</b></span>";
         }
@@ -529,7 +584,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 
         $label = $this->title;
 
-        if($this->pageable?->exists()){
+        if ($this->pageable?->exists()) {
             $label = blank($label) ? "Página Dinâmica Sem Título" : $label;
             $label .= " ({$this->pageable->title})";
         }
@@ -577,13 +632,13 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     public function generateUri()
     {
-        if(!$this->site){
-            
+        if (!$this->site) {
+
         }
 
         if (blank($this->parent_id) && $this->is_home) {
 
-            return  $this->site->uri;
+            return $this->site->uri;
 
         }
 
@@ -592,7 +647,8 @@ class Page extends EloquentModelBase implements BuildableModel,
 
             $urlId = str($this->parent->slug)->finish('/')->append($this->slug);
 
-        }else{
+        }
+        else {
             $urlId = str($this->slug);
         }
 
@@ -614,7 +670,8 @@ class Page extends EloquentModelBase implements BuildableModel,
 
             $urlId = str($this->parent->slug)->finish('/')->append($this->slug);
 
-        }else{
+        }
+        else {
             $urlId = str($this->slug);
         }
 
@@ -657,7 +714,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 
     public function scopeWithRelations(Builder $query): Builder
     {
-        return $query->with(['site','parent','pageable']);
+        return $query->with(['site', 'parent', 'pageable']);
     }
 
     public function scopeWhereUrl(Builder $query, ?string $url = null): Builder
@@ -667,8 +724,8 @@ class Page extends EloquentModelBase implements BuildableModel,
             $q->emptySlug()->orWhere('is_home', true);
         })->when($url, static function (Builder $q) use ($url) {
             return $q->where('slug', $url)
-              ->orWhere('public_id', $url)
-              ->orWhere('id', $url);
+                     ->orWhere('public_id', $url)
+                     ->orWhere('id', $url);
         });
     }
 

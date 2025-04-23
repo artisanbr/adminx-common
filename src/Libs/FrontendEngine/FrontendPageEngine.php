@@ -16,15 +16,22 @@ use Adminx\Common\Models\CustomLists\CustomListItem;
 use Adminx\Common\Models\Pages\Page;
 use Adminx\Common\Models\Pages\Types\Manager\Facade\PageTypeManager;
 use Adminx\Common\Models\Sites\SiteRoute;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
+/**
+ * Class FrontendPageEngine
+ *
+ * Handles logic for loading and retrieving pages, articles, and routes within the system,
+ * based on provided URLs or other parameters. Integrates caching mechanisms for optimized performance.
+ */
 class FrontendPageEngine extends FrontendEngineBase
 {
     public function __construct(
-        protected ?Page                                                                                      $currentPage = null,
+        protected ?Page                                                         $currentPage = null,
         protected EloquentModelBase|Page|Article|CustomListItem|CustomList|null $firstModel = null,
-        protected EloquentModelBase|Page|Article|CustomListItem|null                    $secondModel = null
+        protected EloquentModelBase|Page|Article|CustomListItem|null            $secondModel = null
     )
     {
         if (!$this->currentSite) {
@@ -80,40 +87,46 @@ class FrontendPageEngine extends FrontendEngineBase
         return $this->currentPage;
     }
 
-    public function loadCurrentPageFromUrl(?String $slug = null): ?Page
+    public function loadCurrentPageFromUrl(?string $slug = null, ?callable $applyQuery = null): ?Page
     {
 
         if ($this->currentSite?->config->performance->enable_advanced_cache ?? false) {
 
-            $this->currentPage = Cache::remember($this->currentSite->relatedCacheName($slug ?? 'home'), $this->cacheMinutes * 60, fn() => $this->getPageByUrl($slug));
+            $this->currentPage = Cache::remember($this->currentSite->relatedCacheName($slug ?? 'home'), $this->cacheMinutes * 60, fn() => $this->getPageByUrl($slug , $applyQuery));
 
         }
         else {
-            $this->currentPage = $this->getPageByUrl($slug);
+            $this->currentPage = $this->getPageByUrl($slug , $applyQuery);
         }
 
         return $this->currentPage;
     }
 
 
-    /***
-     *
-     * @param string|null $pageUrl
+    /**
+     * @param string|null   $pageUrl
+     * @param null|callable(Builder): Builder $applyQuery
      *
      * @return Page|null
      */
-    public function getPageByUrl(?string $pageUrl = null): ?Page
+    public function getPageByUrl(?string $pageUrl = null, ?callable $applyQuery = null): ?Page
     {
 
 
         //Se não for informada URL retornar a home
         if ($this->currentSite && empty($pageUrl)) {
+            //Se não for informada URL e a pagina atual não existir, ou não for a home, definir e retornar a home
             return $this->currentSite->home_page;
         }
 
-        //Se não for informada URL e a pagina atual não existir, ou não for a home, definir e retornar a home
+        $query = $this->currentSite->pages()->whereUrl($pageUrl);
 
-        return $this->currentSite?->pages()->whereUrl($pageUrl)->first() ?? null;
+
+        if ($applyQuery && is_callable($applyQuery)) {
+            $query = $applyQuery($query);
+        }
+
+        return $query->first() ?? null;
     }
 
     public function getPageByUrlByTypes(?string $pageUrl = null, array|string|null $expectedTypes = null): ?Page

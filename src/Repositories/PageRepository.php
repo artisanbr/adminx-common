@@ -37,6 +37,7 @@ class PageRepository extends Repository
 
         $this->model->fill($this->data);
 
+        $this->model->pageable_type = !blank($this->data['pageable_id'] ?? null) ? 'list' : null;
 
         $this->model->save();
         $this->model->refresh();

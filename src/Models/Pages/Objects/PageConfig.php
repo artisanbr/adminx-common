@@ -22,13 +22,12 @@ class PageConfig extends GenericModel
     protected $fillable = [
         'breadcrumb',
         'editor_type',
-
         'captcha',
+        'items_per_page',
     ];
 
     protected $attributes = [
         'captcha' => [],
-
         'editor_type' => null,
     ];
 
@@ -37,6 +36,7 @@ class PageConfig extends GenericModel
         'editor_type'          => ContentEditorType::class,
         'allowed_source_types' => 'collection',
         'require_source'       => 'bool',
+        'items_per_page'       => 'int',
         'captcha'              => CaptchaConfig::class,
     ];
 

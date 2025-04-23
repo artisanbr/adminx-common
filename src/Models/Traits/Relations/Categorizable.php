@@ -17,16 +17,17 @@ trait Categorizable
 {
     public function scopeHasCategory(Builder $query, string $category): Builder
     {
-        return $query->whereHas('categories', fn(Builder $query) => $query->whereUrl('slug', $category));
+        return $query->whereHas('categories', fn(Builder $q) => $q
+            ->whereUrl('slug', $category));
     }
 
     public function scopeHasAnyCategory(Builder $query, array $categories): Builder
     {
         return $query->whereHas(
             'categories',
-            fn(Builder $query) => $query
-                ->orWhereIn('id', $categories)
+            fn(Builder $q) => $q
                 ->whereIn('slug', $categories)
+                ->orWhereIn('id', $categories)
         );
     }
 

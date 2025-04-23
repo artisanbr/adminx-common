@@ -317,7 +317,7 @@ class FrontendTwigEngine extends FrontendEngineBase
         try {
             return $this->twig->render($this->getTemplateName($template), $this->getRenderViewData());
         } catch (Exception $e) {
-            if(env('APP_ENV') == 'local') {
+            if (env('APP_ENV') == 'local') {
                 Debugbar::enable();
                 dump($template, $this->viewData, $this->templates->toArray());
             }
@@ -534,6 +534,13 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $this->addViewData($this->currentSite->getBuildViewData($page->getBuildViewData($mergeData)));
 
+        //$urlCategory = Route:
+
+        /*if ($page->pageable_id && $page->pageable) {
+            $this->addPageableViewData($page);
+        }*/
+
+
         //$this->registerFrontendBuild($page->frontend_build);
         $this->registerFrontendBuild($page->prepareFrontendBuild());
 
@@ -661,8 +668,8 @@ blade, [
 
         //Meta::registerSeoForArticle($article);
         $this->addViewData($this->currentSite->getBuildViewData($article->getBuildViewData([
-                                                          'customPageTemplate' => $page->page_template ? '@template/article.twig' : false,
-                                                      ])));
+                                                                                               'customPageTemplate' => $page->page_template ? '@template/article.twig' : false,
+                                                                                           ])));
 
         //dd($this->themeBuild);
 
@@ -746,6 +753,7 @@ blade, [
                                                        ...$viewData,
                                                        'pageable'    => $pageable,
                                                        'currentItem' => $currentItem,
+                                                       'current_item' => $currentItem,
                                                        'breadcrumb'  => $page->breadcrumb($breadcrumb),
                                                    ]));
 
@@ -829,4 +837,5 @@ blade, [
         );
 
     }
+
 }
