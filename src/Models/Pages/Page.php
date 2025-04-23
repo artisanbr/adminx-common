@@ -370,6 +370,9 @@ class Page extends EloquentModelBase implements BuildableModel,
 
             if ($categories->count()) {
                 $listItemsQuery = $listItemsQuery->hasAnyCategory($categories->toArray());
+                $viewData['items_categories'] = $viewData['categories'] ?? null;
+            }else{
+                $viewData['items_categories'] = null;
             }
 
             if ($hasSearch) {
@@ -382,7 +385,6 @@ class Page extends EloquentModelBase implements BuildableModel,
             $viewData['items_page_count'] = $listItems->count();
             $viewData['items_last_page'] = $paginationPerPage ? $listItems->lastPage() : 1;
             $viewData['items_total_count'] = $paginationPerPage ? $listItems->total() : $listItems->count();
-            $viewData['items_categories'] = $categories->count() ? $viewData['categories'] : null;
         }
 
         $viewData['breadcrumb'] = $this->show_breadcrumb ? $this->breadcrumb($breadcrumbAdd->toArray()) : false;

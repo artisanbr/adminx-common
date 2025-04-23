@@ -7,7 +7,6 @@
 namespace Adminx\Common\Models;
 
 use Adminx\Common\Facades\Frontend\FrontendPage;
-use Adminx\Common\Libs\Support\Str;
 use Adminx\Common\Models\Bases\EloquentModelBase;
 use Adminx\Common\Models\CustomLists\CustomList;
 use Adminx\Common\Models\CustomLists\CustomListItem;
@@ -88,8 +87,8 @@ class Category extends EloquentModelBase implements OwneredModel
     protected function slug(): Attribute
     {
         return Attribute::make(
-            get: fn($value) => $value ?? Str::slug(Str::lower($this->title)),
-            set: static fn($value) => Str::contains($value, ' ') ? Str::slug(Str::lower($value)) : Str::lower($value),
+            get: fn($value, array $attributes) => $value,
+            set: fn($value, array $attributes) => str(!blank($value) ? $value : ($attributes['title'] ?? ''))->slug()->toString(),
         );
     }
 
@@ -97,7 +96,7 @@ class Category extends EloquentModelBase implements OwneredModel
     protected function getUrlAttribute()
     {
 
-        $url = "/category/{$this->slug}";
+        $url = "/category/".($this->slug ?? $this->id);
 
         /*if ($this->page) {
             return $this->page->urlTo($url);
