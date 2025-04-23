@@ -371,8 +371,7 @@ class Page extends EloquentModelBase implements BuildableModel,
             if ($categories->count()) {
                 $listItemsQuery = $listItemsQuery->hasAnyCategory($categories->toArray());
                 $viewData['items_categories'] = $viewData['categories'] ?? null;
-            }else{
-                $viewData['items_categories'] = null;
+                $viewData['categorySlug'] = $categorySlug;
             }
 
             if ($hasSearch) {
