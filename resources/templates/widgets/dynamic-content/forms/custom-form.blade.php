@@ -23,13 +23,14 @@
             <div class="row mb-3">
                 <div class="col-12">
                     @include((@$widget?->template ?? @$template)->getTemplateBladeFile("elements/select_field"), [
-                    ...compact('element','form'),
-    'slug' => 'recipient_address',
-    'title' => $form->config->select_recipient_title,
-    'optionList' => $form->config->recipients->map(fn($recipient) => [
-                                'value' => $recipient->address,
-                                'text' => $recipient->title,
-                        ])
+                    'element' => $element,
+                    'form' => $form,
+                    'slug' => 'recipient_address',
+                    'title' => $form->config->select_recipient_title,
+                    'optionList' => $form->config->recipients->map(fn($recipient) => [
+                                                'value' => $recipient->address,
+                                                'text' => $recipient->title,
+                                        ])
                 ])
                 </div>
             </div>
