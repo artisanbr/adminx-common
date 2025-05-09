@@ -13,7 +13,8 @@
 @endphp
 
 @if($form->id ?? false)
-    <form id="{{ $formId }}" class="form w-100" action="{{ route('frontend.send-form', $form->public_id, false) }}" method="POST"
+    <form id="{{ $formId }}" class="form w-100" action="{{ route('frontend.send-form', $form->public_id, false) }}"
+          method="POST"
           enctype="multipart/form-data" data-grecaptcha-action="{{$form->slug}}">
         @method('POST')
 
@@ -22,12 +23,13 @@
             <div class="row mb-3">
                 <div class="col-12">
                     @include((@$widget?->template ?? @$template)->getTemplateBladeFile("elements/select_field"), [
-    'slug' => 'recipient_address',
-    'title' => $form->config->select_recipient_title,
-    'optionList' => $form->config->recipients->map(fn($recipient) => [
-                                'value' => $recipient->address,
-                                'text' => $recipient->title,
-                        ])
+                    'form' => $form,
+                    'slug' => 'recipient_address',
+                    'title' => $form->config->select_recipient_title,
+                    'optionList' => $form->config->recipients->map(fn($recipient) => [
+                                                'value' => $recipient->address,
+                                                'text' => $recipient->title,
+                                        ])
                 ])
                 </div>
             </div>
@@ -41,11 +43,12 @@
         <div class="row">
             {{--@dump($form->config->captcha->type?->is(FormCaptchaType::RecaptchaV2->value), $form->config->captcha->keys->get('site_key') ??  $form->site->config->recaptcha_site_key)--}}
             @if($form->config->captcha->enabled)
-            <div class="col-12 col-sm-8">
-                @if($form->config->captcha->type?->is(FormCaptchaType::RecaptchaV2->value))
-                <x-common::recaptcha-v2 :site-key="$form->config->captcha->keys->get('site_key') ??  $form->site->config->recaptcha_site_key"/>
-                @endif
-            </div>
+                <div class="col-12 col-sm-8">
+                    @if($form->config->captcha->type?->is(FormCaptchaType::RecaptchaV2->value))
+                        <x-common::recaptcha-v2
+                                :site-key="$form->config->captcha->keys->get('site_key') ??  $form->site->config->recaptcha_site_key"/>
+                    @endif
+                </div>
             @endif
             <div class="col-12 col-sm d-flex justify-content-end align-items-start">
                 {!! $form->config->send_button->html !!}
@@ -100,7 +103,7 @@
 
                                 //const alertElement = document.querySelector(".alert");
                                 if ($alert[0]) {
-                                    $alert[0].scrollIntoView({ behavior: "smooth", block: "center" });
+                                    $alert[0].scrollIntoView({behavior: "smooth", block: "center"});
                                 }
                             }
                         },
@@ -186,7 +189,7 @@
                                         $submitButton.prop('disabled', false);
                                         let isToRedirect = @json($form->config->enable_redirect);
                                         let redirectUrl = '{{ $form->config->redirect_url }}';
-                                        if(isToRedirect && redirectUrl && redirectUrl.length){
+                                        if (isToRedirect && redirectUrl && redirectUrl.length) {
                                             location.href = redirectUrl;
                                         }
                                     }, 8000);
@@ -222,11 +225,11 @@
             $(function () {
                 formModule_{{$form->public_id}}.init();
             });
-                @else
-                document.addEventListener('DOMContentLoaded', (event) => {
-                    formModule_{{$form->public_id}}.init();
-                });
-                @endif
+            @else
+            document.addEventListener('DOMContentLoaded', (event) => {
+                formModule_{{$form->public_id}}.init();
+            });
+            @endif
 
 
         </script>

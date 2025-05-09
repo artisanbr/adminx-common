@@ -21,6 +21,8 @@ use Adminx\Common\Models\Widgets\SiteWidget;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\View;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
@@ -78,6 +80,10 @@ class FrontendTwigExtension extends AbstractExtension
     public function getFunctions()
     {
         return [
+            new TwigFunction('urlParam', $this->getUrlParameter(...), ['needs_context' => true]),
+            new TwigFunction('urlQuery', $this->getUrlParameter(...), ['needs_context' => true]),
+            new TwigFunction('urlArg', $this->getUrlParameter(...), ['needs_context' => true]),
+
             new TwigFunction('widget', $this->widget(...), ['needs_context' => true]),
             new TwigFunction('w', $this->widget(...), ['needs_context' => true]),
 
@@ -131,6 +137,17 @@ class FrontendTwigExtension extends AbstractExtension
         ];
     }
 
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getUrlParameter($context, $name, $default = null): string
+    {
+
+        return request()->get($name, $default);
+
+    }
 
     /**
      * @throws SyntaxError
