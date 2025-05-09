@@ -23,7 +23,6 @@
             <div class="row mb-3">
                 <div class="col-12">
                     @include((@$widget?->template ?? @$template)->getTemplateBladeFile("elements/select_field"), [
-                    'element' => $element,
                     'form' => $form,
                     'slug' => 'recipient_address',
                     'title' => $form->config->select_recipient_title,
