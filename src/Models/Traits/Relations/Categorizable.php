@@ -51,4 +51,9 @@ trait Categorizable
         return $this->morphToMany(Category::class, 'categorizable');
     }
 
+    public function parentCategories()
+    {
+        return $this->categories()->where('parent_id', null);
+    }
+
 }
