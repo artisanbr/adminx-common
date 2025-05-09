@@ -3,9 +3,9 @@
 ])--}}
 
 @php
-    $element = $element ?? new \Adminx\Common\Elements\Forms\FormElement();
+    $element = @$element ?? new \Adminx\Common\Elements\Forms\FormElement();
     $optionList = $optionList ?? $element->option_list ?? [];
- @endphp
+@endphp
 
 {{--<label for="input_{{ $element->slug }}" class="form-label">{{ $element->title }}</label>--}}
 <label for="input_{{ $element->slug ?? $slug }}" class="mb-1">
