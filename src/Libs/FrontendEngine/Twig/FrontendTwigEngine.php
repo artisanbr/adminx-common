@@ -783,6 +783,15 @@ blade, [
             $this->applyTheme(FrontendSite::currentTheme() ?? $this->currentSite->theme);
         }
 
+        /*dd([
+               ...$page->getBuildViewData(),
+               ...$viewData,
+               'pageable'     => $pageable,
+               'currentItem'  => $currentItem,
+               'current_item' => $currentItem,
+               'breadcrumb'   => $page->breadcrumb($breadcrumb),
+           ]);*/
+
         $this->addViewData([
                                ...$page->getBuildViewData(),
                                ...$viewData,

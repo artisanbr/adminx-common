@@ -284,13 +284,14 @@ class Page extends EloquentModelBase implements BuildableModel,
                 $categoryQuery = $this->pageable->categories()->whereUrlIn($categorySlug);
 
             }
-            else{
+            else {
                 $categoryQuery = $this->categories()->whereUrlIn($categorySlug);
             }
 
             if ($categories->count() === 1) {
                 if ($category = $categoryQuery->first()) {
                     $viewData['category'] = $category;
+                    $viewData['categories'] = collect($category);
                     $breadcrumbAdd = $breadcrumbAdd->merge(['' => $category->title]);
                 }
                 else if (Route::current()->parameter('categorySlug')) {
@@ -300,8 +301,8 @@ class Page extends EloquentModelBase implements BuildableModel,
 
             }
             else {
-
                 $viewData['categories'] = $categoryQuery->get();
+                $viewData['category'] = $categoryQuery->first();
             }
         }
 
@@ -370,8 +371,9 @@ class Page extends EloquentModelBase implements BuildableModel,
 
             if ($categories->count()) {
                 $listItemsQuery = $listItemsQuery->hasAnyCategory($categories->toArray());
-                $viewData['items_categories'] = $viewData['categories'] ?? null;
-                $viewData['category_slugs'] = $categorySlug;
+                $viewData['items_categories'] = $viewData['categories'] ?? (!blank($viewData['category']) ? collect([$viewData['category']]) : null);
+                $viewData['items_category'] = $viewData['category'] ?? null;
+                $viewData['category_slugs'] = $categories->values() ?? null;
             }
 
             if ($hasSearch) {
