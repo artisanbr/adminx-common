@@ -370,7 +370,7 @@ class Page extends EloquentModelBase implements BuildableModel,
 
             if ($categories->count()) {
                 $listItemsQuery = $listItemsQuery->hasAnyCategory($categories->toArray());
-                $viewData['items_categories'] = $viewData['categories'] ?? null;
+                $viewData['items_categories'] = $viewData['categories'] ?? $merge_data['categories'] ?? null;
                 $viewData['category_slugs'] = $categorySlug;
             }
 

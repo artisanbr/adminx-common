@@ -749,9 +749,6 @@ blade, [
         $breadcrumb += ['#' => $currentItem->title];
 
 
-
-
-
         if ($page->frontend_build ?? false) {
             $this->registerFrontendBuild($page->frontend_build);
         }
@@ -787,14 +784,15 @@ blade, [
         }
 
         $this->addViewData([
+                               ...$page->getBuildViewData(),
                                ...$viewData,
-                               'pageable'    => $pageable,
-                               'currentItem' => $currentItem,
+                               'pageable'     => $pageable,
+                               'currentItem'  => $currentItem,
                                'current_item' => $currentItem,
-                               'breadcrumb'  => $page->breadcrumb($breadcrumb),
+                               'breadcrumb'   => $page->breadcrumb($breadcrumb),
                            ]);
 
-        $this->addViewData($page->getBuildViewData());
+        //$this->addViewData();
 
 
         $pageContent = $page->content;
