@@ -142,7 +142,7 @@ class FrontendTwigExtension extends AbstractExtension
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function getUrlParameter($context, $name, $default = null): string
+    public function getUrlParameter($context, $name, $default = null): ?string
     {
 
         return request()->get($name, $default);
