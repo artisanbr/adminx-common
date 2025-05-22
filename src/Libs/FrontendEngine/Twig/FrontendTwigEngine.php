@@ -582,6 +582,24 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $pageContent = $page->html;
 
+        $this->registerFrontendSeo([
+                                       'description' => match (true) {
+                                           !blank($page->seo->description ?? null) => $page->seo->description,
+                                           $page->parent_id && !blank($page->parent?->seo->description ?? null) => $page->parent?->seo->description,
+                                           !blank($this->currentSite->seo->description ?? null) => $this->currentSite->seo->description,
+                                           default => null,
+                                       },
+                                   ]);
+
+        $this->registerFrontendSeo([
+                                       'keywords' => match (true) {
+                                           !blank($page->seo->keywords ?? null) => $page->seo->keywords,
+                                           $page->parent_id && !blank($page->parent?->seo->keywords ?? null) => $page->parent?->seo->keywords,
+                                           !blank($this->currentSite->seo->keywords ?? null) => $this->currentSite->seo->keywords,
+                                           default => null,
+                                       },
+                                   ]);
+
         if ($pageTemplate) {
             //dd($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id));
             $this->twigFileLoader->addPath($pageTemplate->template->getTemplateGlobalFile($pageTemplate->template->public_id), 'template');
@@ -777,7 +795,7 @@ blade, [
 
         $this->registerFrontendSeo([
                                        'description' => match (true) {
-                                           !blank($currentItem->description ?? null) => $currentItem->description,
+                                           !blank($currentItem->description ?? null) => $currentItem->description ?? null,
                                            !blank($page->seo->description ?? null) => $page->seo->description,
                                            $page->parent_id && !blank($page->parent?->seo->description ?? null) => $page->parent?->seo->description,
                                            !blank($this->currentSite->seo->description ?? null) => $this->currentSite->seo->description,
