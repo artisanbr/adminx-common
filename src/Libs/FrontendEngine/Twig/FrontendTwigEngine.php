@@ -161,6 +161,9 @@ class FrontendTwigEngine extends FrontendEngineBase
         $this->frontendBuild->meta->initialize();
         $this->frontendBuild->meta->addCsrfToken();
 
+        //dd($this->frontendBuild->seo);
+
+
         $this->frontendBuild->meta->registerSeoObject($this->frontendBuild->seo);
 
         $this->frontendBuild->seo->html = $this->frontendBuild->meta->toHtml();
@@ -731,13 +734,15 @@ blade, [
 
         $this->currentSite = FrontendSite::current() ?? $page->site;
 
+        $page->load(['parent']);
+
         if (blank($page->breadcrumb_config->background_url ?? null) && !blank($currentItem->image_url ?? null)) {
             $page->breadcrumb_config->background_url = $currentItem->image_url;
         }
 
 
         if (blank($page->title ?? null)) {
-            $page->title = $currentItem->title;
+            $page->title = $page->parent?->title ?? $currentItem->title;
         }
 
         $breadcrumb = [];
@@ -754,17 +759,38 @@ blade, [
         }
 
         $this->registerFrontendSeo([
-                                       'title'        => $currentItem->title,
-                                       'title_prefix' => $this->currentSite->seoTitle($page->title),
-                                       'published_at' => $currentItem->created_at,
-                                       'updated_at'   => $currentItem->updated_at,
+                                       'title'         => $this->currentSite->seoTitle($page->title . ' - ' . $currentItem->title),
+                                       'title_prefix'  => null,
+                                       'published_at'  => $currentItem->created_at,
+                                       'updated_at'    => $currentItem->updated_at,
+                                       'document_type' => 'website',
                                    ]);
 
-        if(!(blank($currentItem->first_image_url ?? null))) {
+        if (!(blank($currentItem->first_image_url ?? null))) {
             $this->registerFrontendSeo([
-                'image_url' => $this->currentSite->uriTo($currentItem->first_image_url, false),
-            ]);
+                                           'image_url' => $this->currentSite->uriTo($currentItem->first_image_url, false),
+                                       ]);
         }
+
+
+        $this->registerFrontendSeo([
+                                       'description' => match (true) {
+                                           !blank($currentItem->description ?? null) => $currentItem->description,
+                                           !blank($page->seo->description ?? null) => $page->seo->description,
+                                           !blank($page->parent?->seo->description ?? null) => $page->parent?->seo->description,
+                                           !blank($this->currentSite->seo->description ?? null) => $this->currentSite->seo->description,
+                                           default => null,
+                                       },
+                                   ]);
+
+        $this->registerFrontendSeo([
+                                       'keywords' => match (true) {
+                                           !blank($page->seo->keywords ?? null) => $page->seo->keywords,
+                                           !blank($page->parent?->seo->keywords ?? null) => $page->parent?->seo->keywords,
+                                           !blank($this->currentSite->seo->keywords ?? null) => $this->currentSite->seo->keywords,
+                                           default => null,
+                                       },
+                                   ]);
 
         if ($currentItem->seo ?? null) {
             $this->registerFrontendSeo(array_filter($currentItem->seo->toArray()));

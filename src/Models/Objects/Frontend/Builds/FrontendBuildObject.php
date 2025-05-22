@@ -16,6 +16,7 @@ use Butschster\Head\MetaTags\Meta;
 /**
  * @property string $html
  * @property string $minify
+ * @property Meta   $meta
  */
 class FrontendBuildObject extends GenericModel
 {

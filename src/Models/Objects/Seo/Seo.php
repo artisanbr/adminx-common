@@ -32,7 +32,7 @@ class Seo extends GenericModel
     ];
 
     protected $attributes = [
-        'document_type' => 'page', // (page, article)
+        'document_type' => 'website', // (page, article)
         'title'         => '',
         'title_prefix'  => null,
         'description'   => '',

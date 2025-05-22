@@ -191,17 +191,17 @@ class FrontendPageServiceProvider extends ServiceProvider
         });
 
 
-        Meta::macro('registerSeoObject', function (Seo $seo) {
+        Meta::macro('registerSeoObject', function (Seo $seo, Site $site = null) {
 
-            //$site = $site ?? FrontendSite::current();
-
-            if (!empty($seo->title_prefix)) {
-                $this->prependTitle($seo->title_prefix);
-            }
+            //$site = $site ?? FrontendSite::current() ?? auth()->user()->site;
 
             //$article->load(['site','page']);
             $metaOg = new OpenGraphPackage('site_og_seo');
             $metaTwitter = new TwitterCardPackage('site_tt_seo');
+
+            if (!blank($seo->title_prefix)) {
+                $this->prependTitle($seo->title_prefix);
+            }
 
 
             //$seoFullTitle = $seo->title; //$site->seoTitle($page->seoTitle($article->seoTitle()));
