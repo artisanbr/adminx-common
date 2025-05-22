@@ -734,7 +734,9 @@ blade, [
 
         $this->currentSite = FrontendSite::current() ?? $page->site;
 
-        $page->load(['parent']);
+        if($page->parent_id) {
+            $page->load(['parent']);
+        }
 
         if (blank($page->breadcrumb_config->background_url ?? null) && !blank($currentItem->image_url ?? null)) {
             $page->breadcrumb_config->background_url = $currentItem->image_url;
@@ -747,8 +749,8 @@ blade, [
 
         $breadcrumb = [];
 
-        if ($page->parent?->exists()) {
-            $breadcrumb += $page->parent->breadcrumb->items->toArray();
+        if ($page->parent_id) {
+            $breadcrumb += $page->parent?->breadcrumb->items->toArray() ?? [];
         }
 
         $breadcrumb += ['#' => $currentItem->title];
@@ -777,7 +779,7 @@ blade, [
                                        'description' => match (true) {
                                            !blank($currentItem->description ?? null) => $currentItem->description,
                                            !blank($page->seo->description ?? null) => $page->seo->description,
-                                           !blank($page->parent?->seo->description ?? null) => $page->parent?->seo->description,
+                                           $page->parent_id && !blank($page->parent?->seo->description ?? null) => $page->parent?->seo->description,
                                            !blank($this->currentSite->seo->description ?? null) => $this->currentSite->seo->description,
                                            default => null,
                                        },
@@ -786,7 +788,7 @@ blade, [
         $this->registerFrontendSeo([
                                        'keywords' => match (true) {
                                            !blank($page->seo->keywords ?? null) => $page->seo->keywords,
-                                           !blank($page->parent?->seo->keywords ?? null) => $page->parent?->seo->keywords,
+                                           $page->parent_id && !blank($page->parent?->seo->keywords ?? null) => $page->parent?->seo->keywords,
                                            !blank($this->currentSite->seo->keywords ?? null) => $this->currentSite->seo->keywords,
                                            default => null,
                                        },
