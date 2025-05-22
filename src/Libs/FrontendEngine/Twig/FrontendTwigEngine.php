@@ -758,6 +758,7 @@ blade, [
                                        'title_prefix' => $this->currentSite->seoTitle($page->title),
                                        'published_at' => $currentItem->created_at,
                                        'updated_at'   => $currentItem->updated_at,
+                                       'image_url' => $currentItem->first_image_url,
                                    ]);
 
         if ($currentItem->seo ?? null) {
