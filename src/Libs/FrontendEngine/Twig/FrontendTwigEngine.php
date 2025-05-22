@@ -758,8 +758,13 @@ blade, [
                                        'title_prefix' => $this->currentSite->seoTitle($page->title),
                                        'published_at' => $currentItem->created_at,
                                        'updated_at'   => $currentItem->updated_at,
-                                       'image_url' => $currentItem->first_image_url,
                                    ]);
+
+        if(!(blank($currentItem->first_image_url ?? null))) {
+            $this->registerFrontendSeo([
+                'image_url' => $currentItem->first_image_url,
+            ]);
+        }
 
         if ($currentItem->seo ?? null) {
             $this->registerFrontendSeo(array_filter($currentItem->seo->toArray()));
