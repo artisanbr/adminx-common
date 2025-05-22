@@ -762,7 +762,7 @@ blade, [
 
         if(!(blank($currentItem->first_image_url ?? null))) {
             $this->registerFrontendSeo([
-                'image_url' => $currentItem->first_image_url,
+                'image_url' => $this->currentSite->uriTo($currentItem->first_image_url, false),
             ]);
         }
 
