@@ -582,16 +582,17 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $pageContent = $page->html;
 
+        $pageSeoTitle = $this->currentSite->seoTitle($page->title);
+
         $this->registerFrontendSeo([
+                                       'title'        => $pageSeoTitle,
+                                       'title_prefix'        => null,
                                        'description' => match (true) {
                                            !blank($page->seo->description ?? null) => $page->seo->description,
                                            $page->parent_id && !blank($page->parent?->seo->description ?? null) => $page->parent?->seo->description,
                                            !blank($this->currentSite->seo->description ?? null) => $this->currentSite->seo->description,
                                            default => null,
                                        },
-                                   ]);
-
-        $this->registerFrontendSeo([
                                        'keywords' => match (true) {
                                            !blank($page->seo->keywords ?? null) => $page->seo->keywords,
                                            $page->parent_id && !blank($page->parent?->seo->keywords ?? null) => $page->parent?->seo->keywords,
@@ -611,7 +612,7 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         if ($category) {
             $this->registerFrontendSeo([
-                                           'title'        => $category->title,
+                                           'title'        => $pageSeoTitle . ' - ' . $category->title,
                                            'title_prefix' => '{{ site.seoTitle() }} - {{ page.seoTitle() }}',
                                        ]);
 
