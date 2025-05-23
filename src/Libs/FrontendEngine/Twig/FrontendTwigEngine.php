@@ -381,9 +381,14 @@ class FrontendTwigEngine extends FrontendEngineBase
     {
         $this->currentSite = FrontendSite::current();
 
-        $this->setViewData($this->currentSite->getBuildViewData());
+        if($this->currentSite){
+            $this->setViewData($this->currentSite->getBuildViewData());
 
-        $this->registerFrontendBuild($this->currentSite->frontendBuild());
+            $this->registerFrontendBuild($this->currentSite->frontendBuild());
+
+            $theme = $theme ?? $this->currentSite->theme;
+            $this->applyTheme($theme);
+        }
 
         //$this->frontendBuild->meta->registerSeoForPage($page);
 
@@ -393,11 +398,6 @@ class FrontendTwigEngine extends FrontendEngineBase
         else if (config('app.env') === 'local') {
             Debugbar::enable();
         }
-
-        $theme = $theme ?? $this->currentSite->theme;
-
-        $this->applyTheme($theme);
-
 
         $templateName = 'error-' . time();
 
@@ -415,10 +415,11 @@ class FrontendTwigEngine extends FrontendEngineBase
 
         $this->initFrontendBuild();
 
-        $headHtml = $this->themeBuild->head;
-        $headerHtml = $this->themeBuild->header;
-        $footerHtml = $this->themeBuild->footer;
-        $seoHtml = $this->frontendBuild->seo->html;
+
+        $headHtml = $this->themeBuild?->head ?? '';
+        $headerHtml = $this->themeBuild?->header ?? '';
+        $footerHtml = $this->themeBuild?->footer ?? '';
+        $seoHtml = $this->frontendBuild?->seo->html ?? '';
 
         /*<main class="main-content"></main>*/
 
