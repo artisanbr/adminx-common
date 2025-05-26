@@ -207,20 +207,20 @@ class FrontendPageServiceProvider extends ServiceProvider
             //$seoFullTitle = $seo->title; //$site->seoTitle($page->seoTitle($article->seoTitle()));
 
             $metaOg
-                ->setType($seo->document_type)
-                ->setTitle($seo->title)
-                ->setDescription($seo->description)
+                ->setType($seo->document_type ?? 'website')
+                ->setTitle($seo->title ?? '')
+                ->setDescription($seo->description ?? '')
                 //->setUrl($article->uri)
                 //->addOgMeta('article:author', $article->user->name)
-                ->addOgMeta('article:section', $seo->title)
-                ->addOgMeta('article:tag', $seo->keywords)
+                ->addOgMeta('article:section', $seo->title ?? '')
+                ->addOgMeta('article:tag', $seo->keywords ?? '')
                 ->addOgMeta('article:published_time', $seo->published_at ?? '')
                 ->addOgMeta('article:modified_time', $seo->updated_at ?? '')
                 ->addOgMeta('og:updated_time', $seo->updated_at ?? '');
 
             $metaTwitter
-                ->setTitle($seo->title)
-                ->setDescription($seo->description);
+                ->setTitle($seo->title ?? '')
+                ->setDescription($seo->description ?? '');
 
             if ($seo->image_url) {
                 $metaTwitter
@@ -236,9 +236,9 @@ class FrontendPageServiceProvider extends ServiceProvider
 
 
             $this
-                ->setTitle($seo->title)
-                ->setDescription($seo->description)
-                ->setKeywords($seo->keywords)
+                ->setTitle($seo->title ?? '')
+                ->setDescription($seo->description ?? '')
+                ->setKeywords($seo->keywords ?? '')
                 ->registerPackage($metaOg)
                 //->setCanonical($article->uri)
                 ->registerPackage($metaTwitter);
