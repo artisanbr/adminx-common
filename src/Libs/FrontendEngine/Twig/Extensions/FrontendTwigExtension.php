@@ -20,6 +20,7 @@ use Adminx\Common\Models\Templates\Template;
 use Adminx\Common\Models\Widgets\SiteWidget;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -90,6 +91,7 @@ class FrontendTwigExtension extends AbstractExtension
             //Todo: formRender e formRenderAjax
             new TwigFunction('form', $this->form(...), ['needs_context' => true]),
             new TwigFunction('f', $this->form(...), ['needs_context' => true]),
+            new TwigFunction('captcha', $this->captcha(...), ['needs_context' => true]),
 
             new TwigFunction('menu', $this->menu(...), ['needs_context' => true]),
             new TwigFunction('m', $this->menu(...), ['needs_context' => true]),
@@ -251,6 +253,27 @@ class FrontendTwigExtension extends AbstractExtension
 
 
         return $this->currentSiteWidget->content->html;
+
+    }
+
+    public function captcha($context, string $form_slug): string
+    {
+
+        //Não foi o ultimo utilizado, Verificar no cache
+        $currentForm = $this->currentSite->forms()->where('public_id', $form_slug)->orWhere('slug', $form_slug)->first();
+
+        //Se não encontrar parar aqui.
+        if (!$currentForm) {
+            return "Formulário '{$form_slug}' não encontrado";
+        }
+
+
+        $siteKey = $currentForm->config->captcha->keys->get('site_key') ??  $currentForm->site->config->recaptcha_site_key;
+
+
+        return Blade::render('<x-common::recaptcha-v2 :site-key="$siteKey"/>', [
+            'siteKey' => $siteKey
+        ]);
 
     }
 
@@ -416,24 +439,24 @@ class FrontendTwigExtension extends AbstractExtension
 
         //dd($result->append(['url', 'uri'])->withoutRelationships());
 
-            $result = $result->append(['url'])->map(function (Category $category): Category {
+        $result = $result->append(['url'])->map(function (Category $category): Category {
 
 
-                //return $category->withoutRelations();
+            //return $category->withoutRelations();
 
 
-                $categoryData = $category->only(['id','site_id', 'title', 'slug', 'description', 'parent_id','url']);
-                $categoryModel = new Category($categoryData);
+            $categoryData = $category->only(['id','site_id', 'title', 'slug', 'description', 'parent_id','url']);
+            $categoryModel = new Category($categoryData);
 
-                $categoryModel->setAttribute('id', $categoryData['id'] ?? null);
-                $categoryModel->setAttribute('url', $categoryData['url'] ?? null);
-                //$categoryModel->setAttribute('uri', $categoryData['uri'] ?? null);
+            $categoryModel->setAttribute('id', $categoryData['id'] ?? null);
+            $categoryModel->setAttribute('url', $categoryData['url'] ?? null);
+            //$categoryModel->setAttribute('uri', $categoryData['uri'] ?? null);
 
-                return $categoryModel;
-            });
+            return $categoryModel;
+        });
 
 
-            //dd($result);
+        //dd($result);
 
         return $result ?? collect();
 
