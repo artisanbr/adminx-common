@@ -22,17 +22,14 @@
             @endforeach
         </div>
         <div class="row">
+            @if($form->config->captcha->enabled)
             <div class="col-12 col-sm-8">
-                {{--<script>
-                    const verifyCallback_{{$form->id}} = function(response) {
-                        alert(response);
-                    };
-                </script>--}}
-
-                @if($form->config->captcha->enabled)
-                <x-common::recaptcha-v2 :site-key="$form->config->captcha->keys->get('site_key') ??  $form->site->config->recaptcha_site_key"  {{--:callback='"verifyCallback_{$form->id}"'--}}/>
-                @endif
+                        @if($form->config->captcha->type?->is(FormCaptchaType::RecaptchaV2->value))
+                            <x-common::recaptcha-v2
+                                    :site-key="$form->config->captcha->keys->get('site_key') ??  $form->site->config->recaptcha_site_key"/>
+                        @endif
             </div>
+            @endif
             <div class="col-12 col-sm d-flex justify-content-end align-items-end">
                 {{--<button type="submit"
                         class="primary_btn btn btn-primary btn-icon ml-0 ms-auto me-0">
