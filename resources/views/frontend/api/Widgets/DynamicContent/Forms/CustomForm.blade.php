@@ -28,7 +28,10 @@
                         alert(response);
                     };
                 </script>--}}
-                <x-common::recaptcha :site="$form->site" {{--:callback='"verifyCallback_{$form->id}"'--}}/>
+
+                @if($form->config->captcha->enabled)
+                <x-common::recaptcha-v2 :site-key="$form->config->captcha->keys->get('site_key') ??  $form->site->config->recaptcha_site_key"  {{--:callback='"verifyCallback_{$form->id}"'--}}/>
+                @endif
             </div>
             <div class="col-12 col-sm d-flex justify-content-end align-items-end">
                 {{--<button type="submit"

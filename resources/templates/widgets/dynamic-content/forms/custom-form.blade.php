@@ -45,6 +45,7 @@
             @if($form->config->captcha->enabled)
                 <div class="col-12 col-sm-8">
                     @if($form->config->captcha->type?->is(FormCaptchaType::RecaptchaV2->value))
+                        {{--@dump($form->config->captcha, $form->config->captcha->keys->get('site_key'))--}}
                         <x-common::recaptcha-v2
                                 :site-key="$form->config->captcha->keys->get('site_key') ??  $form->site->config->recaptcha_site_key"/>
                     @endif
