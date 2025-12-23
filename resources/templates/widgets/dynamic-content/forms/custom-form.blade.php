@@ -146,7 +146,11 @@
                             // Simulate ajax request
                             //axios.post(url_action, $form.serializeObject())
                             let formData = new FormData($form[0]);
-                            axios.post(url_action, formData).then(function (response) {
+                            axios.post(url_action, formData, {
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest'
+                                }
+                            }).then(function (response) {
 
                                 @if($form->config->on_success ?? false)
                                         {{$form->config->on_success}}(response.data);
