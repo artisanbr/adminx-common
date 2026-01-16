@@ -17,7 +17,7 @@
                 <div
                     class="footer-copyright footer-copyright-3 text-center d-flex align-items-center justify-content-center">
                     <span class="mt-1">
-                        {{ date("Y") }} © <b>{{ $site->title }}</b> — {{ config('common.app.provider.copyright') }}
+                        @{{ "now"|date("Y") }} © <b>@{{ site.title }}</b> — {{ config('common.app.provider.copyright') }}
                     </span>
                     <a href="{{ config('common.app.provider.url') }}" target="_blank" title="Powered by {{ config('common.app.provider.name') }}"
                        class="ms-2 ml-2">
