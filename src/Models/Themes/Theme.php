@@ -227,7 +227,7 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
         $meta->includePackages([$this->meta_pkg_name, 'frontend.pos']);*/
 
         $themeMeta->reset();
-        $themeMeta->addLink('preconnect-cloudflare', [
+        /*$themeMeta->addLink('preconnect-cloudflare', [
             'rel'  => 'preconnect',
             'href' => 'https://cdn.cloudflare.com',
             'crossorigin',
@@ -236,12 +236,12 @@ class Theme extends EloquentModelBase implements PublicIdModel, OwneredModel
             'rel'  => 'preconnect',
             'href' => 'https://cdnjs.cloudflare.com',
             'crossorigin',
-        ]);
+        ]);*/
 
-        $themeMeta->addLink('preconnect-self', [
+        /*$themeMeta->addLink('preconnect-self', [
             'rel'  => 'preconnect',
             'href' => $this->site->uri,
-        ]);
+        ]);*/
 
         $themeMeta->registerFromSiteTheme($this);
         $themeMeta->registerFromSite($this->site);
