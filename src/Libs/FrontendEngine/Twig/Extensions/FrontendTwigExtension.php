@@ -268,8 +268,9 @@ class FrontendTwigExtension extends AbstractExtension
         }
 
 
-        $siteKey = $currentForm->config->captcha->keys->get('site_key') ??  $currentForm->site->config->recaptcha_site_key;
+        $siteKey = $currentForm->config->captcha->keys->get('site_key') ?? $currentForm->site->config->recaptcha_site_key;
 
+        //dd($siteKey);
 
         return Blade::render('<x-common::recaptcha-v2 :site-key="$siteKey"/>', [
             'siteKey' => $siteKey
